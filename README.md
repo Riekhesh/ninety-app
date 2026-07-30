@@ -58,29 +58,35 @@ met, the phase is not done.
 
 ```
 docs/
-  brief.md                      the source brief, distilled and linkable
   decisions/                    ADRs — every locked decision, with its reversal trigger
-  phase-0/                      the live Phase 0 tracker, runbooks and deliverables
-    01-prerequisites.md           hardware and toolchain, with a verification script
-    02-accounts.md                what to buy and when (dev programme is critical path)
-    03-swift-rampup.md            30 days of Swift, mapped onto what Phase 1 needs
+  phase-0/
+    README.md                     the live tracker: exit criteria, critical path, accounts
     04-competitor-teardown.md     measurement protocol + the numbers + 10 differences
     07-spike-findings.md          results of both spikes, written down
-  design/                       the design system: principles, tokens, components, screens
+  design/
+    00-design-principles.md       seven rules, each traceable to the thesis or §10
+    02-components.md              the seven components, with their states
+    04-copy-deck.md               every string, reviewed against the no-punishment rule
   safety/                       §10 turned into rules with numbers and test names
   security/secrets.md           where every secret lives, and why none is in the app
 
 design/
   tokens/notch.tokens.json      single source of truth for the design system
-  tokens/generate.py            → Swift, CSS and a Figma-importable file
-  preview/                      the interactive design system page
+  tokens/generate.py            → Swift + CSS, and validates contrast against WCAG AA
+  generated/                    DO NOT EDIT — regenerate from the tokens
+  preview/design-system.html    the interactive design system page
+  preview/claude-design-brief.md a compact block to paste into Claude and iterate on screens
 
 spikes/                         THROWAWAY. De-risking only — never promoted into the app
   healthkit/                    Spike A — read 30 days of real data on a real device
   vision-accuracy/              Spike B — measure photo-estimate error over 20 real meals
 
-scripts/                        toolchain verification and small helpers
+scripts/verify-toolchain.sh     checks macOS, Xcode, disk, device, CLI tools, repo setup
 ```
+
+The brief itself is not in the repo — it is the source PDF. Its locked decisions are
+in [`docs/decisions/`](docs/decisions/), and every doc here cites the section it came
+from (`§0.7`, `§2.3`) so a claim can be traced back.
 
 Nothing in `Notch/` or `Packages/` yet, deliberately. **Phase 0 is not a build
 phase.**
@@ -136,6 +142,21 @@ brew install swiftlint
 key.** The short version: no API key ever enters the app bundle or this repo, and
 because Supabase's anon key is public by design, Row-Level Security is the *only*
 thing protecting user health data — not a defence-in-depth nicety.
+
+---
+
+## Working on the design
+
+The token system is real code: `design/tokens/notch.tokens.json` is the single source
+of truth, and `python3 design/tokens/generate.py` emits the Swift and CSS **and fails
+the build if any text-on-surface pair drops below WCAG AA**. It caught three genuine
+contrast failures in its first run.
+
+To iterate on screens conversationally, paste
+[`design/preview/claude-design-brief.md`](design/preview/claude-design-brief.md) into a
+fresh Claude chat — it's a compact, self-contained version of the tokens, the seven
+rules, the copy rules and all six screens. Bring anything you land back into the
+tokens file and regenerate.
 
 ---
 

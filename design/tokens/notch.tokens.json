@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "direction": "Quiet premium, dark-first (ADR 0011)",
     "contrastPolicy": "Every text-on-surface pair below carries its measured WCAG 2.1 contrast ratio. Text tokens meet AA (4.5:1) at body size; tokens that do not are named and scoped explicitly.",
-    "colourBudget": "Tier metals are the only saturated colour in the product. Semantic colours are rationed to state, safety, and destruction. See docs/design/01-tokens.md."
+    "colourBudget": "Tier metals are the only saturated colour in the product. Semantic colours are rationed to state, safety, and destruction. See docs/design/00-design-principles.md (principle 2)."
   },
 
   "theme": {
