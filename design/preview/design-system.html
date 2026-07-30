@@ -1,0 +1,1212 @@
+<title>Notch — Design System</title>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOKENS — mirrored from design/generated/tokens.generated.css
+   Source of truth is design/tokens/notch.tokens.json. If you edit tokens, run
+   `python3 design/tokens/generate.py` and re-sync the block between the
+   BEGIN/END markers below.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ==== BEGIN GENERATED TOKENS ==== */
+:root {
+  --c-canvas:#FBFAF7; --c-surface:#FFFFFF; --c-surface-raised:#FFFFFF; --c-surface-sunken:#F2F0EB;
+  --c-stroke:#E5E2DB; --c-stroke-strong:#CFCBC1;
+  --c-text-primary:#17150F; --c-text-secondary:#5C574D; --c-text-tertiary:#767063;
+  --c-text-disabled:#ADA79B; --c-text-inverse:#FBFAF7;
+  --c-accent:#3B5BDB; --c-accent-pressed:#2F4BC0; --c-accent-subtle:#EDF0FD;
+  --c-positive:#1E8A5F; --c-safety:#A66A00; --c-critical:#B4341A;
+  --c-chart-line:#17150F; --c-chart-baseline:#9A9488; --c-chart-band:#E6F2EB;
+  --c-chart-grid:#EFEDE7; --c-chart-raw:#CFCBC1;
+  --tier-bronze:#9A5F2E; --tier-silver:#6E747E; --tier-gold:#A8781A;
+  --tier-platinum:#7C8794; --tier-diamond:#1F7F96;
+
+  --spa-hair:2px; --spa-xs:4px; --spa-sm:8px; --spa-md:12px; --spa-lg:16px;
+  --spa-xl:20px; --spa-xxl:24px; --spa-xxxl:32px; --spa-huge:48px; --spa-vast:64px;
+  --rad-none:0px; --rad-sm:8px; --rad-md:12px; --rad-lg:16px; --rad-xl:24px; --rad-full:999px;
+  --bor-hairline:1px; --bor-focus:2px;
+  --dur-instant:120ms; --dur-fast:200ms; --dur-base:300ms; --dur-reveal:900ms;
+  --ease-standard:cubic-bezier(0.32,0.72,0,1); --ease-reveal:cubic-bezier(0.16,1,0.3,1);
+}
+@media (prefers-color-scheme:dark){:root{
+  --c-canvas:#0C0B0A; --c-surface:#171614; --c-surface-raised:#201E1B; --c-surface-sunken:#070606;
+  --c-stroke:#2C2A26; --c-stroke-strong:#3D3A34;
+  --c-text-primary:#F6F4F1; --c-text-secondary:#A8A29A; --c-text-tertiary:#8A8479;
+  --c-text-disabled:#5A554D; --c-text-inverse:#0C0B0A;
+  --c-accent:#7C9EFF; --c-accent-pressed:#6B8BEE; --c-accent-subtle:#181B26;
+  --c-positive:#4FBF8B; --c-safety:#E2A03F; --c-critical:#E5674E;
+  --c-chart-line:#F6F4F1; --c-chart-baseline:#6E6960; --c-chart-band:#1E2A24;
+  --c-chart-grid:#221F1C; --c-chart-raw:#3D3A34;
+  --tier-bronze:#C8834E; --tier-silver:#C3C7CE; --tier-gold:#E7B23C;
+  --tier-platinum:#E3EAF0; --tier-diamond:#8AE0F2;
+}}
+:root[data-theme="dark"]{
+  --c-canvas:#0C0B0A; --c-surface:#171614; --c-surface-raised:#201E1B; --c-surface-sunken:#070606;
+  --c-stroke:#2C2A26; --c-stroke-strong:#3D3A34;
+  --c-text-primary:#F6F4F1; --c-text-secondary:#A8A29A; --c-text-tertiary:#8A8479;
+  --c-text-disabled:#5A554D; --c-text-inverse:#0C0B0A;
+  --c-accent:#7C9EFF; --c-accent-pressed:#6B8BEE; --c-accent-subtle:#181B26;
+  --c-positive:#4FBF8B; --c-safety:#E2A03F; --c-critical:#E5674E;
+  --c-chart-line:#F6F4F1; --c-chart-baseline:#6E6960; --c-chart-band:#1E2A24;
+  --c-chart-grid:#221F1C; --c-chart-raw:#3D3A34;
+  --tier-bronze:#C8834E; --tier-silver:#C3C7CE; --tier-gold:#E7B23C;
+  --tier-platinum:#E3EAF0; --tier-diamond:#8AE0F2;
+}
+:root[data-theme="light"]{
+  --c-canvas:#FBFAF7; --c-surface:#FFFFFF; --c-surface-raised:#FFFFFF; --c-surface-sunken:#F2F0EB;
+  --c-stroke:#E5E2DB; --c-stroke-strong:#CFCBC1;
+  --c-text-primary:#17150F; --c-text-secondary:#5C574D; --c-text-tertiary:#767063;
+  --c-text-disabled:#ADA79B; --c-text-inverse:#FBFAF7;
+  --c-accent:#3B5BDB; --c-accent-pressed:#2F4BC0; --c-accent-subtle:#EDF0FD;
+  --c-positive:#1E8A5F; --c-safety:#A66A00; --c-critical:#B4341A;
+  --c-chart-line:#17150F; --c-chart-baseline:#9A9488; --c-chart-band:#E6F2EB;
+  --c-chart-grid:#EFEDE7; --c-chart-raw:#CFCBC1;
+  --tier-bronze:#9A5F2E; --tier-silver:#6E747E; --tier-gold:#A8781A;
+  --tier-platinum:#7C8794; --tier-diamond:#1F7F96;
+}
+/* ==== END GENERATED TOKENS ==== */
+
+/* ═══ Page chrome ═══════════════════════════════════════════════════════════
+   The DOCUMENT speaks in serif; the PRODUCT speaks in sans. Everything inside
+   a device frame uses the system sans stack (what the app actually renders in);
+   the spec's own voice is set in a serif so the two are never confused.
+   ═════════════════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --doc-serif:ui-serif,Georgia,"Iowan Old Style","Times New Roman",serif;
+  --doc-sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --doc-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --measure:66ch;
+  color-scheme:light dark;
+}
+body{
+  margin:0;background:var(--c-canvas);color:var(--c-text-primary);
+  font:400 17px/1.6 var(--doc-sans);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--doc-serif);font-weight:600;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:var(--c-accent)}
+code,.mono{font-family:var(--doc-mono);font-size:0.86em}
+
+.wrap{max-width:1140px;margin:0 auto;padding:0 var(--spa-xxl)}
+
+/* ── Masthead ── */
+.mast{padding:var(--spa-vast) 0 var(--spa-xxxl);border-bottom:1px solid var(--c-stroke)}
+.mast-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--spa-xxl);flex-wrap:wrap}
+.wordmark{display:flex;align-items:center;gap:var(--spa-md);font-family:var(--doc-sans);
+  font-weight:700;font-size:30px;letter-spacing:0.16em;text-transform:uppercase}
+.mast h1{font-size:clamp(30px,4.6vw,52px);line-height:1.1;letter-spacing:-0.02em;
+  max-width:22ch;margin:var(--spa-xxl) 0 var(--spa-lg)}
+.mast .thesis{font-family:var(--doc-serif);font-style:italic;font-size:19px;
+  color:var(--c-text-secondary);max-width:52ch}
+.mast-meta{display:flex;gap:var(--spa-xxl);flex-wrap:wrap;margin-top:var(--spa-xxxl);
+  padding-top:var(--spa-xl);border-top:1px solid var(--c-stroke)}
+.mast-meta div{min-width:0}
+.eyebrow{font:600 11px/1.3 var(--doc-sans);letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--c-text-tertiary)}
+.mast-meta strong{display:block;font:600 15px/1.4 var(--doc-sans);margin-top:4px}
+
+/* ── Theme toggle ── */
+.toggle{display:inline-flex;background:var(--c-surface-sunken);border:1px solid var(--c-stroke);
+  border-radius:var(--rad-full);padding:3px;gap:2px;flex:0 0 auto}
+.toggle button{appearance:none;border:0;background:transparent;color:var(--c-text-secondary);
+  font:600 12px/1 var(--doc-sans);letter-spacing:0.06em;text-transform:uppercase;
+  padding:9px 15px;border-radius:var(--rad-full);cursor:pointer;
+  transition:background var(--dur-instant) var(--ease-standard),color var(--dur-instant)}
+.toggle button[aria-pressed="true"]{background:var(--c-surface);color:var(--c-text-primary);
+  box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+.toggle button:focus-visible{outline:var(--bor-focus) solid var(--c-accent);outline-offset:2px}
+
+/* ── Section rhythm. The structural device is the notch: a section's rule is
+      notched, echoing the tier badge. Not decoration — it's the product's own
+      primitive doing the document's typography. ── */
+section{padding:var(--spa-vast) 0;border-bottom:1px solid var(--c-stroke)}
+.sec-head{display:flex;align-items:baseline;gap:var(--spa-lg);margin-bottom:var(--spa-sm)}
+.notch-mark{display:inline-flex;gap:3px;flex:0 0 auto;padding-bottom:5px}
+.notch-mark i{display:block;width:3px;height:15px;background:var(--c-text-primary);border-radius:1px}
+section h2{font-size:clamp(24px,3vw,34px);letter-spacing:-0.015em}
+.sec-lede{color:var(--c-text-secondary);max-width:var(--measure);margin-bottom:var(--spa-xxxl)}
+.sec-lede em{font-family:var(--doc-serif);color:var(--c-text-primary)}
+
+/* ── Generic grid ── */
+.grid{display:grid;gap:var(--spa-lg)}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--c-surface);border:1px solid var(--c-stroke);border-radius:var(--rad-lg);
+  padding:var(--spa-xl)}
+.card h3{font-family:var(--doc-sans);font-size:16px;letter-spacing:-0.005em;margin-bottom:var(--spa-sm)}
+.card p{font-size:15px;line-height:1.55;color:var(--c-text-secondary)}
+.card .test{margin-top:var(--spa-md);padding-top:var(--spa-md);border-top:1px dashed var(--c-stroke);
+  font-size:13.5px;color:var(--c-text-tertiary)}
+.card .test b{color:var(--c-text-secondary);font-weight:600}
+
+/* ── Swatches ── */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:var(--spa-md)}
+.sw{border:1px solid var(--c-stroke);border-radius:var(--rad-md);overflow:hidden;
+  background:var(--c-surface)}
+.sw-chip{height:74px;display:flex;align-items:flex-end;padding:var(--spa-sm)}
+.sw-chip span{font:600 12px/1 var(--doc-mono)}
+.sw-body{padding:var(--spa-sm) var(--spa-md) var(--spa-md)}
+.sw-name{font:600 13px/1.3 var(--doc-sans)}
+.sw-hex{font-family:var(--doc-mono);font-size:11.5px;color:var(--c-text-tertiary);margin-top:2px}
+.ratio{display:inline-flex;align-items:center;gap:5px;margin-top:var(--spa-sm);
+  font:600 11px/1 var(--doc-mono);padding:4px 7px;border-radius:var(--rad-sm);
+  background:var(--c-surface-sunken);color:var(--c-text-secondary)}
+.ratio.pass{color:var(--c-positive)}
+.ratio.large{color:var(--c-safety)}
+
+/* ── Tier rail ── */
+.tier-rail{display:flex;gap:var(--spa-xl);flex-wrap:wrap;align-items:flex-end}
+.tier-item{text-align:center;flex:1 1 130px;min-width:110px}
+.tier-item svg{display:block;margin:0 auto var(--spa-md)}
+.tier-item .tname{font:600 15px/1.2 var(--doc-sans)}
+.tier-item .tcount{font-family:var(--doc-mono);font-size:11.5px;color:var(--c-text-tertiary);margin-top:3px}
+.tier-item .tdesc{font-size:12.5px;color:var(--c-text-secondary);margin-top:var(--spa-xs)}
+
+/* ── Type specimen ── */
+.spec-row{display:grid;grid-template-columns:minmax(120px,150px) 1fr;gap:var(--spa-xl);
+  padding:var(--spa-lg) 0;border-bottom:1px solid var(--c-stroke);align-items:baseline}
+.spec-row:last-child{border-bottom:0}
+.spec-meta{font-family:var(--doc-mono);font-size:11.5px;color:var(--c-text-tertiary);line-height:1.6}
+.spec-meta b{display:block;color:var(--c-text-primary);font-family:var(--doc-sans);
+  font-size:13px;font-weight:600;margin-bottom:3px}
+.spec-sample{font-family:var(--doc-sans);color:var(--c-text-primary);min-width:0;overflow-wrap:anywhere}
+.tab{font-variant-numeric:tabular-nums}
+
+/* ── Scales ── */
+.scale-row{display:flex;align-items:center;gap:var(--spa-lg);padding:7px 0}
+.scale-row .lbl{font-family:var(--doc-mono);font-size:11.5px;color:var(--c-text-tertiary);
+  width:96px;flex:0 0 auto}
+.scale-row .bar{height:14px;background:var(--c-accent);border-radius:3px}
+.rad-demo{display:flex;gap:var(--spa-lg);flex-wrap:wrap}
+.rad-demo div{width:78px;height:78px;background:var(--c-accent-subtle);
+  border:1px solid var(--c-accent);display:grid;place-items:center;
+  font-family:var(--doc-mono);font-size:11px;color:var(--c-accent)}
+
+/* ── Component demos ── */
+.demo{background:var(--c-surface-sunken);border:1px solid var(--c-stroke);
+  border-radius:var(--rad-lg);padding:var(--spa-xl);font-family:var(--doc-sans)}
+.demo-label{font:600 11px/1.3 var(--doc-sans);letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--c-text-tertiary);margin-bottom:var(--spa-lg)}
+.btn{appearance:none;font:600 17px/1 var(--doc-sans);border-radius:var(--rad-full);
+  padding:16px var(--spa-xxl);border:0;cursor:pointer;transition:transform var(--dur-instant) var(--ease-standard)}
+.btn:active{transform:scale(.98)}
+.btn-pri{background:var(--c-accent);color:var(--c-text-inverse)}
+.btn-sec{background:var(--c-surface);color:var(--c-text-primary);border:1px solid var(--c-stroke)}
+.btn-plain{background:transparent;color:var(--c-accent);padding:16px var(--spa-sm)}
+.btn-dis{background:var(--c-accent);color:var(--c-text-inverse);opacity:.4;cursor:not-allowed}
+.btn:focus-visible{outline:var(--bor-focus) solid var(--c-accent);outline-offset:3px}
+.btn-row{display:flex;gap:var(--spa-md);flex-wrap:wrap;align-items:center}
+
+.field{max-width:340px}
+.field label{display:block;font:600 11px/1.3 var(--doc-sans);letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--c-text-tertiary);margin-bottom:var(--spa-sm)}
+.field .inp{background:var(--c-surface-sunken);border:1px solid var(--c-stroke-strong);
+  border-radius:var(--rad-md);padding:15px var(--spa-md);font-size:17px;
+  display:flex;justify-content:space-between;gap:var(--spa-sm)}
+.field.focus .inp{border-color:var(--c-accent);border-width:var(--bor-focus);padding:14px 11px}
+.field.warn .inp{border-color:var(--c-safety)}
+.field .msg{font-size:13px;margin-top:var(--spa-sm);color:var(--c-safety);line-height:1.45}
+.field .unit{color:var(--c-text-tertiary)}
+
+.frow{display:flex;align-items:center;gap:var(--spa-md);padding:var(--spa-md) 0;
+  border-bottom:1px solid var(--c-stroke)}
+.frow:last-child{border-bottom:0}
+.frow .fmain{flex:1;min-width:0}
+.frow .fname{font:600 17px/1.3 var(--doc-sans)}
+.frow .fsub{font-size:15px;color:var(--c-text-secondary);margin-top:2px}
+.frow .fkcal{font:600 17px/1.2 var(--doc-sans);text-align:right;flex:0 0 auto}
+.frow .fkcal small{display:block;font-weight:400;font-size:12px;color:var(--c-text-tertiary)}
+.chip{display:inline-block;font:600 10px/1 var(--doc-sans);letter-spacing:0.09em;
+  text-transform:uppercase;padding:4px 7px;border-radius:var(--rad-sm);
+  background:var(--c-surface-sunken);color:var(--c-text-tertiary);border:1px solid var(--c-stroke)}
+.chip.pos{color:var(--c-positive)}
+.chip.warn{color:var(--c-safety)}
+
+.stat{background:var(--c-surface);border:1px solid var(--c-stroke);border-radius:var(--rad-lg);
+  padding:var(--spa-lg)}
+.stat .sl{font:600 11px/1.3 var(--doc-sans);letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--c-text-tertiary)}
+.stat .sv{font:600 40px/1.1 var(--doc-sans);letter-spacing:-0.02em;margin:var(--spa-md) 0 var(--spa-xs)}
+.stat .sc{font-size:13px;color:var(--c-text-secondary)}
+.bandbar{height:9px;border-radius:var(--rad-full);background:var(--c-surface-sunken);
+  margin-top:var(--spa-md);position:relative;overflow:hidden}
+.bandbar .zone{position:absolute;inset:0 auto 0 44%;width:26%;background:var(--c-chart-band)}
+.bandbar .now{position:absolute;top:-3px;bottom:-3px;left:56%;width:3px;
+  background:var(--c-positive);border-radius:2px}
+
+.ringwrap{display:flex;align-items:center;gap:var(--spa-xxl);flex-wrap:wrap}
+.ringctl{font-size:14px;color:var(--c-text-secondary)}
+.ringctl input{width:170px;accent-color:var(--c-accent);display:block;margin-top:var(--spa-sm)}
+
+/* ── Device frames ── */
+.rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(292px,1fr));gap:var(--spa-xxl)}
+.screen{min-width:0}
+.screen-head{display:flex;align-items:baseline;gap:var(--spa-md);margin-bottom:var(--spa-md)}
+.screen-num{font:600 12px/1 var(--doc-mono);color:var(--c-text-inverse);
+  background:var(--c-text-primary);border-radius:var(--rad-full);
+  width:24px;height:24px;display:grid;place-items:center;flex:0 0 auto}
+.screen-head h3{font-family:var(--doc-sans);font-size:16px}
+.screen-note{font-size:13.5px;color:var(--c-text-secondary);line-height:1.55;margin-bottom:var(--spa-md)}
+.screen-note b{color:var(--c-text-primary);font-weight:600}
+
+.phone{background:var(--c-surface);border:1px solid var(--c-stroke-strong);
+  border-radius:34px;padding:9px;box-shadow:0 12px 34px rgb(0 0 0 / .14)}
+.phone-in{background:var(--c-canvas);border-radius:26px;overflow:hidden;
+  aspect-ratio:393/852;display:flex;flex-direction:column;font-family:var(--doc-sans)}
+.island{height:26px;display:grid;place-items:center;flex:0 0 auto}
+.island i{display:block;width:76px;height:19px;background:var(--c-text-primary);
+  opacity:.9;border-radius:var(--rad-full)}
+.vp{flex:1;overflow:hidden;padding:var(--spa-md) var(--spa-lg);display:flex;
+  flex-direction:column;gap:var(--spa-md);min-height:0}
+.tabbar{flex:0 0 auto;height:52px;border-top:1px solid var(--c-stroke);
+  display:grid;grid-template-columns:repeat(3,1fr);align-items:center;text-align:center}
+.tabbar span{font:600 10px/1.2 var(--doc-sans);color:var(--c-text-tertiary)}
+.tabbar span.on{color:var(--c-accent)}
+
+/* WIREFRAME mode — deliberately low fidelity (§0.5: six wireframes, ONE hero) */
+.wf .vp{gap:var(--spa-sm)}
+.wf .box{border:1.5px dashed var(--c-stroke-strong);border-radius:var(--rad-sm);
+  padding:var(--spa-sm) var(--spa-md);color:var(--c-text-secondary);font-size:12px;line-height:1.4}
+.wf .box b{display:block;color:var(--c-text-primary);font-size:12.5px;font-weight:600}
+.wf .solid{border-style:solid}
+.wf .fill{background:var(--c-surface-sunken);border-style:solid}
+.wf .cta{background:var(--c-text-primary);color:var(--c-canvas);border:0;text-align:center;
+  padding:11px;border-radius:var(--rad-full);font-weight:600;font-size:12.5px}
+.wf .ph{background:repeating-linear-gradient(135deg,var(--c-stroke) 0 6px,transparent 6px 12px);
+  border:1.5px solid var(--c-stroke-strong);border-radius:var(--rad-sm);
+  display:grid;place-items:center;font-size:11px;color:var(--c-text-tertiary);min-height:52px}
+.wf .row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--spa-sm)}
+.wf .taps{margin-top:auto;font-family:var(--doc-mono);font-size:10.5px;
+  color:var(--c-text-tertiary);border-top:1px dashed var(--c-stroke);padding-top:var(--spa-sm)}
+
+/* ── HERO: the rank screen, full fidelity ── */
+.hero-stage{display:grid;grid-template-columns:minmax(280px,340px) 1fr;gap:var(--spa-huge);
+  align-items:start}
+.hero-phone .phone-in{background:var(--c-canvas)}
+.hero-vp{flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:var(--spa-sm) var(--spa-lg) 0;min-height:0;overflow:hidden}
+.hero-eyebrow{font:600 11px/1.3 var(--doc-sans);letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--c-text-tertiary);margin-top:var(--spa-sm)}
+.hero-badge{margin:var(--spa-md) 0 var(--spa-sm)}
+.hero-tier{font:600 36px/1 var(--doc-sans);letter-spacing:-0.02em}
+.hero-move{font-size:15px;color:var(--c-positive);margin-top:6px;font-weight:600}
+.hero-score{font:600 56px/1 var(--doc-sans);letter-spacing:-0.04em;
+  font-variant-numeric:tabular-nums;margin-top:var(--spa-md)}
+.hero-score-l{font:600 11px/1.3 var(--doc-sans);letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--c-text-tertiary);margin-top:var(--spa-sm)}
+.brk{width:100%;margin-top:var(--spa-lg);display:flex;flex-direction:column;gap:6px}
+.brk-row{display:grid;grid-template-columns:1fr auto;gap:var(--spa-sm);align-items:center;
+  padding-bottom:6px;border-bottom:1px solid var(--c-stroke)}
+.brk-row:last-child{border-bottom:0}
+.brk-l{font:600 10.5px/1.3 var(--doc-sans);letter-spacing:0.09em;text-transform:uppercase;
+  color:var(--c-text-tertiary)}
+.brk-d{font-size:12.5px;color:var(--c-text-secondary);margin-top:3px}
+.brk-v{font:600 17px/1 var(--doc-sans);font-variant-numeric:tabular-nums}
+.brk-w{width:100%;height:4px;background:var(--c-surface-sunken);border-radius:2px;
+  margin-top:6px;overflow:hidden}
+.brk-w i{display:block;height:100%;background:var(--c-text-secondary);border-radius:2px}
+.hero-next{width:100%;background:var(--c-surface);border:1px solid var(--c-stroke);
+  border-radius:var(--rad-md);padding:var(--spa-sm) var(--spa-md);margin-top:var(--spa-md);
+  margin-bottom:var(--spa-md);font-size:12.5px;line-height:1.4;color:var(--c-text-secondary)}
+.hero-next b{color:var(--c-text-primary);font-weight:600}
+
+.callouts{display:flex;flex-direction:column;gap:var(--spa-lg)}
+.callout{display:grid;grid-template-columns:26px 1fr;gap:var(--spa-md);align-items:start}
+.callout .n{width:26px;height:26px;border-radius:var(--rad-full);background:var(--c-accent-subtle);
+  border:1px solid var(--c-accent);color:var(--c-accent);display:grid;place-items:center;
+  font:600 12px/1 var(--doc-mono)}
+.callout h4{font:600 15px/1.35 var(--doc-sans);margin:3px 0 4px}
+.callout p{font-size:14.5px;line-height:1.55;color:var(--c-text-secondary)}
+.reveal-btn{margin-top:var(--spa-xl)}
+
+/* Reveal animation — the ONE place the motion budget opens up */
+@keyframes badgePop{
+  0%{transform:scale(.9);opacity:0}
+  60%{opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes notchIn{from{opacity:0}to{opacity:1}}
+.playing .hero-badge{animation:badgePop var(--dur-reveal) var(--ease-reveal) both}
+.playing .nslot{animation:notchIn var(--dur-fast) linear both}
+@media (prefers-reduced-motion:reduce){
+  .playing .hero-badge,.playing .nslot{animation:none}
+  *{transition-duration:1ms!important}
+}
+
+/* ── Tables ── */
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14.5px}
+th,td{text-align:left;padding:var(--spa-md) var(--spa-lg) var(--spa-md) 0;
+  border-bottom:1px solid var(--c-stroke);vertical-align:top;line-height:1.5}
+th{font:600 11px/1.3 var(--doc-sans);letter-spacing:0.09em;text-transform:uppercase;
+  color:var(--c-text-tertiary)}
+td.no{color:var(--c-text-tertiary);text-decoration:line-through;text-decoration-color:var(--c-critical)}
+td.yes{color:var(--c-text-primary);font-weight:600}
+
+.note{background:var(--c-surface);border-left:3px solid var(--c-accent);
+  border-radius:0 var(--rad-md) var(--rad-md) 0;padding:var(--spa-lg) var(--spa-xl);
+  max-width:var(--measure);font-size:15px;line-height:1.6;color:var(--c-text-secondary)}
+.note b{color:var(--c-text-primary)}
+
+footer{padding:var(--spa-huge) 0 var(--spa-vast);color:var(--c-text-tertiary);font-size:14px}
+footer p{max-width:var(--measure);line-height:1.6}
+
+@media (max-width:820px){
+  .hero-stage{grid-template-columns:1fr}
+  .spec-row{grid-template-columns:1fr;gap:var(--spa-sm)}
+  .wrap{padding:0 var(--spa-lg)}
+}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="mast-top">
+    <div class="wordmark">
+      <svg width="30" height="34" viewBox="0 0 100 120" aria-hidden="true">
+        <mask id="wm"><rect width="100" height="120" fill="#fff"/>
+          <rect x="35.5" y="-4" width="9" height="30" rx="3" fill="#000"/>
+          <rect x="50.5" y="-4" width="9" height="30" rx="3" fill="#000"/>
+        </mask>
+        <path d="M8 6h84a4 4 0 0 1 4 4v58L50 114 4 68V10a4 4 0 0 1 4-4Z"
+              fill="currentColor" mask="url(#wm)"/>
+      </svg>
+      Notch
+    </div>
+    <div class="toggle" role="group" aria-label="Preview theme">
+      <button type="button" data-theme-set="dark" aria-pressed="true">Dark</button>
+      <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
+    </div>
+  </div>
+
+  <h1>A design system with a colour budget.</h1>
+  <p class="thesis">Every fitness app compares you to other people. This one compares you to
+  who you were last month — and ranks you on that.</p>
+
+  <div class="mast-meta">
+    <div><span class="eyebrow">Phase</span><strong>0 · Foundations</strong></div>
+    <div><span class="eyebrow">Direction</span><strong>Quiet premium, dark-first</strong></div>
+    <div><span class="eyebrow">Source of truth</span><strong class="mono">notch.tokens.json</strong></div>
+    <div><span class="eyebrow">Screens</span><strong>6 wireframes · 1 hero</strong></div>
+  </div>
+</header>
+
+<!-- ═══ PRINCIPLES ═══ -->
+<section id="principles">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i></span>
+    <h2>Seven rules</h2>
+  </div>
+  <p class="sec-lede">Each one traces to the cover thesis or to §10, and each is
+  <em>falsifiable</em> — you can look at a screen and say whether it holds. The failure mode
+  the brief warns about is designing screens you never build, so the effort goes into rules,
+  which survive into code.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3>1 · The baseline is always on screen</h3>
+      <p>No number appears alone. Every metric sits next to what it was, and every chart draws
+      a reference line for the user's own four-week baseline. The <code>chartBaseline</code>
+      token exists for exactly one purpose: drawing "you, four weeks ago."</p>
+      <p class="test"><b>Test:</b> point at any number. Can you tell if it's better or worse
+      than the user's own past, without tapping?</p>
+    </div>
+    <div class="card">
+      <h3>2 · Quiet by default, loud once a week</h3>
+      <p>Attention is a budget, spent almost entirely on the weekly rank-up. Saturated colour
+      is rationed to the tier metals. Motion over 0.3s is rationed to one reveal. 56pt type
+      appears once per app.</p>
+      <p class="test"><b>Test:</b> screenshot Today and Rank side by side. Is Rank obviously
+      the more important one, without reading a word?</p>
+    </div>
+    <div class="card">
+      <h3>3 · Ranges, not points</h3>
+      <p>Calorie targets are bands. Photo estimates are ranges with confidence. Weight is a
+      7-day average, because raw daily weight is mostly water and glycogen — showing it as the
+      headline is noise presented as signal.</p>
+      <p class="test"><b>Test:</b> is there a single precise number anywhere the underlying
+      data can't support one?</p>
+    </div>
+    <div class="card">
+      <h3>4 · Regression is a reset, never a failure</h3>
+      <p>There is deliberately <b>no error colour for logged intake</b>. Going above your band
+      is not an error, it's Tuesday. A designer reaching for "the red one" won't find it — the
+      palette offers <code>positive</code>, <code>safety</code>, <code>critical</code>, and
+      nothing in between.</p>
+      <p class="test"><b>Enforced:</b> <code>no_punishment_framing</code>, severity error.</p>
+    </div>
+    <div class="card">
+      <h3>5 · "No data" is a designed state</h3>
+      <p>iOS won't tell you whether HealthKit access was denied — an empty result is
+      indistinguishable from "no data." So both are worded identically, and neither reads as
+      broken. Four states per surface, from the first commit.</p>
+      <p class="test"><b>Test:</b> does any empty state use a warning icon or the word
+      "failed"?</p>
+    </div>
+    <div class="card">
+      <h3>6 · Three tabs. Two taps to log.</h3>
+      <p>Today · Log · Rank. A repeat food logs on tap at its last portion with an undo toast,
+      which is what buys the 2-tap number — the measurable claim against the incumbents.</p>
+      <p class="test"><b>Test:</b> cold open to logged meal. Count the taps. Write it down next
+      to MyFitnessPal's.</p>
+    </div>
+    <div class="card">
+      <h3>7 · The engine is the product</h3>
+      <p>The UI's job is to make the scoring legible, not to decorate it. The rank screen
+      always answers: what's my tier, what moved it, and what's the cheapest thing that would
+      move it next.</p>
+      <p class="test"><b>Test:</b> show it to a stranger. Can they say what would raise their
+      rank?</p>
+    </div>
+    <div class="card" style="border-style:dashed">
+      <h3>Anti-patterns</h3>
+      <p>Red "over budget". Streak-break animations. Confetti on weight loss — it rewards rate,
+      which the engine deliberately caps. Absolute leaderboards. Raw daily weight as the
+      headline. Daily nudges. A fourth tab.</p>
+      <p class="test"><b>Each has a reason, not just a preference.</b> See
+      <code>00-design-principles.md</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COLOUR ═══ -->
+<section id="colour">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i><i></i></span>
+    <h2>Colour, with a budget</h2>
+  </div>
+  <p class="sec-lede">The contrast ratios below are <em>computed on this page</em>, live, against
+  the current theme — not typed in by hand. <code>generate.py</code> runs the same check in CI
+  and fails the build on a regression. It has already caught one: the first tertiary text colour
+  passed on canvas and failed on cards at 4.43:1.</p>
+
+  <h3 style="font-family:var(--doc-sans);font-size:15px;margin-bottom:var(--spa-md)">Neutrals &amp; text</h3>
+  <div class="swatches" id="sw-neutral"></div>
+
+  <h3 style="font-family:var(--doc-sans);font-size:15px;margin:var(--spa-xxxl) 0 var(--spa-md)">Accent &amp; semantic</h3>
+  <div class="swatches" id="sw-semantic"></div>
+
+  <div class="note" style="margin-top:var(--spa-xxxl)">
+    <b>There is no <code>error</code> token, and that is the design.</b> <code>positive</code>
+    means "in your band". <code>safety</code> is reserved for the six §10 interventions —
+    calorie floor, goal-weight BMI, rate ceiling — and is named "safety" rather than "warning"
+    so its scope can't creep. <code>critical</code> is destructive confirmation only. Nothing
+    in the palette can express "you ate too much," because the product does not have that
+    thought.
+  </div>
+</section>
+
+<!-- ═══ TIERS ═══ -->
+<section id="tiers">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+    <h2>The ladder is a count, not a colour</h2>
+  </div>
+  <p class="sec-lede">Any honest rendering of "silver" and "platinum" as metals gives you two
+  light cool greys. And roughly <em>1 in 12 men</em> have some colour vision deficiency, which
+  makes a hue-only ladder unreadable for them. So tier is encoded in the number of notches cut
+  into the badge, with metal colour as the redundant second signal. Both derive from one
+  <code>Tier</code> enum, so they can never disagree.</p>
+
+  <div class="tier-rail" id="tier-rail"></div>
+
+  <div class="note" style="margin-top:var(--spa-xxxl)">
+    <b>The name earns its keep.</b> A notch is a mark you cut to record progress — a tally.
+    It's physical, humble and pre-digital, and it means <em>one more than before</em> rather
+    than <em>a score</em>. That's the thesis in a single image: you're not being measured
+    against a scale, you're accumulating marks against your own past. The same primitive
+    carries the consistency ring below — seven notches, one per day.
+  </div>
+</section>
+
+<!-- ═══ TYPE ═══ -->
+<section id="type">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <h2>Type scale</h2>
+  </div>
+  <p class="sec-lede">Every style binds to an iOS text style so Dynamic Type works without extra
+  code — <em>required</em>, not optional, in a health app. Metric styles use tabular figures so
+  digits don't jitter as a value updates in place.</p>
+
+  <div id="type-spec"></div>
+</section>
+
+<!-- ═══ SCALES ═══ -->
+<section id="scales">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    <h2>Space, radius, motion</h2>
+  </div>
+  <p class="sec-lede">A 4-point grid, six radii, and a motion budget with exactly one
+  exception in it.</p>
+
+  <div class="grid g2">
+    <div>
+      <p class="eyebrow" style="margin-bottom:var(--spa-md)">Spacing</p>
+      <div id="space-scale"></div>
+    </div>
+    <div>
+      <p class="eyebrow" style="margin-bottom:var(--spa-md)">Radius · always continuous curve</p>
+      <div class="rad-demo">
+        <div style="border-radius:8px">sm 8</div>
+        <div style="border-radius:12px">md 12</div>
+        <div style="border-radius:16px">lg 16</div>
+        <div style="border-radius:24px">xl 24</div>
+        <div style="border-radius:999px">full</div>
+      </div>
+      <p class="eyebrow" style="margin:var(--spa-xxl) 0 var(--spa-md)">Motion budget</p>
+      <div class="tbl-scroll">
+        <table style="min-width:0">
+          <tr><td class="mono">instant</td><td>120ms</td><td>press, chip toggle</td></tr>
+          <tr><td class="mono">fast</td><td>200ms</td><td>row insert, toast</td></tr>
+          <tr><td class="mono">base</td><td>300ms</td><td>sheet, tab — the ceiling for everything routine</td></tr>
+          <tr><td class="mono" style="color:var(--tier-gold)">reveal</td><td>900ms</td>
+              <td><b>The rank reveal, and nothing else.</b></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COMPONENTS ═══ -->
+<section id="components">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <h2>Six components, plus one</h2>
+  </div>
+  <p class="sec-lede">The brief caps the set at six and says <em>"That's it."</em> The seventh —
+  the notch ring — is justified: consistency is seven discrete days, and a continuous ring at
+  71% invites the question "which day was the 0.71?"</p>
+
+  <div class="grid g2">
+    <div class="demo">
+      <p class="demo-label">Button · three variants, one primary per screen</p>
+      <div class="btn-row">
+        <button class="btn btn-pri">Log 3 items</button>
+        <button class="btn btn-sec">Not now</button>
+        <button class="btn btn-plain">Add manually</button>
+      </div>
+      <div class="btn-row" style="margin-top:var(--spa-md)">
+        <button class="btn btn-dis" disabled>Continue</button>
+        <span style="font-size:13px;color:var(--c-safety)">Disabled is never the only feedback</span>
+      </div>
+    </div>
+
+    <div class="demo">
+      <p class="demo-label">Text input · note there is no critical state</p>
+      <div class="field warn">
+        <label>Goal weight</label>
+        <div class="inp"><span>54</span><span class="unit">kg</span></div>
+        <p class="msg">That's below the healthy range for your height, which starts at 58 kg.
+        Notch can't set it as a target.</p>
+      </div>
+    </div>
+
+    <div class="demo">
+      <p class="demo-label">Food row · frequents log on tap</p>
+      <div class="frow">
+        <div class="fmain">
+          <div class="fname">Porridge with milk</div>
+          <div class="fsub">Tesco · 250 g</div>
+        </div>
+        <div class="fkcal">320<small>kcal</small></div>
+      </div>
+      <div class="frow">
+        <div class="fmain">
+          <div class="fname">Chicken &amp; rice</div>
+          <div class="fsub">420 g · <span class="chip">photo</span></div>
+        </div>
+        <div class="fkcal">610<small>kcal</small></div>
+      </div>
+      <div class="frow">
+        <div class="fmain">
+          <div class="fname">Banana</div>
+          <div class="fsub">118 g · <span class="chip">locked</span></div>
+        </div>
+        <div class="fkcal">105<small>kcal</small></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--c-text-tertiary);margin-top:var(--spa-md);line-height:1.5">
+        Locked rows state the rule rather than just disabling: <em>"Logs older than 48 hours
+        can't be edited. It keeps scores honest."</em></p>
+    </div>
+
+    <div class="demo">
+      <p class="demo-label">Stat card · the comparison slot is not optional</p>
+      <div class="stat">
+        <div class="sl">Calories remaining</div>
+        <div class="sv tab">340</div>
+        <div class="sc">of 1,750–1,950 band</div>
+        <div class="bandbar"><span class="zone"></span><span class="now"></span></div>
+        <div class="sc" style="margin-top:var(--spa-sm);color:var(--c-positive);font-weight:600">
+          In your band</div>
+      </div>
+    </div>
+
+    <div class="demo" style="grid-column:1/-1">
+      <p class="demo-label">Notch ring · seven segments, because consistency is seven days</p>
+      <div class="ringwrap">
+        <div id="ring-host"></div>
+        <label class="ringctl">Days logged
+          <input type="range" id="ring-slider" min="0" max="7" value="5"
+                 aria-label="Days logged this week">
+        </label>
+        <p style="font-size:14px;color:var(--c-text-secondary);max-width:36ch;line-height:1.55">
+          Missed days are <b>empty</b>, never crossed out and never red — principle 4. Drag the
+          slider: nothing about a low count is styled as damage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WIREFRAMES ═══ -->
+<section id="screens">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <h2>Six screens, deliberately unfinished</h2>
+  </div>
+  <p class="sec-lede">These are wireframes, and they look like wireframes on purpose. The brief
+  caps design at two days and warns about <em>"forty beautiful screens you never build."</em>
+  Structure is the deliverable here; exactly one screen gets full fidelity, and it's the
+  differentiator. The numbering is real — this is the user's actual first-week sequence.</p>
+
+  <div class="rail">
+
+    <!-- 1 -->
+    <div class="screen">
+      <div class="screen-head"><span class="screen-num">1</span><h3>Onboarding · goal &amp; rate</h3></div>
+      <p class="screen-note">Collects only what the engine needs. The <b>safety gate is built
+      in here, not bolted on later</b> — rate ceiling, calorie floor, BMI validation.</p>
+      <div class="phone wf"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="vp">
+          <div class="box"><b>Progress · step 4 of 6</b>▓▓▓▓░░</div>
+          <div class="box solid"><b>What are you aiming for?</b>display type</div>
+          <div class="box fill">◉ Lose weight</div>
+          <div class="box">○ Maintain &nbsp; ○ Gain weight</div>
+          <div class="box"><b>How fast?</b>Steady 0.25 · Moderate 0.5 · Faster 0.75 kg/wk</div>
+          <div class="box solid" style="border-color:var(--c-safety);color:var(--c-safety)">
+            <b>Rate ceiling · safety token</b>"Notch scores the appropriate rate highest, not
+            the fastest one."</div>
+          <div class="box"><b>Your band</b>1,750–1,950 kcal — a band, not a number</div>
+          <div class="cta">Continue</div>
+          <p class="taps">age gate → hard stop, no bypass</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 2 -->
+    <div class="screen">
+      <div class="screen-head"><span class="screen-num">2</span><h3>Today dashboard</h3></div>
+      <p class="screen-note">One screen, five things. Every number carries its comparison; the
+      tier slot is <b>reserved in Phase 1 and filled in Phase 2</b>.</p>
+      <div class="phone wf"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="vp">
+          <div class="box solid"><b>Today</b>no name, no time-of-day greeting</div>
+          <div class="box fill"><b>CALORIES REMAINING</b>340 · of 1,750–1,950 band · in band</div>
+          <div class="row2">
+            <div class="box"><b>CONSISTENCY</b>◍ 5 of 7 days</div>
+            <div class="box"><b>WEIGHT</b>78.4 kg<br>−1.2 kg vs 4 wks</div>
+          </div>
+          <div class="ph">weight trend sparkline + baseline line</div>
+          <div class="box" style="border-color:var(--tier-gold);color:var(--tier-gold)">
+            <b>TIER SLOT</b>"CALIBRATING · 6 days to go"</div>
+          <div class="box"><b>Logged today</b>3 food rows</div>
+          <p class="taps">cold open lands here · 0 taps</p>
+        </div>
+        <div class="tabbar"><span class="on">Today</span><span>Log</span><span>Rank</span></div>
+      </div></div>
+    </div>
+
+    <!-- 3 -->
+    <div class="screen">
+      <div class="screen-head"><span class="screen-num">3</span><h3>Log food · three paths</h3></div>
+      <p class="screen-note">Search, barcode and camera are peers at the top. <b>Frequents log
+      on tap</b> — that single decision is what makes 2 taps possible.</p>
+      <div class="phone wf"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="vp">
+          <div class="box solid">🔍 Search foods or scan a barcode</div>
+          <div class="row2">
+            <div class="box fill" style="text-align:center">▥ Barcode</div>
+            <div class="box fill" style="text-align:center">◉ Photo</div>
+          </div>
+          <div class="box"><b>FREQUENT</b>tap = log at last portion + undo</div>
+          <div class="box solid">Porridge with milk · 250 g · 320</div>
+          <div class="box solid">Chicken &amp; rice · 420 g · 610</div>
+          <div class="box solid">Greek yoghurt · 170 g · 133</div>
+          <div class="box"><b>RECENT</b>3 more rows</div>
+          <p class="taps">tap Log (1) → tap frequent (2) = LOGGED</p>
+        </div>
+        <div class="tabbar"><span>Today</span><span class="on">Log</span><span>Rank</span></div>
+      </div></div>
+    </div>
+
+    <!-- 4 -->
+    <div class="screen">
+      <div class="screen-head"><span class="screen-num">4</span><h3>Photo · confirm &amp; correct</h3></div>
+      <p class="screen-note"><b>Mandatory. Never silently accept an estimate.</b> Ranges and
+      confidence, correction one tap. Every correction is logged — that dataset is a real
+      proprietary asset.</p>
+      <div class="phone wf"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="vp">
+          <div class="ph" style="min-height:74px">meal photo · downscaled to 1024px</div>
+          <div class="box solid"><b>Estimates, not measurements</b>Misses cooking oil, hidden
+          sugar, portion size. Dietitians are 20–30% out; models do worse.</div>
+          <div class="box fill"><b>Porridge with milk</b>200–280 g · 290–390 kcal ·
+            <span class="chip pos">high</span></div>
+          <div class="box fill"><b>Banana</b>90–140 g · 80–125 kcal ·
+            <span class="chip warn">low</span><br>"Notch isn't confident — worth a look."</div>
+          <div class="box">＋ Add a missed item</div>
+          <div class="cta">Log 2 items</div>
+          <p class="taps">correction → photo_estimates.was_corrected</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 5 -->
+    <div class="screen">
+      <div class="screen-head"><span class="screen-num">5</span><h3>Weight &amp; trend</h3></div>
+      <p class="screen-note">7-day average as the headline. Raw dailies exist but are
+      <b>off by default</b> — the jagged line is what makes a good week look like a bad one.</p>
+      <div class="phone wf"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="vp">
+          <div class="box solid"><b>Weight</b>78.4 kg · 7-day average</div>
+          <div class="box" style="border-color:var(--c-positive);color:var(--c-positive)">
+            −1.2 kg vs 4 weeks ago</div>
+          <div class="ph" style="min-height:124px">
+            EWMA line · dashed baseline (4 wks ago) · goal band fill</div>
+          <div class="box">7d · <b>4w</b> · 3m</div>
+          <div class="box">☐ Show daily readings <i>(off)</i></div>
+          <div class="box"><b>Why an average?</b>"Daily weight is mostly water, glycogen and
+          gut content."</div>
+          <div class="cta">Add today's weight</div>
+          <p class="taps">manual entry + HealthKit (smart scales)</p>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- 6 -->
+    <div class="screen">
+      <div class="screen-head"><span class="screen-num">6</span><h3>Rank · structure</h3></div>
+      <p class="screen-note">The wireframe. <b>Full-fidelity version below</b> — it's the App
+      Store screenshot, the portfolio image, and the thing you show people.</p>
+      <div class="phone wf"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="vp">
+          <div class="box">WEEK OF 3 AUGUST</div>
+          <div class="ph" style="min-height:104px">tier badge · 3 notches · hero size 240pt</div>
+          <div class="box solid"><b>Gold</b>Up from Silver</div>
+          <div class="box fill"><b>0.71</b>composite · metricXL, once per app</div>
+          <div class="box"><b>CONSISTENCY · 0.50</b>6 of 7 days → 0.86</div>
+          <div class="box"><b>ADHERENCE · 0.25</b>5 of 7 in band → 0.71</div>
+          <div class="box"><b>PROGRESS · 0.25</b>on your expected curve → 0.52</div>
+          <div class="box solid"><b>Next</b>"One more logged day keeps you there."</div>
+          <p class="taps">weights visible · the engine explains itself</p>
+        </div>
+        <div class="tabbar"><span>Today</span><span>Log</span><span class="on">Rank</span></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <h2>The hero: rank week</h2>
+  </div>
+  <p class="sec-lede">One screen at full fidelity, because it's the differentiator. This is
+  where the whole colour budget gets spent and where the only long animation in the product
+  lives. <em>Press play.</em></p>
+
+  <div class="hero-stage">
+    <div class="hero-phone" id="hero-phone">
+      <div class="phone"><div class="phone-in">
+        <div class="island"><i></i></div>
+        <div class="hero-vp">
+          <div class="hero-eyebrow">Week of 3 August</div>
+          <div class="hero-badge" id="hero-badge"></div>
+          <div class="hero-tier">Gold</div>
+          <div class="hero-move">Up from Silver</div>
+          <div class="hero-score tab">0.71</div>
+          <div class="hero-score-l">Composite score</div>
+
+          <div class="brk">
+            <div class="brk-row">
+              <div>
+                <div class="brk-l">Consistency · weighted 0.50</div>
+                <div class="brk-d">6 of 7 days</div>
+                <div class="brk-w"><i style="width:86%"></i></div>
+              </div>
+              <div class="brk-v">0.86</div>
+            </div>
+            <div class="brk-row">
+              <div>
+                <div class="brk-l">Adherence · weighted 0.25</div>
+                <div class="brk-d">5 of 7 days in band</div>
+                <div class="brk-w"><i style="width:71%"></i></div>
+              </div>
+              <div class="brk-v">0.71</div>
+            </div>
+            <div class="brk-row">
+              <div>
+                <div class="brk-l">Progress · weighted 0.25</div>
+                <div class="brk-d">On your expected curve</div>
+                <div class="brk-w"><i style="width:52%"></i></div>
+              </div>
+              <div class="brk-v">0.52</div>
+            </div>
+          </div>
+
+          <div class="hero-next">
+            <b>Gold holds at 0.65.</b> One more logged day next week keeps you there.
+          </div>
+        </div>
+        <div class="tabbar"><span>Today</span><span>Log</span><span class="on">Rank</span></div>
+      </div></div>
+      <button class="btn btn-sec reveal-btn" id="play" style="width:100%">
+        ▶ Play the reveal
+      </button>
+    </div>
+
+    <div class="callouts">
+      <div class="callout">
+        <span class="n">1</span>
+        <div>
+          <h4>The badge carries the count, not just the metal</h4>
+          <p>Three notches for Gold. At tab-bar size the silhouette still reads as three,
+          which is what makes the ladder legible to someone who can't separate gold from
+          silver by hue. VoiceOver hears <em>"Gold. Tier 3 of 5."</em></p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="n">2</span>
+        <div>
+          <h4>"Up from Silver" — and, on a bad week, "Reset to Silver"</h4>
+          <p>Never <em>dropped</em>, <em>demoted</em>, or <em>lost</em>. All three are in the
+          linter's banned-phrase list at error severity. The reset copy always states the way
+          back: <em>"Gold is four consistent days away."</em></p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="n">3</span>
+        <div>
+          <h4>The weights are on screen</h4>
+          <p>0.50 / 0.25 / 0.25, shown rather than hidden. The decision log accepts that
+          consistency-weighting will feel unresponsive to someone chasing fast results, and
+          specifies mitigating <em>through copy, not by reweighting</em>. Showing the weights
+          is that mitigation — an unresponsive rank becomes a legible one.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="n">4</span>
+        <div>
+          <h4>Next step, always present</h4>
+          <p>The one question the screen must never leave unanswered: what's the cheapest thing
+          that would move this? A rank you can't act on is a rank that feels arbitrary.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="n">5</span>
+        <div>
+          <h4>What isn't here</h4>
+          <p>No confetti — it would reward rate, which the engine deliberately caps for safety.
+          No other user's name or number anywhere. No percentile. Your rank moves only for
+          reasons you caused; that's the thesis, enforced by the screen.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COPY ═══ -->
+<section id="copy">
+  <div class="sec-head">
+    <span class="notch-mark" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <h2>The rewrite rule</h2>
+  </div>
+  <p class="sec-lede">Every string describing a shortfall must answer <em>"what now?"</em>
+  rather than <em>"what went wrong?"</em> State the fact neutrally, then give the next action.
+  "Above your band" is a fact; "over budget" is a judgement that frames food as money you've
+  spent.</p>
+
+  <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Never</th><th>Instead</th></tr></thead>
+      <tbody>
+        <tr><td class="no">You broke your streak</td><td class="yes">Welcome back</td></tr>
+        <tr><td class="no">You lost your Gold tier</td><td class="yes">Reset to Silver. Gold is four consistent days away.</td></tr>
+        <tr><td class="no">You missed 3 days</td><td class="yes">Logged 4 of 7 days</td></tr>
+        <tr><td class="no">340 calories over budget</td><td class="yes">2,190 — above your band today</td></tr>
+        <tr><td class="no">Your progress has stalled</td><td class="yes">Weight steady over 4 weeks</td></tr>
+        <tr><td class="no">Only 2 days logged this week</td><td class="yes">2 days logged · 5 to go</td></tr>
+        <tr><td class="no">Bad week</td><td class="yes">Quieter week than usual</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note" style="margin-top:var(--spa-xxxl)">
+    <b>Seventeen phrases are banned by the linter</b> at error severity — <code>you failed</code>,
+    <code>lost your streak</code>, <code>over budget</code>, <code>demoted</code>,
+    <code>dropped to</code> and the rest. §10 asks you to review every string against the
+    no-punishment rule; a lint rule reviews them on every commit instead of once, in a hurry,
+    the week before TestFlight.
+  </div>
+</section>
+
+<footer>
+  <p><b style="color:var(--c-text-secondary)">Phase 0 · Foundations.</b> Tokens, components and
+  screens generated from <code>design/tokens/notch.tokens.json</code>. Contrast ratios on this
+  page are computed live and match the CI check in <code>design/tokens/generate.py</code>.</p>
+  <p style="margin-top:var(--spa-md)">Not a medical device. Notch makes no medical claims and is
+  not a substitute for professional advice.</p>
+</footer>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ── Theme ──────────────────────────────────────────────────────────────
+     Dark-first is the product's default, so the page opens dark unless the
+     viewer's OS says otherwise. The toggle stamps data-theme, which beats the
+     media query in both directions. */
+  const root = document.documentElement;
+  const btns = [...document.querySelectorAll("[data-theme-set]")];
+  const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+
+  function setTheme(mode) {
+    root.setAttribute("data-theme", mode);
+    btns.forEach(b => b.setAttribute("aria-pressed",
+      String(b.dataset.themeSet === mode)));
+    paintSwatches();
+    paintTiers();
+    paintHeroBadge();
+  }
+  btns.forEach(b => b.addEventListener("click", () => setTheme(b.dataset.themeSet)));
+
+  /* ── WCAG contrast, computed live ───────────────────────────────────────
+     Same formula as generate.py. If the page and CI ever disagree, one of them
+     has a bug — which is the point of doing it twice. */
+  const lin = c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+
+  function luminance(hex) {
+    const h = hex.replace("#", "").trim();
+    const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  }
+  function ratio(fg, bg) {
+    const a = luminance(fg), b = luminance(bg);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  }
+  const tok = name => getComputedStyle(root)
+    .getPropertyValue("--" + name).trim();
+
+  /* ── Swatches ── */
+  const NEUTRAL = [
+    ["c-canvas", "canvas", "App background"],
+    ["c-surface", "surface", "Cards, rows, sheets"],
+    ["c-surface-raised", "surfaceRaised", "Card on a card"],
+    ["c-surface-sunken", "surfaceSunken", "Inset wells"],
+    ["c-stroke", "stroke", "Hairline dividers"],
+    ["c-stroke-strong", "strokeStrong", "Input borders"],
+    ["c-text-primary", "textPrimary", "Body text"],
+    ["c-text-secondary", "textSecondary", "Supporting copy"],
+    ["c-text-tertiary", "textTertiary", "Least-emphasis labels"],
+    ["c-text-disabled", "textDisabled", "Disabled controls ONLY"],
+  ];
+  const SEMANTIC = [
+    ["c-accent", "accent", "The single accent"],
+    ["c-accent-pressed", "accentPressed", "Pressed state"],
+    ["c-accent-subtle", "accentSubtle", "Selected row tint"],
+    ["c-positive", "positive", "In your band · synced"],
+    ["c-safety", "safety", "§10 interventions only"],
+    ["c-critical", "critical", "Destructive confirm only"],
+    ["c-chart-line", "chartLine", "The trend line"],
+    ["c-chart-baseline", "chartBaseline", "You, 4 weeks ago"],
+    ["c-chart-band", "chartBand", "Target band fill"],
+    ["c-chart-raw", "chartRaw", "Raw dailies · off by default"],
+  ];
+
+  function swatchCard([varName, label, use]) {
+    const hex = tok(varName).toUpperCase();
+    const bg = tok("c-surface");
+    const r = ratio(hex, bg);
+    const isText = label.startsWith("text") || label.startsWith("accent") ||
+                   label === "positive" || label === "safety" ||
+                   label === "critical" || label === "chartLine";
+    let cls = "", note = "on surface";
+    if (isText) {
+      if (r >= 4.5) { cls = "pass"; note = "AA on surface"; }
+      else if (r >= 3) { cls = "large"; note = "large text only"; }
+      else { note = "non-text / exempt"; }
+    }
+    const onChip = luminance(hex) > 0.4 ? "#000" : "#fff";
+    return `<div class="sw">
+      <div class="sw-chip" style="background:${hex}">
+        <span style="color:${onChip}">${hex}</span>
+      </div>
+      <div class="sw-body">
+        <div class="sw-name">${label}</div>
+        <div class="sw-hex">${use}</div>
+        <div class="ratio ${cls}">${r.toFixed(2)}:1 · ${note}</div>
+      </div>
+    </div>`;
+  }
+  function paintSwatches() {
+    document.getElementById("sw-neutral").innerHTML =
+      NEUTRAL.map(swatchCard).join("");
+    document.getElementById("sw-semantic").innerHTML =
+      SEMANTIC.map(swatchCard).join("");
+  }
+
+  /* ── Tier badge ─────────────────────────────────────────────────────────
+     Generated from one source, so notch count and metal can never disagree —
+     the same property the Swift `Tier` enum has. Notches are cut from the top
+     edge via a mask, so the COUNT is a silhouette change and survives being
+     shrunk to tab-bar size. */
+  const TIERS = [
+    ["Bronze", 1, "tier-bronze", "Starting out"],
+    ["Silver", 2, "tier-silver", "Building habit"],
+    ["Gold", 3, "tier-gold", "Consistent"],
+    ["Platinum", 4, "tier-platinum", "Dialled in"],
+    ["Diamond", 5, "tier-diamond", "Exceptional"],
+  ];
+
+  function badgeSVG(name, notches, colourVar, size, idSuffix) {
+    // Notches are a FIXED width with FIXED gaps, centred as a group — not
+    // stretched to fill a span. Stretching makes a single notch read as a bite
+    // out of the badge rather than as a tally mark, and it stops the widths
+    // being comparable between tiers, which is the whole point of a count.
+    const W = 100, H = 120, NW = 9, GAP = 6, depth = 30;
+    const groupW = notches * NW + (notches - 1) * GAP;
+    const x0 = (W - groupW) / 2;
+    let cuts = "";
+    for (let i = 0; i < notches; i++) {
+      const x = x0 + i * (NW + GAP);
+      cuts += `<rect class="nslot" x="${x.toFixed(2)}" y="-4"
+        width="${NW}" height="${depth}" rx="3"
+        fill="#000" style="animation-delay:${180 + i * 110}ms"/>`;
+    }
+    const mid = `m-${idSuffix}`;
+    return `<svg width="${size}" height="${(size * H / W).toFixed(0)}"
+        viewBox="0 0 ${W} ${H}" role="img"
+        aria-label="${name}. Tier ${notches} of 5.">
+      <mask id="${mid}">
+        <rect width="${W}" height="${H}" fill="#fff"/>${cuts}
+      </mask>
+      <path d="M8 4h84a5 5 0 0 1 5 5v60L50 116 3 69V9a5 5 0 0 1 5-5Z"
+            fill="var(--${colourVar})" mask="url(#${mid})"/>
+    </svg>`;
+  }
+
+  function paintTiers() {
+    document.getElementById("tier-rail").innerHTML = TIERS.map(
+      ([name, n, v, desc]) => `<div class="tier-item">
+        ${badgeSVG(name, n, v, 86, "rail" + n)}
+        <div class="tname">${name}</div>
+        <div class="tcount">${n} notch${n > 1 ? "es" : ""}</div>
+        <div class="tdesc">${desc}</div>
+      </div>`).join("");
+  }
+
+  function paintHeroBadge() {
+    document.getElementById("hero-badge").innerHTML =
+      badgeSVG("Gold", 3, "tier-gold", 106, "hero");
+  }
+
+  /* ── Type specimen ── */
+  const TYPE = [
+    ["display", 40, 44, 600, "largeTitle", "Gold", 0],
+    ["title1", 28, 34, 600, "title", "Rank week", 0],
+    ["title2", 22, 28, 600, "title2", "Photo confirm", 0],
+    ["title3", 20, 25, 600, "title3", "Weight & trend", 0],
+    ["headline", 17, 22, 600, "headline", "Porridge with milk", 0],
+    ["body", 17, 22, 400, "body", "Notch shows a 7-day average because daily weight is mostly water.", 0],
+    ["callout", 16, 21, 400, "callout", "Estimates, not measurements", 0],
+    ["subhead", 15, 20, 400, "subheadline", "Tesco · 250 g", 0],
+    ["footnote", 13, 18, 400, "footnote", "of 1,750–1,950 band", 0],
+    ["caption", 12, 16, 400, "caption", "7-day average", 0],
+    ["label", 11, 14, 600, "caption2", "CALORIES REMAINING", 1],
+    ["metricXL", 56, 58, 600, "largeTitle", "0.71", 2],
+    ["metricL", 40, 44, 600, "title", "340", 2],
+    ["metricM", 28, 32, 600, "title2", "5/7", 2],
+    ["metricS", 17, 22, 600, "headline", "320", 2],
+  ];
+  document.getElementById("type-spec").innerHTML = TYPE.map(
+    ([name, size, lh, w, style, sample, flag]) => {
+      const tags = [];
+      if (flag === 1) tags.push("uppercase");
+      if (flag === 2) tags.push("tabular");
+      return `<div class="spec-row">
+        <div class="spec-meta">
+          <b>${name}</b>${size}/${lh} · ${w}<br>→ .${style}${
+            tags.length ? "<br>" + tags.join(" · ") : ""}
+        </div>
+        <div class="spec-sample${flag === 2 ? " tab" : ""}"
+             style="font-size:${size}px;line-height:${lh}px;font-weight:${w}${
+               flag === 1 ? ";letter-spacing:.6px" : ""}">${sample}</div>
+      </div>`;
+    }).join("");
+
+  /* ── Spacing scale ── */
+  document.getElementById("space-scale").innerHTML =
+    [["hair", 2], ["xs", 4], ["sm", 8], ["md", 12], ["lg", 16], ["xl", 20],
+     ["xxl", 24], ["xxxl", 32], ["huge", 48], ["vast", 64]]
+    .map(([n, v]) => `<div class="scale-row">
+        <span class="lbl">${n} · ${v}</span>
+        <span class="bar" style="width:${v * 2.4}px"></span>
+      </div>`).join("");
+
+  /* ── Notch ring ────────────────────────────────────────────────────────
+     Seven segments because consistency IS seven discrete days. A continuous
+     ring at 71% invites "which day was the 0.71?" */
+  function ringSVG(filled) {
+    const S = 132, C = S / 2, R = 52, stroke = 9;
+    const seg = 360 / 7, gap = 5;
+    let arcs = "";
+    for (let i = 0; i < 7; i++) {
+      const a0 = -90 + i * seg + gap / 2;
+      const a1 = -90 + (i + 1) * seg - gap / 2;
+      const rad = d => (d * Math.PI) / 180;
+      const x0 = C + R * Math.cos(rad(a0)), y0 = C + R * Math.sin(rad(a0));
+      const x1 = C + R * Math.cos(rad(a1)), y1 = C + R * Math.sin(rad(a1));
+      const col = i < filled ? "var(--c-positive)" : "var(--c-stroke)";
+      arcs += `<path d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}"
+        fill="none" stroke="${col}" stroke-width="${stroke}" stroke-linecap="round"/>`;
+    }
+    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" role="img"
+        aria-label="${filled} of 7 days logged this week">
+      ${arcs}
+      <text x="${C}" y="${C + 4}" text-anchor="middle"
+        style="font:600 28px system-ui;font-variant-numeric:tabular-nums"
+        fill="var(--c-text-primary)">${filled}/7</text>
+    </svg>`;
+  }
+  const ringHost = document.getElementById("ring-host");
+  const slider = document.getElementById("ring-slider");
+  const drawRing = () => { ringHost.innerHTML = ringSVG(Number(slider.value)); };
+  slider.addEventListener("input", drawRing);
+
+  /* ── The reveal. 0.9s, the only animation in the product allowed past 0.3s. ── */
+  const phone = document.getElementById("hero-phone");
+  document.getElementById("play").addEventListener("click", () => {
+    phone.classList.remove("playing");
+    void phone.offsetWidth;            // force reflow so the animation restarts
+    phone.classList.add("playing");
+  });
+
+  /* ── Boot ── */
+  setTheme(prefersLight ? "light" : "dark");
+  drawRing();
+})();
+</script>

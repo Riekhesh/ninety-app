@@ -1,0 +1,180 @@
+/* GENERATED FILE — DO NOT EDIT.
+   Source: design/tokens/notch.tokens.json
+   Regenerate: python3 design/tokens/generate.py */
+
+:root {
+  --c-canvas: #FBFAF7;
+  --c-surface: #FFFFFF;
+  --c-surface-raised: #FFFFFF;
+  --c-surface-sunken: #F2F0EB;
+  --c-stroke: #E5E2DB;
+  --c-stroke-strong: #CFCBC1;
+  --c-text-primary: #17150F;
+  --c-text-secondary: #5C574D;
+  --c-text-tertiary: #767063;
+  --c-text-disabled: #ADA79B;
+  --c-text-inverse: #FBFAF7;
+  --c-accent: #3B5BDB;
+  --c-accent-pressed: #2F4BC0;
+  --c-accent-subtle: #EDF0FD;
+  --c-positive: #1E8A5F;
+  --c-safety: #A66A00;
+  --c-critical: #B4341A;
+  --c-chart-line: #17150F;
+  --c-chart-baseline: #9A9488;
+  --c-chart-band: #E6F2EB;
+  --c-chart-grid: #EFEDE7;
+  --c-chart-raw: #CFCBC1;
+  --tier-bronze: #9A5F2E;
+  --tier-silver: #6E747E;
+  --tier-gold: #A8781A;
+  --tier-platinum: #7C8794;
+  --tier-diamond: #1F7F96;
+  --spa-hair: 2px;
+  --spa-xs: 4px;
+  --spa-sm: 8px;
+  --spa-md: 12px;
+  --spa-lg: 16px;
+  --spa-xl: 20px;
+  --spa-xxl: 24px;
+  --spa-xxxl: 32px;
+  --spa-huge: 48px;
+  --spa-vast: 64px;
+  --rad-none: 0px;
+  --rad-sm: 8px;
+  --rad-md: 12px;
+  --rad-lg: 16px;
+  --rad-xl: 24px;
+  --rad-full: 999px;
+  --bor-hairline: 1px;
+  --bor-focus: 2px;
+  --type-display: 600 40px/44px system-ui, -apple-system, sans-serif;
+  --track-display: -0.5px;
+  --type-title1: 600 28px/34px system-ui, -apple-system, sans-serif;
+  --track-title1: -0.3px;
+  --type-title2: 600 22px/28px system-ui, -apple-system, sans-serif;
+  --track-title2: -0.2px;
+  --type-title3: 600 20px/25px system-ui, -apple-system, sans-serif;
+  --track-title3: 0px;
+  --type-headline: 600 17px/22px system-ui, -apple-system, sans-serif;
+  --track-headline: 0px;
+  --type-body: 400 17px/22px system-ui, -apple-system, sans-serif;
+  --track-body: 0px;
+  --type-callout: 400 16px/21px system-ui, -apple-system, sans-serif;
+  --track-callout: 0px;
+  --type-subhead: 400 15px/20px system-ui, -apple-system, sans-serif;
+  --track-subhead: 0px;
+  --type-footnote: 400 13px/18px system-ui, -apple-system, sans-serif;
+  --track-footnote: 0px;
+  --type-caption: 400 12px/16px system-ui, -apple-system, sans-serif;
+  --track-caption: 0px;
+  --type-label: 600 11px/14px system-ui, -apple-system, sans-serif;
+  --track-label: 0.6px;
+  --type-metric-x-l: 600 56px/58px system-ui, -apple-system, sans-serif;
+  --track-metric-x-l: -1.5px;
+  --type-metric-l: 600 40px/44px system-ui, -apple-system, sans-serif;
+  --track-metric-l: -0.8px;
+  --type-metric-m: 600 28px/32px system-ui, -apple-system, sans-serif;
+  --track-metric-m: -0.3px;
+  --type-metric-s: 600 17px/22px system-ui, -apple-system, sans-serif;
+  --track-metric-s: 0px;
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 300ms;
+  --dur-reveal: 900ms;
+  --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-canvas: #0C0B0A;
+    --c-surface: #171614;
+    --c-surface-raised: #201E1B;
+    --c-surface-sunken: #070606;
+    --c-stroke: #2C2A26;
+    --c-stroke-strong: #3D3A34;
+    --c-text-primary: #F6F4F1;
+    --c-text-secondary: #A8A29A;
+    --c-text-tertiary: #8A8479;
+    --c-text-disabled: #5A554D;
+    --c-text-inverse: #0C0B0A;
+    --c-accent: #7C9EFF;
+    --c-accent-pressed: #6B8BEE;
+    --c-accent-subtle: #181B26;
+    --c-positive: #4FBF8B;
+    --c-safety: #E2A03F;
+    --c-critical: #E5674E;
+    --c-chart-line: #F6F4F1;
+    --c-chart-baseline: #6E6960;
+    --c-chart-band: #1E2A24;
+    --c-chart-grid: #221F1C;
+    --c-chart-raw: #3D3A34;
+    --tier-bronze: #C8834E;
+    --tier-silver: #C3C7CE;
+    --tier-gold: #E7B23C;
+    --tier-platinum: #E3EAF0;
+    --tier-diamond: #8AE0F2;
+  }
+}
+
+/* Explicit override must beat the media query in BOTH directions. */
+:root[data-theme="dark"] {
+  --c-canvas: #0C0B0A;
+  --c-surface: #171614;
+  --c-surface-raised: #201E1B;
+  --c-surface-sunken: #070606;
+  --c-stroke: #2C2A26;
+  --c-stroke-strong: #3D3A34;
+  --c-text-primary: #F6F4F1;
+  --c-text-secondary: #A8A29A;
+  --c-text-tertiary: #8A8479;
+  --c-text-disabled: #5A554D;
+  --c-text-inverse: #0C0B0A;
+  --c-accent: #7C9EFF;
+  --c-accent-pressed: #6B8BEE;
+  --c-accent-subtle: #181B26;
+  --c-positive: #4FBF8B;
+  --c-safety: #E2A03F;
+  --c-critical: #E5674E;
+  --c-chart-line: #F6F4F1;
+  --c-chart-baseline: #6E6960;
+  --c-chart-band: #1E2A24;
+  --c-chart-grid: #221F1C;
+  --c-chart-raw: #3D3A34;
+  --tier-bronze: #C8834E;
+  --tier-silver: #C3C7CE;
+  --tier-gold: #E7B23C;
+  --tier-platinum: #E3EAF0;
+  --tier-diamond: #8AE0F2;
+}
+
+:root[data-theme="light"] {
+  --c-canvas: #FBFAF7;
+  --c-surface: #FFFFFF;
+  --c-surface-raised: #FFFFFF;
+  --c-surface-sunken: #F2F0EB;
+  --c-stroke: #E5E2DB;
+  --c-stroke-strong: #CFCBC1;
+  --c-text-primary: #17150F;
+  --c-text-secondary: #5C574D;
+  --c-text-tertiary: #767063;
+  --c-text-disabled: #ADA79B;
+  --c-text-inverse: #FBFAF7;
+  --c-accent: #3B5BDB;
+  --c-accent-pressed: #2F4BC0;
+  --c-accent-subtle: #EDF0FD;
+  --c-positive: #1E8A5F;
+  --c-safety: #A66A00;
+  --c-critical: #B4341A;
+  --c-chart-line: #17150F;
+  --c-chart-baseline: #9A9488;
+  --c-chart-band: #E6F2EB;
+  --c-chart-grid: #EFEDE7;
+  --c-chart-raw: #CFCBC1;
+  --tier-bronze: #9A5F2E;
+  --tier-silver: #6E747E;
+  --tier-gold: #A8781A;
+  --tier-platinum: #7C8794;
+  --tier-diamond: #1F7F96;
+}
