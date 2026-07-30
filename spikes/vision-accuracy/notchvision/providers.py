@@ -299,8 +299,11 @@ class GeminiProvider:
         key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not key:
             raise RuntimeError(
-                "GEMINI_API_KEY is not set. Put it in .env (copy .env.example), "
-                "or run with --provider mock to exercise the pipeline without a key."
+                "GEMINI_API_KEY is not set.\n"
+                "  Put it in the repo-root .env (cp .env.example .env) — the run\n"
+                "  prints which .env it read, so check that line matches the file\n"
+                "  you edited. Or export GEMINI_API_KEY for a one-off run, or use\n"
+                "  --provider mock to exercise the pipeline without a key."
             )
 
         self.model = model

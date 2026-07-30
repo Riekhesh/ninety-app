@@ -13,6 +13,7 @@ What is worth carrying into Phase 1:
 
 __all__ = [
     "dataset",
+    "env",
     "imaging",
     "metrics",
     "prompts",

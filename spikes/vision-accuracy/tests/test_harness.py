@@ -11,6 +11,7 @@ These tests do NOT validate model accuracy. That is what the real run measures.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -22,6 +23,7 @@ sys.path.insert(0, str(SPIKE))
 
 from notchvision import imaging, metrics  # noqa: E402
 from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
+from notchvision.env import find_dotenv, load_dotenv, parse_dotenv  # noqa: E402
 from notchvision.providers import MockProvider, Usage  # noqa: E402
 from notchvision.report import render  # noqa: E402
 from notchvision.schema import EstimateParseError, parse_estimate  # noqa: E402
@@ -388,6 +390,81 @@ def test_gemini_output_still_parses_with_extra_keys():
     })
     assert est.items[0].name == "rice"
     assert est.warnings == ()
+
+
+# ─── .env loading ────────────────────────────────────────────────────────────
+#
+# The harness reads keys from os.environ but the key lives in a file. Nothing
+# bridged the two, so filling in .env exactly as instructed still produced
+# "GEMINI_API_KEY is not set". These lock the bridge in place.
+
+
+def test_dotenv_parses_comments_exports_and_quotes():
+    parsed = parse_dotenv(
+        "# a comment\n"
+        "\n"
+        "GEMINI_API_KEY=abc123\n"
+        "export OPENAI_API_KEY=from-export\n"
+        'QUOTED="dq"\n'
+        "SINGLE='sq'\n"
+        "  SPACED = padded \n"
+    )
+    assert parsed["GEMINI_API_KEY"] == "abc123"
+    assert parsed["OPENAI_API_KEY"] == "from-export"
+    assert parsed["QUOTED"] == "dq"
+    assert parsed["SINGLE"] == "sq"
+    assert parsed["SPACED"] == "padded"
+
+
+def test_dotenv_survives_the_real_env_example(tmp_path: Path):
+    """.env.example is full of box-drawing rules and prose. Parsing it must not
+    explode or invent keys — it is the literal file the README says to copy."""
+    example = SPIKE.parents[1] / ".env.example"
+    parsed = parse_dotenv(example.read_text(encoding="utf-8"))
+    assert "GEMINI_API_KEY" in parsed
+    assert parsed["NOTCH_VISION_MODEL"] == "gemini-2.5-flash"
+    assert all(k.replace("_", "").isalnum() for k in parsed)
+
+
+def test_dotenv_found_by_walking_up_from_a_subdirectory(tmp_path: Path):
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=root-key\n", encoding="utf-8")
+    deep = tmp_path / "spikes" / "vision-accuracy"
+    deep.mkdir(parents=True)
+    assert find_dotenv(deep) == tmp_path / ".env"
+
+
+def test_dotenv_does_not_override_a_real_environment_variable(tmp_path: Path, monkeypatch):
+    """An exported key is a deliberate per-run override, and CI injects secrets as
+    real variables. A stale .env must never win over either."""
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=stale-file-value\n", encoding="utf-8")
+    monkeypatch.setenv("GEMINI_API_KEY", "live-exported-value")
+    load_dotenv(tmp_path)
+    assert os.environ["GEMINI_API_KEY"] == "live-exported-value"
+
+
+def test_dotenv_ignores_blank_values(tmp_path: Path, monkeypatch):
+    """.env.example ships every key blank. A blank must not read as 'set', or the
+    failure moves from startup to a confusing auth error at the API."""
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=\n", encoding="utf-8")
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    load_dotenv(tmp_path)
+    assert "GEMINI_API_KEY" not in os.environ
+
+
+def test_dotenv_sets_the_key_the_provider_actually_looks_for(tmp_path: Path, monkeypatch):
+    """The end-to-end claim: a key in .env reaches the provider's os.environ lookup."""
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=from-dotenv\n", encoding="utf-8")
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    assert load_dotenv(tmp_path) == tmp_path / ".env"
+    assert os.environ.get("GEMINI_API_KEY") == "from-dotenv"
+
+
+def test_a_nonexistent_start_directory_is_not_an_error(tmp_path: Path):
+    """Called before the photo-directory check, so it must never be the thing that
+    raises. Returning None and letting the provider report a missing key is the
+    correct failure."""
+    assert load_dotenv(tmp_path / "nothing" / "here") in (None, find_dotenv(tmp_path))
 
 
 # ─── End to end ──────────────────────────────────────────────────────────────
