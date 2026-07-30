@@ -1,0 +1,340 @@
+# Safety requirements
+
+> §10: *"This is the most important page in the document."*
+>
+> *"A gamified calorie app with streaks and competitive ranks can actively reinforce
+> disordered eating. This is a real, well-documented harm. Apple has rejected apps
+> over it. And you will have real users, some of whom will be vulnerable in ways you
+> cannot see from a dashboard."*
+
+§10 gives seven requirements as prose. This file turns each into a **rule with a
+number and a test name**, because a requirement you cannot test is a requirement you
+will discover you did not implement.
+
+All seven are built in **from Phase 1**, not bolted on before launch. §10: *"Building
+these in from the start costs a couple of hours. Retrofitting them after someone has
+been harmed costs considerably more."*
+
+---
+
+## ⚠️ These numbers need a clinician
+
+The thresholds below come from widely-published UK public-health guidance (NHS, NICE)
+and are the values a reasonable non-expert would arrive at. **They have not been
+reviewed by anyone clinically qualified, and I am not qualified to set them.**
+
+- Before Phase 3 external testers, get them reviewed. A GP, a registered dietitian, or
+  a university health-sciences contact. This is a half-hour conversation, not a
+  research project.
+- Record who reviewed them and when, at the bottom of this file.
+- Until then, the app is used by one person who knows the limitation.
+
+The *structure* here — floors, ceilings, refusals, opt-outs — is right regardless of
+whether a specific number moves.
+
+---
+
+## S1 · Hard minimum calorie floor
+
+**Rule.** The computed daily target may never fall below the floor, whatever the user
+asks for.
+
+| Sex | Floor | Basis |
+|---|---:|---|
+| Female | **1,200 kcal/day** | Below this, meeting micronutrient requirements from food is impractical; commonly cited as the point where medical supervision is advised |
+| Male | **1,500 kcal/day** | Same reasoning, higher baseline requirement |
+| Not specified / prefer not to say | **1,500 kcal/day** | Use the higher floor when unsure — erring high is the safe direction |
+
+**Behaviour.** Clamp, do not reject. If Mifflin-St Jeor minus the requested deficit
+lands below the floor, set the band at the floor and say so. Then offer the lever that
+actually helps — a slower rate of loss — rather than leaving the user stuck.
+
+**Interacts with S3.** A user who wants 1 kg/week at a low body weight will hit this
+floor. The correct response is to reduce the *rate*, not to sit at the floor
+indefinitely: the floor is a hard stop, not a target.
+
+```
+test_calorie_target_never_below_floor_female
+test_calorie_target_never_below_floor_male
+test_unspecified_sex_uses_higher_floor
+test_floor_breach_surfaces_slower_rate_option
+test_floor_applies_after_deficit_not_before
+```
+
+---
+
+## S2 · Goal weight validation against healthy BMI
+
+**Rule.** Reject a goal weight whose BMI would be **below 18.5** for the user's
+height.
+
+```
+BMI = kg / (m × m)
+minimum acceptable goal weight = 18.5 × height_m²
+```
+
+For 1.75 m that is 56.7 kg; the app refuses anything lower and says what the lowest
+acceptable value is, so the user is not left guessing.
+
+**Deliberately asymmetric.** There is no upper limit on goal weight. A user wanting to
+*gain* to a BMI of 27 is not doing something the app should block — the harm this
+requirement addresses runs in one direction.
+
+**Reject, do not clamp.** Unlike S1, silently substituting a different goal would be
+dishonest about what the app is tracking toward.
+
+```
+test_goal_weight_below_bmi_18_5_is_rejected
+test_goal_weight_at_bmi_18_5_is_accepted
+test_rejection_states_the_minimum_acceptable_weight
+test_no_upper_bound_on_goal_weight
+test_bmi_uses_metres_not_centimetres        // the classic 10,000× bug
+```
+
+---
+
+## S3 · Rate-of-loss ceiling — safety *and* scoring
+
+**The one that is genuinely elegant.** §10: *"The engine should not reward losing
+weight faster than a safe rate. Score the appropriate rate highest, not the maximum —
+this is a place where the ranking design and the safety design happen to align
+perfectly."*
+
+**Rule.** The ceiling is the lower of:
+
+```
+ceiling = min(1.0 kg/week, 1% of current body weight per week)
+```
+
+For 70 kg that is 0.70 kg/week. For 120 kg it is 1.0 kg/week (the absolute cap binds).
+
+Selectable rates in onboarding: **0.25 / 0.5 / 0.75 kg per week**, filtered to those
+at or below the user's ceiling. There is deliberately no "maximum" option.
+
+**Two enforcement points, and both are needed:**
+
+1. **Onboarding** — cannot select a target rate above the ceiling.
+2. **The scoring engine** — progress score **peaks at the user's target rate and
+   declines above it.** Losing 1.5 kg in a week scores *lower* than losing 0.5 kg
+   when 0.5 was the target.
+
+Point 2 is the part that matters. A ceiling only in onboarding is advice; a ceiling in
+the score is an incentive. Without it, the app's headline metric rewards exactly the
+behaviour §10 exists to discourage — and users optimise for the metric, not the
+onboarding copy.
+
+**Shape.** Score rises to 1.0 at target rate, then falls away above it. Not a cliff
+(a hard cutoff makes a good week look like a bad one for being slightly over) — a
+smooth decline. Specified properly in Phase 2 alongside the rest of the maths.
+
+```
+test_target_rate_scores_higher_than_double_target_rate
+test_progress_score_peaks_at_target_rate
+test_progress_score_declines_monotonically_above_ceiling
+test_rate_ceiling_is_one_percent_bodyweight_for_light_user
+test_rate_ceiling_caps_at_1kg_for_heavy_user
+test_onboarding_hides_rates_above_ceiling
+```
+
+---
+
+## S4 · Age gate
+
+**Rule.** Date of birth is collected in onboarding. **Under 18 is a hard stop with no
+bypass** — no "continue anyway", no parental-consent path.
+
+§10: *"The safeguarding considerations for minors and body-image content are
+substantial and well beyond what a solo v1 should attempt."* That is the honest
+reason, and the copy says it (`04-copy-deck.md`) rather than pretending it is a legal
+technicality.
+
+The rejection screen signposts Beat's youth helpline. A user turned away should not
+leave with nothing.
+
+**Computed on the actual date**, not a year subtraction — someone turning 18 tomorrow
+is 17 today.
+
+```
+test_under_18_is_blocked
+test_exactly_18_today_is_allowed
+test_17_years_364_days_is_blocked
+test_no_bypass_path_exists_from_the_age_gate
+test_age_gate_screen_includes_support_signposting
+```
+
+---
+
+## S5 · No punishment framing anywhere
+
+**Rule.** No user-facing string frames a shortfall as failure. Regression is a reset.
+
+**Enforced three ways:**
+
+1. **`no_punishment_framing`** in `.swiftlint.yml`, severity **error** — 17 banned
+   phrases, matched against string literals. Fails the build.
+2. **`docs/design/04-copy-deck.md`** — every string written out, with the rewrite rule
+   and a second list of phrases that need human judgement (`cheat meal`, `burn off`,
+   `earn it`, `on track`).
+3. **PR template** — an explicit safety-review checkbox on anything touching copy.
+
+**Also structural, not just verbal:**
+
+- **No error colour exists for logged intake.** Absent from the token set on purpose.
+  A designer reaching for "the red one" for over-budget will not find one.
+- A missed day is an **empty** notch, never crossed out.
+- No streak-loss animation.
+- Losing a tier always states the way back: *"Gold is four consistent days away."*
+
+```
+test_no_banned_phrase_in_any_localised_string
+test_tier_regression_copy_states_the_path_back
+test_missed_day_renders_empty_not_negative
+test_over_band_state_does_not_use_critical_colour
+```
+
+---
+
+## S6 · Always-available competitive opt-out
+
+**Rule.** A visible switch disables **every** competitive and social feature —
+without disabling the app's core usefulness.
+
+| Off | Still works |
+|---|---|
+| Tier badges and the Rank tab | Food logging, all three paths |
+| Weekly score computation | Weight trend and EWMA chart |
+| Rank-up notifications | HealthKit sync |
+| Streaks | Data export and deletion |
+| Friend leaderboards (Phase 4) | The Today dashboard |
+
+**The critical property is the right-hand column.** An opt-out that leaves a crippled
+app is not an opt-out — it is a threat. Someone who turns competition off must still
+have a fully useful food and weight tracker, or they will simply delete the app,
+which is the outcome this requirement exists to prevent.
+
+Reachable in **at most two taps** from the Today screen. Not buried. History is
+preserved and the switch is reversible.
+
+```
+test_opt_out_hides_rank_tab
+test_opt_out_stops_score_computation
+test_opt_out_preserves_food_logging
+test_opt_out_preserves_weight_trend_and_healthkit_sync
+test_opt_out_is_reachable_in_two_taps
+test_opt_out_is_reversible_and_preserves_history
+```
+
+---
+
+## S7 · Signposting
+
+**Rule.** Where patterns suggest it may help, surface UK support resources.
+
+| Organisation | Contact |
+|---|---|
+| Beat | 0808 801 0677 · beateatingdisorders.org.uk |
+| National Alliance for Eating Disorders | eatingdisorderinfo.org |
+
+**Always available** in Settings. **Additionally surfaced** — once, non-modally,
+dismissible — when any of these hold:
+
+| Trigger | Threshold |
+|---|---|
+| Sustained loss above the ceiling | > S3 ceiling for 3 consecutive weeks |
+| Sustained intake near the floor | Within 5% of the S1 floor for 14 consecutive days |
+| Repeated goal-weight attempts below healthy BMI | 3 or more attempts (S2 rejections) |
+| Logging at the floor with high activity | Floor-adjacent intake + activity in the top decile of their own history |
+
+**Never modal, never repeated, never accusatory.** A dialogue the user cannot dismiss
+is coercive, and a repeated one gets the app deleted. Offer once, keep it in Settings.
+
+**No diagnosis.** The app does not detect eating disorders, must not imply it can, and
+the copy says only *"if this is feeling difficult, these people help"* — which is true
+and within what the app can honestly claim.
+
+```
+test_signposting_always_available_in_settings
+test_signposting_surfaces_after_three_weeks_above_rate_ceiling
+test_signposting_surfaces_after_fourteen_days_at_calorie_floor
+test_signposting_is_dismissible
+test_signposting_does_not_repeat_within_30_days
+test_signposting_copy_contains_no_diagnostic_language
+```
+
+---
+
+## Data protection (§10 · UK GDPR Article 9)
+
+Health data is **special category data** under Article 9 — explicit consent and a
+documented lawful basis. Required **before the first external tester**, not before
+launch.
+
+| Requirement | Where |
+|---|---|
+| Privacy policy live | GitHub Pages, free and adequate |
+| Explicit consent for health data | Onboarding, separate from ToS acceptance |
+| Working data export | Settings → Export. JSON: profile, food logs, weights, health samples, weekly scores |
+| Genuine account deletion | Settings → Delete. Actually deletes, including Storage objects. Not a soft-delete flag. |
+| Accurate App Privacy labels | App Store Connect. Under-declaring health collection is a fast rejection (§3.2) |
+
+```
+test_export_includes_every_table_holding_user_data
+test_deletion_removes_all_rows_across_all_tables
+test_deletion_removes_storage_objects_for_meal_photos
+test_deletion_is_not_a_soft_delete_flag
+test_health_consent_is_separate_from_terms_acceptance
+```
+
+The deletion test is the one that will actually catch something. Add a table in Phase
+2 and forget to add it to the delete path, and the test fails — which is the entire
+reason to write it as a test that enumerates tables rather than a checklist item.
+
+---
+
+## No medical claims
+
+§10 lists App Store rejection as a live risk: *"Health apps face stricter review. No
+medical claims anywhere in copy."*
+
+**Banned:** any claim to diagnose, treat, prevent or cure; "clinically proven";
+"doctor recommended"; specific health-outcome promises; "should" in a prescriptive
+sense.
+
+**Allowed:** describing what the app does — *"tracks what you log"*, *"scores your
+consistency"*, *"shows your weight trend"*.
+
+Footer, everywhere it fits: *"Not a medical device. Notch makes no medical claims and
+is not a substitute for professional advice."*
+
+---
+
+## Phase gate checklist
+
+**Phase 1 — build it in, do not defer it:**
+- [ ] S1 calorie floor, clamping with the slower-rate offer
+- [ ] S2 goal-weight BMI validation, rejecting
+- [ ] S3 rate ceiling enforced in onboarding
+- [ ] S4 age gate, hard stop, with signposting
+- [ ] S5 SwiftLint rule active and copy deck followed
+- [ ] S6 opt-out switch, with core usefulness intact
+- [ ] S7 signposting present in Settings
+
+**Phase 2 — the scoring half of S3:**
+- [ ] Progress score peaks at target rate and declines above the ceiling
+- [ ] Named tests for every S3 assertion above
+
+**Phase 3 — before the first external tester:**
+- [ ] Thresholds reviewed by someone clinically qualified
+- [ ] Privacy policy live
+- [ ] Export and deletion working and tested
+- [ ] App Privacy labels accurate
+- [ ] S7 pattern triggers implemented and tested
+
+---
+
+## Review log
+
+| Date | Reviewer | Role | Changed |
+|---|---|---|---|
+| 2026-07-30 | — | initial draft, **not clinically reviewed** | S1–S7 numbers set from public UK guidance |
+
