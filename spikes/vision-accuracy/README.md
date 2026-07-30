@@ -56,7 +56,7 @@ the Edge Function's per-user daily cap needs to be generous or strict.
 Cheap comparison on the same 3 photos:
 
 ```bash
-python3 run_baseline.py --limit 3 --model gemini-2.5-pro --tag pro --no-analyse
+python3 run_baseline.py --limit 3 --model gemini-3.6-flash --tag flash --no-analyse
 ```
 
 **Gemini is the default** — you already have credit, and ADR 0010's provider interface
@@ -75,7 +75,7 @@ cp groundtruth.example.csv groundtruth.csv
 python3 run_baseline.py
 ```
 
-Roughly $0.02–0.10 for 20 images on `gemini-2.5-flash` — trivially inside your existing
+Roughly $0.02–0.10 for 20 images on `gemini-3.5-flash-lite` — trivially inside your existing
 credit, with room for the sweeps below.
 
 The **protocol** for collecting those meals is next, and it matters far more than the
@@ -129,7 +129,7 @@ for edge in 2576 1568 1024 768; do
 done
 
 # Cost/accuracy curve across models.
-for m in gemini-2.5-flash gemini-2.5-pro; do
+for m in gemini-3.5-flash-lite gemini-3.6-flash; do
   python3 run_baseline.py --model $m --tag "${m}"
 done
 

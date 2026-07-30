@@ -50,7 +50,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--provider", choices=providers.PROVIDERS, default="gemini",
                    help="default: gemini (see ADR 0010)")
     p.add_argument("--model", default=None,
-                   help="override the provider default, e.g. gemini-2.5-pro. "
+                   help="override the provider default, e.g. gemini-3.6-flash. "
                         "Model ids move faster than this harness does.")
     p.add_argument("--effort", choices=("low", "medium", "high", "xhigh", "max"),
                    default="medium",

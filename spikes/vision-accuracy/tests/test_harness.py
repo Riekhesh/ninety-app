@@ -422,7 +422,7 @@ def test_dotenv_survives_the_real_env_example(tmp_path: Path):
     example = SPIKE.parents[1] / ".env.example"
     parsed = parse_dotenv(example.read_text(encoding="utf-8"))
     assert "GEMINI_API_KEY" in parsed
-    assert parsed["NOTCH_VISION_MODEL"] == "gemini-2.5-flash"
+    assert parsed["NOTCH_VISION_MODEL"] == "gemini-3.5-flash-lite"
     assert all(k.replace("_", "").isalnum() for k in parsed)
 
 
