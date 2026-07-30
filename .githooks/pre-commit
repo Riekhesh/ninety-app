@@ -36,8 +36,14 @@ fi
 
 # ── 2. Personal health data ─────────────────────────────────────────────────
 # Meal photos and HealthKit exports are Article 9 special category data (§10).
-if echo "$staged" | grep -qE '^spikes/vision-accuracy/photos/.+|^spikes/healthkit/exports/'; then
+# The .gitkeep placeholders that keep these directories in the tree are fine;
+# anything else under them is your own health data.
+health_data=$(echo "$staged" \
+  | grep -E '^spikes/vision-accuracy/photos/|^spikes/healthkit/exports/' \
+  | grep -v '/\.gitkeep$' || true)
+if [ -n "$health_data" ]; then
   bad "your own health data is staged — never push meal photos or HealthKit exports"
+  printf '\033[31m    %s\033[0m\n' $health_data
 fi
 
 # ── 3. Design tokens in sync ────────────────────────────────────────────────
