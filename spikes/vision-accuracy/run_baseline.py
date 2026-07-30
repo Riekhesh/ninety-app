@@ -34,7 +34,7 @@ sys.path.insert(0, str(HERE))
 
 from notchvision import imaging, providers  # noqa: E402
 from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
-from notchvision.env import load_dotenv  # noqa: E402
+from notchvision.env import describe_missing, load_dotenv  # noqa: E402
 from notchvision.prompts import PROMPT_VERSION, prompt_hash  # noqa: E402
 from notchvision.providers import VisionRefusal  # noqa: E402
 
@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
     if dotenv_path:
         print(f"· env: {dotenv_path}")
     else:
-        print("· env: no .env found (searched upward from the spike directory)")
+        print(describe_missing(HERE))
 
     if not args.photos.is_dir():
         print(f"✗ {args.photos} is not a directory.", file=sys.stderr)

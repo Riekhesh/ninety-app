@@ -23,7 +23,13 @@ sys.path.insert(0, str(SPIKE))
 
 from notchvision import imaging, metrics  # noqa: E402
 from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
-from notchvision.env import find_dotenv, load_dotenv, parse_dotenv  # noqa: E402
+from notchvision.env import (  # noqa: E402
+    describe_missing,
+    find_dotenv,
+    find_near_misses,
+    load_dotenv,
+    parse_dotenv,
+)
 from notchvision.providers import MockProvider, Usage  # noqa: E402
 from notchvision.report import render  # noqa: E402
 from notchvision.schema import EstimateParseError, parse_estimate  # noqa: E402
@@ -458,6 +464,40 @@ def test_dotenv_sets_the_key_the_provider_actually_looks_for(tmp_path: Path, mon
     monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     assert load_dotenv(tmp_path) == tmp_path / ".env"
     assert os.environ.get("GEMINI_API_KEY") == "from-dotenv"
+
+
+def test_near_miss_finds_the_macos_hidden_extension_case(tmp_path: Path):
+    """Finder hides known extensions, so a TextEdit-created file lands as .env.txt
+    while displaying as '.env'. "No .env found" is maddening when you can see it."""
+    root = tmp_path / "Notch-App"
+    deep = root / "spikes" / "vision-accuracy"
+    deep.mkdir(parents=True)
+    (root / ".env.example").write_text("GEMINI_API_KEY=\n", encoding="utf-8")
+    (root / ".env.txt").write_text("GEMINI_API_KEY=key\n", encoding="utf-8")
+
+    assert find_dotenv(deep) is None
+    message = describe_missing(deep)
+    assert ".env.txt" in message
+    assert "macOS hides known extensions" in message
+    assert f"expected: {root / '.env'}" in message
+
+
+def test_near_miss_ignores_env_example(tmp_path: Path):
+    """.env.example always exists, so naming it as a near miss is pure noise."""
+    root = tmp_path / "Notch-App"
+    root.mkdir()
+    (root / ".env.example").write_text("GEMINI_API_KEY=\n", encoding="utf-8")
+    assert find_near_misses(root) == []
+    assert "did you mean" not in describe_missing(root)
+
+
+def test_describe_missing_points_at_the_repo_root(tmp_path: Path):
+    """The useful half of the message: where the file belongs, as a path."""
+    root = tmp_path / "Notch-App"
+    deep = root / "spikes" / "vision-accuracy"
+    deep.mkdir(parents=True)
+    (root / ".env.example").write_text("GEMINI_API_KEY=\n", encoding="utf-8")
+    assert f"expected: {root / '.env'}" in describe_missing(deep)
 
 
 def test_a_nonexistent_start_directory_is_not_an_error(tmp_path: Path):
