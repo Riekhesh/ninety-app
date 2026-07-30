@@ -34,6 +34,7 @@ sys.path.insert(0, str(HERE))
 
 from notchvision import imaging, providers  # noqa: E402
 from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
+from notchvision.env import load_dotenv  # noqa: E402
 from notchvision.prompts import PROMPT_VERSION, prompt_hash  # noqa: E402
 from notchvision.providers import VisionRefusal  # noqa: E402
 
@@ -49,7 +50,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--provider", choices=providers.PROVIDERS, default="gemini",
                    help="default: gemini (see ADR 0010)")
     p.add_argument("--model", default=None,
-                   help="override the provider default, e.g. gemini-2.5-pro. "
+                   help="override the provider default, e.g. gemini-3.6-flash. "
                         "Model ids move faster than this harness does.")
     p.add_argument("--effort", choices=("low", "medium", "high", "xhigh", "max"),
                    default="medium",
@@ -72,6 +73,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+
+    # Before anything touches os.environ. The key lives in the repo-root .env that
+    # .env.example tells you to create; nothing else bridges that file to the
+    # process, so without this the error is "key not set" no matter what you put
+    # in the file. A real exported variable still wins — see env.load_dotenv.
+    # Printed before anything can fail, because "which .env did it actually read"
+    # is the first question when a key that is definitely in the file is not seen.
+    dotenv_path = load_dotenv(HERE)
+    if dotenv_path:
+        print(f"· env: {dotenv_path}")
+    else:
+        print("· env: no .env found (searched upward from the spike directory)")
 
     if not args.photos.is_dir():
         print(f"✗ {args.photos} is not a directory.", file=sys.stderr)

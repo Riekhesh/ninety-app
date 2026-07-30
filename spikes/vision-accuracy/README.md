@@ -8,7 +8,7 @@
 
 | | Answers | Needs | Urgency |
 |---|---|---|---|
-| **1 · Cost check** | What does one photo estimate cost? | **3 photos** | Early. §10's real risk is a surprise bill. |
+| **1 · Cost check** | What does one photo estimate cost? | **3 photos** | ✅ **Done** — $0.000862/image, $1.55/mo at 1,800 calls. [Numbers](../../docs/phase-0/07-spike-findings.md) |
 | **2 · Accuracy benchmark** | How wrong is the estimate? | 20 weighed meals | Whenever. Not a gate. |
 
 Job 2 used to be a Phase 0 gate. It isn't any more, because the photo estimate is
@@ -32,7 +32,7 @@ Runs the whole pipeline — downscale → call → score → report — against 
 mock and prints a real report. No network, no key, no cost. **Do this first**, so a
 broken harness gets found now rather than mid-run.
 
-CI runs the same path (`python3 -m pytest tests -q`, 33 tests).
+CI runs the same path (`python3 -m pytest tests -q`, 40 tests).
 
 ---
 
@@ -56,7 +56,7 @@ the Edge Function's per-user daily cap needs to be generous or strict.
 Cheap comparison on the same 3 photos:
 
 ```bash
-python3 run_baseline.py --limit 3 --model gemini-2.5-pro --tag pro --no-analyse
+python3 run_baseline.py --limit 3 --model gemini-3.6-flash --tag flash --no-analyse
 ```
 
 **Gemini is the default** — you already have credit, and ADR 0010's provider interface
@@ -75,7 +75,7 @@ cp groundtruth.example.csv groundtruth.csv
 python3 run_baseline.py
 ```
 
-Roughly $0.02–0.10 for 20 images on `gemini-2.5-flash` — trivially inside your existing
+Roughly $0.02–0.10 for 20 images on `gemini-3.5-flash-lite` — trivially inside your existing
 credit, with room for the sweeps below.
 
 The **protocol** for collecting those meals is next, and it matters far more than the
@@ -129,7 +129,7 @@ for edge in 2576 1568 1024 768; do
 done
 
 # Cost/accuracy curve across models.
-for m in gemini-2.5-flash gemini-2.5-pro; do
+for m in gemini-3.5-flash-lite gemini-3.6-flash; do
   python3 run_baseline.py --model $m --tag "${m}"
 done
 
@@ -173,12 +173,13 @@ groundtruth.example.csv   copy to groundtruth.csv; rules are in the comments
 notchvision/
   schema.py           the structured-output contract Phase 1's Edge Function inherits
   prompts.py          the prompt, versioned + hashed (bump the version when you edit)
-  providers.py        anthropic | openai | mock, behind one interface (ADR 0010)
+  providers.py        gemini | anthropic | openai | mock, one interface (ADR 0010)
+  env.py              loads the repo-root .env into os.environ
   imaging.py          downscale, EXIF, hash, response cache (§10 cost controls)
   metrics.py          the scoring — bias/noise, portion/density, calibration
   report.py           markdown with interpretation, not just numbers
   dataset.py          ground-truth CSV and run-file loading
-tests/                26 tests, mock provider, run in CI
+tests/                40 tests, mock provider, run in CI
 ```
 
 ---

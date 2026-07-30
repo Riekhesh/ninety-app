@@ -138,3 +138,40 @@ That changes what the measurement is *for*:
 
 **Spike A (HealthKit) remains a genuine spike.** It can still kill the project, and no
 amount of good UX rescues an app that cannot read the phone's health data.
+
+---
+
+## Amended — 2026-07-30: the model id is now `gemini-3.5-flash-lite`
+
+**What new information changed it.** Not a judgement call — `gemini-2.5-flash` is
+**retired for new API keys**. Every call returned `404 NOT_FOUND: no longer available
+to new users`. The model is still listed by `models.list()`, which makes this read as a
+harness bug rather than a dead model; it is not.
+
+**What changed:** the gemini default is `gemini-3.5-flash-lite` ($0.30/$2.50 per 1M
+in/out).
+
+**Why flash-lite rather than the newer `gemini-3.6-flash`:**
+
+- Images are almost entirely *input* tokens, where flash-lite is **5× cheaper**
+  ($0.30 vs $1.50 per 1M).
+- **No `-preview` suffix.** Preview ids get retired — which is precisely the failure
+  above. A four-week benchmark should not be built on one.
+- **Not a `-latest` alias.** `gemini-flash-latest` exists and would drift silently,
+  breaking the requirement at the top of this ADR that a measured error rate be
+  attributable to a specific model version.
+- It is the realistic production choice for a helper-with-correction feature at §10's
+  volumes, so the measured cost is the cost actually payable.
+
+**A trap this exposed, recorded because it is silent.** `Usage.cost_usd` falls back to
+`(0.0, 0.0)` for an unknown model, so running an unpriced `--model` reports **$0.00 per
+image** rather than failing. For the one number the cost check exists to produce, that
+is a wrong answer that looks like a clean result. `gemini-3.6-flash` and
+`gemini-3.5-flash` are now priced alongside flash-lite; the 2.5 entries are kept so
+existing run files still price correctly.
+
+**Reversal trigger unchanged**, plus one: if the 20-meal benchmark shows flash-lite's
+accuracy is materially worse than `gemini-3.6-flash`, the 5× input cost is easily
+affordable at the measured rate ($1.55/mo vs roughly $7/mo). Cost is no longer the
+constraint it was assumed to be — see
+[07-spike-findings.md](../phase-0/07-spike-findings.md).

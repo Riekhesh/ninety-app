@@ -45,9 +45,13 @@ project. Everything else exists to feed it data.
 | 4 | Social layer | Nov – Dec | not started |
 | 5 | Public launch & iterate | Jan 2027 → | not started |
 
-Phase 0 exists to kill the two things that could sink this project — HealthKit
-access and photo-recognition accuracy — in throwaway code, before any real code
-gets written. **Live tracker and exit criteria: [`docs/phase-0/`](docs/phase-0/).**
+Phase 0 exists to kill the risky unknowns in throwaway code, before any real code
+gets written. Photo accuracy turned out to be a **benchmark rather than a gate** —
+the estimate is always a helper with one-tap correction, so a bad number changes the
+UX weighting rather than the feature ([ADR 0010](docs/decisions/0010-anthropic-as-vision-provider.md)).
+Vision cost **is** a gate, and it is measured: **$0.000862/image, $1.55/mo** at §10's
+volumes — 12–35× under the brief's estimate. HealthKit remains a genuine spike: it can
+still kill the project. **Live tracker and exit criteria: [`docs/phase-0/`](docs/phase-0/).**
 
 Phases end on a **testable condition, not a date.** If the exit criteria are not
 met, the phase is not done.
@@ -79,7 +83,7 @@ design/
 
 spikes/                         THROWAWAY. De-risking only — never promoted into the app
   healthkit/                    Spike A — read 30 days of real data on a real device
-  vision-accuracy/              Spike B — measure photo-estimate error over 20 real meals
+  vision-accuracy/              cost per image (done) + the 20-meal accuracy benchmark
 
 scripts/verify-toolchain.sh     checks macOS, Xcode, disk, device, CLI tools, repo setup
 ```

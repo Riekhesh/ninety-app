@@ -46,6 +46,10 @@ PRICING: dict[str, tuple[float, float]] = {
     # $/image figure, so CONFIRM these against the provider's pricing page before
     # quoting a cost in the write-up.
     "gpt-5": (1.25, 10.00),
+    "gemini-3.5-flash-lite": (0.30, 2.50),
+    "gemini-3.6-flash": (1.50, 7.50),
+    "gemini-3.5-flash": (1.50, 9.00),
+    # Retired for new API keys as of July 2026 — kept so old run files still price.
     "gemini-2.5-flash": (0.30, 2.50),
     "gemini-2.5-pro": (1.25, 10.00),
 }
@@ -287,7 +291,7 @@ class GeminiProvider:
 
     name = "gemini"
 
-    def __init__(self, model: str = "gemini-2.5-flash", max_tokens: int = 2000) -> None:
+    def __init__(self, model: str = "gemini-3.5-flash-lite", max_tokens: int = 2000) -> None:
         try:
             from google import genai
         except ImportError as exc:  # pragma: no cover - dependency guard
@@ -299,8 +303,11 @@ class GeminiProvider:
         key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not key:
             raise RuntimeError(
-                "GEMINI_API_KEY is not set. Put it in .env (copy .env.example), "
-                "or run with --provider mock to exercise the pipeline without a key."
+                "GEMINI_API_KEY is not set.\n"
+                "  Put it in the repo-root .env (cp .env.example .env) — the run\n"
+                "  prints which .env it read, so check that line matches the file\n"
+                "  you edited. Or export GEMINI_API_KEY for a one-off run, or use\n"
+                "  --provider mock to exercise the pipeline without a key."
             )
 
         self.model = model
@@ -446,7 +453,7 @@ class MockProvider:
 PROVIDERS = ("gemini", "anthropic", "openai", "mock")
 
 DEFAULT_MODELS = {
-    "gemini": "gemini-2.5-flash",
+    "gemini": "gemini-3.5-flash-lite",
     "anthropic": "claude-opus-5",
     "openai": "gpt-5",
     "mock": "mock-v1",
@@ -463,7 +470,7 @@ def build(provider: str, model: str | None) -> VisionProvider:
     resolved = model or DEFAULT_MODELS.get(provider)
     match provider:
         case "gemini":
-            return GeminiProvider(resolved or "gemini-2.5-flash")
+            return GeminiProvider(resolved or "gemini-3.5-flash-lite")
         case "anthropic":
             return AnthropicProvider(resolved or "claude-opus-5")
         case "openai":
