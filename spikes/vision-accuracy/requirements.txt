@@ -1,0 +1,10 @@
+# Spike B — photo-accuracy baseline.
+# Deliberately minimal: this is throwaway de-risking code (§0.7), and every
+# dependency is one more thing that can break a run you only get to do once.
+
+Pillow>=11.0          # downscale + EXIF orientation
+anthropic>=0.70       # default provider (ADR 0010)
+pytest>=8.0           # the mock-provider pipeline self-test, run in CI
+
+# Optional comparison arm — uncomment if you want the OpenAI numbers too.
+# openai>=1.60
