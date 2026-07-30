@@ -15,13 +15,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-__all__ = [
-    "describe_missing",
-    "find_dotenv",
-    "find_near_misses",
-    "load_dotenv",
-    "parse_dotenv",
-]
+__all__ = ["find_dotenv", "load_dotenv", "parse_dotenv"]
 
 
 def parse_dotenv(text: str) -> dict[str, str]:
@@ -63,50 +57,6 @@ def find_dotenv(start: Path) -> Path | None:
         if candidate.is_file():
             return candidate
     return None
-
-
-def find_near_misses(start: Path) -> list[Path]:
-    """Files that were probably meant to be `.env`.
-
-    macOS Finder hides known extensions, so a file created in TextEdit or via
-    "New Document" lands as `.env.txt` while displaying as `.env`. That is
-    indistinguishable from the file being absent, and "no .env found" is a
-    maddening thing to read when you can see the file in Finder.
-
-    `.env.example` is excluded — it always exists, so reporting it is noise.
-    """
-    misses: list[Path] = []
-    for directory in (start, *start.parents):
-        try:
-            entries = list(directory.iterdir())
-        except OSError:
-            continue
-        for entry in entries:
-            name = entry.name.lower()
-            if name in (".env", ".env.example") or not entry.is_file():
-                continue
-            if name.startswith(".env") or name in ("env", "env.txt"):
-                misses.append(entry)
-    return misses
-
-
-def describe_missing(start: Path) -> str:
-    """Explain a missing `.env` in terms of what is actually on disk."""
-    lines = ["· env: no .env found (searched upward from the spike directory)"]
-
-    for miss in find_near_misses(start)[:3]:
-        lines.append(f"    found {miss} — did you mean this to be .env?")
-        if miss.name.lower().endswith((".txt", ".rtf")):
-            lines.append("    macOS hides known extensions, so this shows as '.env' in Finder.")
-            lines.append(f"    fix: mv '{miss}' '{miss.with_name('.env')}'")
-
-    # Where the file belongs, stated as a path rather than left as an exercise.
-    for directory in (start, *start.parents):
-        if (directory / ".env.example").is_file():
-            lines.append(f"    expected: {directory / '.env'}")
-            break
-
-    return "\n".join(lines)
 
 
 def load_dotenv(start: Path | None = None) -> Path | None:
