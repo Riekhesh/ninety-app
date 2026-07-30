@@ -1,6 +1,7 @@
-# ADR 0010 — Anthropic Claude as the vision provider, behind an interface
+# ADR 0010 — A vision provider interface (Gemini first)
 
-**Status:** Locked
+**Status:** Amended 2026-07-30 — **Gemini is now the default**, see the amendment at
+the bottom. The interface decision below is unchanged and is the part that matters.
 **Date:** 2026-07-30
 **Phase:** 0
 **Brief reference:** §0.2, §04, §1.3
@@ -77,3 +78,63 @@ Both are recorded here because they are the kind of thing that reads as a myster
 - Vision API cost exceeds the §10 projection at Phase 3 volumes, and a cheaper model's
   measured accuracy is acceptable. The whole point of the interface is that this is a
   config change plus a re-run, not a rewrite.
+
+---
+
+## Amended — 2026-07-30: Gemini is the default
+
+**What new information changed it.** The developer already holds ~$10 of Google Gemini
+credit and none with Anthropic. Spending $5 to use the *second*-choice provider, when
+the provider interface makes swapping a one-flag change, is not a good use of money.
+
+**What changed:** `--provider gemini`, model `gemini-2.5-flash`, is the default.
+Anthropic and OpenAI remain available as comparison arms and are one flag away.
+
+**What did not change:** the interface, the schema, the prompt, the metrics, or the
+reasoning above for *why* there is an interface. Adding the third provider took ~60
+lines and touched nothing else — which is the interface earning its keep rather than a
+reversal of the decision.
+
+**Two things this costs, both accepted:**
+
+1. **The headline baseline number will be Gemini's, not Claude's.** Fine — it is still
+   a real measurement, and a Gemini-vs-Claude comparison on the same 20 meals is a
+   better write-up than one model alone.
+2. **Gemini's `response_schema` is an OpenAPI 3.0 subset, not full JSON Schema.**
+   `additionalProperties: false` is rejected rather than ignored, so the shared schema
+   is adapted by `_to_gemini_schema()` in `providers.py`. The practical consequence is
+   that Gemini *may* return keys we did not ask for; `parse_estimate` ignores unknown
+   keys, and there is a test asserting that stays true.
+
+The structured-output argument in the reasoning above still holds — Gemini's
+`response_schema` constrains the response rather than requesting it, which is the
+property that actually mattered.
+
+---
+
+## Amended — 2026-07-30: this is a benchmark, not a spike
+
+**What new information changed it.** A design decision the developer had already made
+and I had not accounted for: the photo estimate is **always** presented as a helper,
+never as truth — ranges, a visible "this might be wrong", and one-tap correction. It is
+never the source of a logged value without confirmation.
+
+That changes what the measurement is *for*:
+
+| | Was framed as | Actually is |
+|---|---|---|
+| Bad accuracy | could kill the feature | changes the UX weighting, not the feature |
+| The 20 meals | a gate before Phase 1 | a portfolio asset, do it any time |
+| **Cost per image** | one line in a report | **the only genuine risk here** |
+
+**Consequences:**
+
+- The 20-meal accuracy benchmark is **no longer a Phase 0 exit gate.** It can happen
+  during or after Phase 1.
+- The **cost check is**, and it needs 3 photos rather than 20. §10's actual warning is
+  a surprise bill: *"add the cap before you hand the app to anyone, not after."*
+- The accuracy magnitude still feeds design: 15% out means a nudge control is enough;
+  60% out with high variance means correction has to be the primary interaction.
+
+**Spike A (HealthKit) remains a genuine spike.** It can still kill the project, and no
+amount of good UX rescues an app that cannot read the phone's health data.

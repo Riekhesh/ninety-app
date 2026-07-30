@@ -1,18 +1,25 @@
-# Spike B — photo-accuracy baseline
+# Photo estimate — cost check and accuracy benchmark
 
 > **Throwaway code.** §0.7: *"Write it fast, learn what you need, then delete it."*
-> The deliverable is the measured number, not this harness.
+> The deliverables are the measured numbers, not this harness.
 
-§0.7 says the measured baseline error rate *"is worth more than the feature itself.
-It gives you an honest accuracy figure for your write-up, a benchmark to improve
-against, and a genuinely impressive answer when someone asks 'but how accurate is it
-really?' Most student projects cannot answer that question at all."*
+**Two separate jobs with very different urgency** (see
+[ADR 0010](../../docs/decisions/0010-anthropic-as-vision-provider.md)):
 
-That is the entire point of this directory.
+| | Answers | Needs | Urgency |
+|---|---|---|---|
+| **1 · Cost check** | What does one photo estimate cost? | **3 photos** | Early. §10's real risk is a surprise bill. |
+| **2 · Accuracy benchmark** | How wrong is the estimate? | 20 weighed meals | Whenever. Not a gate. |
+
+Job 2 used to be a Phase 0 gate. It isn't any more, because the photo estimate is
+always presented as a helper — ranges, visible uncertainty, one-tap correction — so a
+bad number changes how hard the UI leans on correction rather than killing the feature.
+Still worth doing: §0.7 is right that *"most student projects cannot answer that
+question at all."* It just doesn't block anything.
 
 ---
 
-## Try it now, with no API key
+## Step 0 — prove it works, no API key needed
 
 ```bash
 pip install -r requirements.txt
@@ -21,26 +28,58 @@ python3 run_baseline.py --provider mock \
     --photos fixtures/synthetic --truth fixtures/groundtruth.csv --repeats 3
 ```
 
-That runs the whole pipeline — downscale → call → score → report — against a
-deterministic mock, and prints a real report. No network, no key, no cost. Do this
-first: it means a broken harness gets found now, rather than halfway through the one
-run you make against 20 real meals.
+Runs the whole pipeline — downscale → call → score → report — against a deterministic
+mock and prints a real report. No network, no key, no cost. **Do this first**, so a
+broken harness gets found now rather than mid-run.
 
-CI runs the same path (`python3 -m pytest tests -q`, 26 tests).
+CI runs the same path (`python3 -m pytest tests -q`, 33 tests).
 
 ---
 
-## The real thing
+## Step 1 — the cost check (3 photos, ~20 minutes)
+
+The number you actually need before handing the app to anyone.
 
 ```bash
-cp ../../.env.example ../../.env      # fill in ANTHROPIC_API_KEY
+cp ../../.env.example ../../.env     # fill in GEMINI_API_KEY
+mkdir -p photos                       # drop in ANY 3 food photos — no weighing needed
+python3 run_baseline.py --limit 3 --no-analyse
+```
+
+Ground truth is optional here. Without it you get no accuracy figures, but the run
+records real token counts, latency and **cost per image**, which is the point.
+
+Then multiply: §10 estimates **20 users × 3 photos/day ≈ 1,800 calls a month.** That
+tells you whether the vision feature costs 50p or £50 a month, which decides whether
+the Edge Function's per-user daily cap needs to be generous or strict.
+
+Cheap comparison on the same 3 photos:
+
+```bash
+python3 run_baseline.py --limit 3 --model gemini-2.5-pro --tag pro --no-analyse
+```
+
+**Gemini is the default** — you already have credit, and ADR 0010's provider interface
+makes a swap one flag. `--provider anthropic` / `--provider openai` still work.
+
+If a call fails with *model not found*, pass a current `--model`. Model ids move faster
+than this harness does.
+
+---
+
+## Step 2 — the accuracy benchmark (20 meals, whenever)
+
+```bash
 cp groundtruth.example.csv groundtruth.csv
-# ... put 20 weighed meals in photos/ and fill in groundtruth.csv ...
+# ... 20 weighed meals in photos/, filled into groundtruth.csv ...
 python3 run_baseline.py
 ```
 
-Roughly $0.15–0.40 for 20 images on `claude-opus-5` at `medium` effort — comfortably
-inside §0.2's $5 of credit, with room for the sweeps below.
+Roughly $0.02–0.10 for 20 images on `gemini-2.5-flash` — trivially inside your existing
+credit, with room for the sweeps below.
+
+The **protocol** for collecting those meals is next, and it matters far more than the
+harness does.
 
 ---
 
@@ -81,21 +120,26 @@ under UK GDPR Article 9 (§10). The generated report is committed; the photos ar
 Each is one command and each produces a real finding.
 
 ```bash
-# Does downscaling actually cost accuracy? §1.3 asserts it "barely moves" —
-# claude-opus-5 accepts up to 2576px, so this is testable rather than assumed.
+# Does downscaling actually cost accuracy? §1.3 asserts it "barely moves".
+# Every current vision model accepts well above 1024px, so this is testable
+# rather than assumed. Image-token pricing differs per provider — read the
+# $/image the run reports rather than reasoning about it.
 for edge in 2576 1568 1024 768; do
   python3 run_baseline.py --max-edge $edge --tag "edge-$edge"
 done
 
 # Cost/accuracy curve across models.
-for m in claude-opus-5 claude-sonnet-5 claude-haiku-4-5; do
+for m in gemini-2.5-flash gemini-2.5-pro; do
   python3 run_baseline.py --model $m --tag "${m}"
 done
 
-# Effort is the primary cost lever, and low/medium are unusually strong here.
-for e in low medium high; do
-  python3 run_baseline.py --effort $e --tag "effort-$e"
-done
+# Cross-provider, if you ever add credit elsewhere. Same photos, same truth.
+# python3 run_baseline.py --provider anthropic --model claude-opus-5 --tag claude
+
+# Effort is an ANTHROPIC-only lever. Skip this sweep on Gemini.
+# for e in low medium high; do
+#   python3 run_baseline.py --provider anthropic --effort $e --tag "effort-$e"
+# done
 
 # How much does the same photo vary between calls? Sets a floor on how good
 # this feature can ever be — prompt tuning cannot fix run-to-run variance.
@@ -139,16 +183,26 @@ tests/                26 tests, mock provider, run in CI
 
 ---
 
-## Two API details worth knowing before you start
+## Provider gotchas worth knowing before you start
 
-Both are `claude-opus-5` specifics that read as mystery bugs:
+All three read as mystery bugs rather than API errors. `providers.py` already handles
+them; this is so they don't surprise you if you go editing it.
 
-- **`temperature` is rejected, not ignored** — it returns a 400. The instinct to set
-  `temperature=0` for a reproducible baseline is a hard failure. Reproducibility here
-  comes from pinning the model id and prompt hash, which every run manifest records.
-- **Thinking is on by default and thinking blocks come first** in the response, so
+**Gemini (the default)**
+- **`response_schema` is an OpenAPI 3.0 subset, not full JSON Schema.**
+  `additionalProperties` is *rejected*, not ignored, so the shared schema is adapted by
+  `_to_gemini_schema()`. Consequence: Gemini may return keys we didn't ask for.
+  `parse_estimate` ignores unknown keys, and a test asserts that stays true.
+- A content-policy block gives you **no text and no error** — it shows up in
+  `prompt_feedback`. Raised as `VisionRefusal` so a run reports it instead of crashing.
+
+**Anthropic, if you switch**
+- **`temperature` is rejected with a 400, not ignored.** The instinct to set
+  `temperature=0` for a reproducible baseline is a hard failure. Reproducibility comes
+  from pinning the model id and prompt hash, which every run manifest records.
+- **Thinking is on by default and thinking blocks come first**, so
   `response.content[0].text` gets you an empty thinking block rather than your JSON.
-  Find the text block by type. `providers.py` does.
+  Find the text block by type.
 
 ---
 

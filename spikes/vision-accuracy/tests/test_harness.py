@@ -312,6 +312,84 @@ def test_cost_prices_cache_reads_cheaper_than_fresh_input():
     assert cached.cost_usd("claude-opus-5") < fresh.cost_usd("claude-opus-5") / 5
 
 
+def test_every_provider_has_a_default_model():
+    from notchvision.providers import DEFAULT_MODELS, PROVIDERS
+
+    assert set(DEFAULT_MODELS) == set(PROVIDERS)
+
+
+def test_unknown_provider_names_the_valid_ones():
+    from notchvision import providers
+
+    with pytest.raises(ValueError, match="gemini"):
+        providers.build("bard", None)
+
+
+def test_every_default_model_is_priced():
+    """A model with no price silently reports $0.0000/image, which is worse than
+    an error — it looks like the feature is free."""
+    from notchvision.providers import DEFAULT_MODELS, PRICING
+
+    for provider, model in DEFAULT_MODELS.items():
+        if provider == "mock":
+            continue  # the mock is genuinely free
+        assert model in PRICING, f"{model} has no pricing entry"
+
+
+# ─── Gemini schema adaptation ────────────────────────────────────────────────
+# Gemini's response_schema is an OpenAPI 3.0 subset and REJECTS unknown keys
+# rather than ignoring them, so the shared schema has to be adapted. These tests
+# are the only way to catch a regression without burning an API call.
+
+
+def test_gemini_schema_strips_unsupported_keys():
+    from notchvision.providers import _to_gemini_schema
+    from notchvision.schema import ESTIMATE_SCHEMA
+
+    adapted = json.dumps(_to_gemini_schema(ESTIMATE_SCHEMA))
+    assert "additionalProperties" not in adapted
+    assert "$schema" not in adapted
+
+
+def test_gemini_schema_keeps_the_parts_that_matter():
+    from notchvision.providers import _to_gemini_schema
+    from notchvision.schema import ESTIMATE_SCHEMA
+
+    adapted = _to_gemini_schema(ESTIMATE_SCHEMA)
+    item = adapted["properties"]["items"]["items"]
+
+    # The range fields and the confidence enum are the contract — losing any of
+    # them silently changes what the model returns.
+    for field_name in ("name", "grams_low", "grams_high", "kcal_low", "kcal_high",
+                       "confidence"):
+        assert field_name in item["properties"], f"lost {field_name}"
+    assert item["properties"]["confidence"]["enum"] == ["low", "medium", "high"]
+    assert set(item["required"]) == set(item["properties"])
+
+
+def test_gemini_schema_adds_stable_property_ordering():
+    from notchvision.providers import _to_gemini_schema
+    from notchvision.schema import ESTIMATE_SCHEMA
+
+    adapted = _to_gemini_schema(ESTIMATE_SCHEMA)
+    assert adapted["propertyOrdering"] == ["items", "notes"]
+    assert adapted["properties"]["items"]["items"]["propertyOrdering"][0] == "name"
+
+
+def test_gemini_output_still_parses_with_extra_keys():
+    """Losing `additionalProperties: false` means Gemini may add keys we did not
+    ask for. That has to be harmless, not a crash."""
+    est = parse_estimate({
+        "items": [{"name": "rice", "grams_low": 100, "grams_high": 150,
+                   "kcal_low": 130, "kcal_high": 195, "confidence": "high",
+                   "surprise_field": "gemini added this"}],
+        "notes": "",
+        "another_surprise": 42,
+    })
+    assert est.items[0].name == "rice"
+    assert est.warnings == ()
+
+
 # ─── End to end ──────────────────────────────────────────────────────────────
 
 

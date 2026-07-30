@@ -42,7 +42,12 @@ PRICING: dict[str, tuple[float, float]] = {
     "claude-opus-4-8": (5.00, 25.00),
     "claude-sonnet-5": (3.00, 15.00),
     "claude-haiku-4-5": (1.00, 5.00),
-    "gpt-5": (1.25, 10.00),  # placeholder — confirm before quoting
+    # Non-Anthropic rates are approximate and move often. The report prints a
+    # $/image figure, so CONFIRM these against the provider's pricing page before
+    # quoting a cost in the write-up.
+    "gpt-5": (1.25, 10.00),
+    "gemini-2.5-flash": (0.30, 2.50),
+    "gemini-2.5-pro": (1.25, 10.00),
 }
 CACHE_WRITE_MULTIPLIER = 1.25
 CACHE_READ_MULTIPLIER = 0.10
@@ -260,6 +265,125 @@ class OpenAIProvider:
 # ─── Mock ────────────────────────────────────────────────────────────────────
 
 
+class GeminiProvider:
+    """Google Gemini. The first provider actually used, because the credit existed.
+
+    ADR 0010 chose Anthropic as the default and put every provider behind an
+    interface so a comparison arm was cheap. This class is that decision paying off:
+    adding a third provider is ~60 lines and changes nothing else.
+
+    Two Gemini-specific wrinkles:
+
+      1. **`response_schema` is an OpenAPI 3.0 subset, not full JSON Schema.**
+         `additionalProperties` is not supported and is rejected rather than ignored,
+         so the shared schema has to be adapted — see `_to_gemini_schema`. Losing
+         `additionalProperties: false` means Gemini *may* add keys we did not ask
+         for; `parse_estimate` ignores unknown keys, so this is harmless here.
+
+      2. **Token accounting names differ** — `usage_metadata.prompt_token_count`
+         rather than `usage.input_tokens`. Image tokens are folded into the prompt
+         count, so there is no separate image figure to report.
+    """
+
+    name = "gemini"
+
+    def __init__(self, model: str = "gemini-2.5-flash", max_tokens: int = 2000) -> None:
+        try:
+            from google import genai
+        except ImportError as exc:  # pragma: no cover - dependency guard
+            raise RuntimeError(
+                "pip install google-genai\n"
+                "  (the new unified SDK — NOT the older google-generativeai package)"
+            ) from exc
+
+        key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+        if not key:
+            raise RuntimeError(
+                "GEMINI_API_KEY is not set. Put it in .env (copy .env.example), "
+                "or run with --provider mock to exercise the pipeline without a key."
+            )
+
+        self.model = model
+        self.max_tokens = max_tokens
+        self._genai = genai
+        self._client = genai.Client(api_key=key)
+
+    def estimate(self, image: PreparedImage, effort: str) -> ProviderResult:
+        import base64
+
+        from google.genai import types
+
+        started = time.perf_counter()
+
+        response = self._client.models.generate_content(
+            model=self.model,
+            contents=[
+                types.Part.from_bytes(
+                    data=base64.standard_b64decode(image.data_b64),
+                    mime_type=image.media_type,
+                ),
+                types.Part.from_text(text=USER_PROMPT),
+            ],
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                max_output_tokens=self.max_tokens,
+                response_mime_type="application/json",
+                response_schema=_to_gemini_schema(ESTIMATE_SCHEMA),
+            ),
+        )
+        latency_ms = int((time.perf_counter() - started) * 1000)
+
+        text = getattr(response, "text", None)
+        if not text:
+            # Gemini signals a content-policy block via prompt_feedback rather than
+            # a stop_reason, and returns no text at all.
+            feedback = getattr(response, "prompt_feedback", None)
+            raise VisionRefusal(
+                f"no text returned (prompt_feedback={feedback}). Food photos should "
+                "never trigger this — inspect the image."
+            )
+
+        meta = getattr(response, "usage_metadata", None)
+        usage = Usage(
+            input_tokens=getattr(meta, "prompt_token_count", 0) or 0,
+            output_tokens=getattr(meta, "candidates_token_count", 0) or 0,
+            cache_read_tokens=getattr(meta, "cached_content_token_count", 0) or 0,
+        )
+
+        return ProviderResult(
+            raw_json=json.loads(text),
+            usage=usage,
+            latency_ms=latency_ms,
+            model=self.model,
+        )
+
+
+# Keys Gemini's response_schema does not accept. It rejects unknown keys rather
+# than ignoring them, so they have to be stripped rather than left in place.
+_GEMINI_UNSUPPORTED = {"additionalProperties", "$schema", "default", "examples"}
+
+
+def _to_gemini_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """Adapt the shared JSON Schema to Gemini's OpenAPI 3.0 subset.
+
+    Recursive, and deliberately conservative: strip what is known-unsupported and
+    pass everything else through. `propertyOrdering` is added so the model emits
+    fields in a stable order, which makes eyeballing raw responses less painful.
+    """
+    out: dict[str, Any] = {}
+    for key, value in schema.items():
+        if key in _GEMINI_UNSUPPORTED:
+            continue
+        if key == "properties" and isinstance(value, dict):
+            out[key] = {k: _to_gemini_schema(v) for k, v in value.items()}
+            out["propertyOrdering"] = list(value.keys())
+        elif key == "items" and isinstance(value, dict):
+            out[key] = _to_gemini_schema(value)
+        else:
+            out[key] = value
+    return out
+
+
 class MockProvider:
     """Deterministic synthetic estimates. No network, no key, no cost.
 
@@ -319,12 +443,34 @@ class MockProvider:
         )
 
 
+PROVIDERS = ("gemini", "anthropic", "openai", "mock")
+
+DEFAULT_MODELS = {
+    "gemini": "gemini-2.5-flash",
+    "anthropic": "claude-opus-5",
+    "openai": "gpt-5",
+    "mock": "mock-v1",
+}
+
+
 def build(provider: str, model: str | None) -> VisionProvider:
-    """Factory. `model=None` uses each provider's default."""
-    if provider == "anthropic":
-        return AnthropicProvider(model or "claude-opus-5")
-    if provider == "openai":
-        return OpenAIProvider(model or "gpt-5")
-    if provider == "mock":
-        return MockProvider(model or "mock-v1")
-    raise ValueError(f"unknown provider {provider!r} (anthropic | openai | mock)")
+    """Factory. `model=None` uses each provider's default (see DEFAULT_MODELS).
+
+    Model ids move faster than this file does. If a call fails with "model not
+    found", pass `--model` with a current id rather than assuming the harness is
+    broken.
+    """
+    resolved = model or DEFAULT_MODELS.get(provider)
+    match provider:
+        case "gemini":
+            return GeminiProvider(resolved or "gemini-2.5-flash")
+        case "anthropic":
+            return AnthropicProvider(resolved or "claude-opus-5")
+        case "openai":
+            return OpenAIProvider(resolved or "gpt-5")
+        case "mock":
+            return MockProvider(resolved or "mock-v1")
+        case _:
+            raise ValueError(
+                f"unknown provider {provider!r} — expected one of {', '.join(PROVIDERS)}"
+            )

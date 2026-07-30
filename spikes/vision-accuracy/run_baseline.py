@@ -46,13 +46,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="directory of meal photos (default: photos/)")
     p.add_argument("--truth", type=Path, default=HERE / "groundtruth.csv",
                    help="ground-truth CSV (default: groundtruth.csv)")
-    p.add_argument("--provider", choices=("anthropic", "openai", "mock"),
-                   default="anthropic")
+    p.add_argument("--provider", choices=providers.PROVIDERS, default="gemini",
+                   help="default: gemini (see ADR 0010)")
     p.add_argument("--model", default=None,
-                   help="override the provider default (e.g. claude-sonnet-5)")
+                   help="override the provider default, e.g. gemini-2.5-pro. "
+                        "Model ids move faster than this harness does.")
     p.add_argument("--effort", choices=("low", "medium", "high", "xhigh", "max"),
                    default="medium",
-                   help="cost/quality lever (default: medium). Sweep this.")
+                   help="cost/quality lever, ANTHROPIC ONLY (default: medium). "
+                        "Ignored by other providers; recorded in the manifest either way.")
     p.add_argument("--max-edge", type=int, default=1024,
                    help=f"longest edge in px, 1..{imaging.MAX_SUPPORTED_EDGE} "
                         "(default: 1024, per §1.3)")

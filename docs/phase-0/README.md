@@ -13,44 +13,65 @@ weeks 3–16 turns out to be impossible."*
 Phases end on a testable condition, not a date. If these aren't met, the phase isn't
 done — extend it and compress a later one.
 
-- [ ] **Apple Developer Program membership active**
-- [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
-- [ ] **Photo-accuracy baseline measured across 20 real meals and written down** → [Spike B](../../spikes/vision-accuracy/README.md), results into [07-spike-findings.md](07-spike-findings.md)
-- [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
-- [ ] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md)
 - [x] **Repo live, SwiftLint configured, secrets handling decided** → `.swiftlint.yml`, [secrets.md](../security/secrets.md)
+- [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
+- [ ] **Vision cost per image measured** → 3 photos, `--provider gemini --limit 3`. §10's real risk is a surprise bill.
+- [ ] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md)
+- [ ] **Apple Developer Program membership active** — needed only for the next item
+- [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
+
+**Moved out of the exit criteria** (see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)):
+
+- **Photo accuracy across 20 weighed meals.** The photo estimate is always presented as
+  a helper — ranges, visible uncertainty, one-tap correction — so a bad number changes
+  the UX weighting rather than killing the feature. That makes it a **benchmark, not a
+  spike**: valuable, but not a gate. Do it during or after Phase 1, whenever the meals
+  accumulate. Results still go in [07-spike-findings.md](07-spike-findings.md).
 
 ---
 
-## The critical path
+## Spike vs benchmark — the distinction that decides urgency
 
-**Buy the Apple Developer Program today.** Everything else can run in parallel; Spike
-A cannot start without it.
+| | Question | If the answer is bad | Urgency |
+|---|---|---|---|
+| **Spike A · HealthKit** | *Can I get weight and step data off my iPhone at all?* | **The project dies.** No UX rescues it. | Real gate |
+| **Cost per image** | *What does one photo estimate cost?* | Surprise bill with real users (§10) | Do it early, 3 photos |
+| **Accuracy benchmark** | *How wrong is the estimate?* | Correction becomes the primary interaction instead of a secondary one | Whenever |
 
-HealthKit and Sign in with Apple are paid-programme entitlements. Free provisioning
-gives you 7-day certificates and no access to either — so you literally cannot
-complete Spike A without paying, and enrolment can take **several days** to clear.
-§0.1 moves this from Phase 2 to week one for exactly this reason.
+A **spike** can kill a feature. A **benchmark** calibrates one. Only the first is a gate.
 
-$99/year + 20% UK VAT for an individual. developer.apple.com/programs → Enroll.
+---
+
+## Sequencing
+
+The Apple Developer Program is $99 + VAT and its *only* purpose is unblocking Spike A.
+Enrolment takes several days, so buy it about a week before you want to run Spike A —
+not on day one, where it sits unused while you learn Swift.
+
+This is a deliberate deviation from §0.1, which puts the purchase in week one. §0.1
+assumes you are ready to build immediately; the account should arrive just before the
+thing it unblocks.
 
 ```
-Now (pre-window) ──── buy dev account ──────────────┐
-                      create other accounts        │ enrolment clears
-                      run scripts/verify-toolchain  │ (days, not hours)
-                                                    ▼
-Week 1 (3–9 Aug) ──── Spike B (vision) ◄── not blocked
-                      Swift days 1–15
-                      install the 6 teardown apps and start using them
+Now ─────────── start the Xcode download (~40 GB, hours, no account needed)
+                GEMINI_API_KEY into .env
+                cost check: 3 photos, one command
+                Swift days 1–5
 
-Week 2 (10–16) ────── Spike A (HealthKit) ◄── needs the dev account
-                      Swift days 16–30
-                      teardown numbers + 10 differences
-                      write up 07-spike-findings.md
+Then ────────── weigh meals as you eat them (slow, passive, no deadline)
+                install the 6 teardown apps and just use them
+                Swift days 5–20
+
+Then ────────── teardown numbers + 10 differences (~90 min once you've used the apps)
+                design the app in Claude (fully unblocked, do it whenever)
+
+Then ────────── buy the dev account → wait for it to clear → Spike A (~90 min)
+
+Then ────────── Phase 1
 ```
 
-**Do Spike B first.** It's the one that isn't blocked, it's where the genuinely novel
-finding is, and it costs about £0.30.
+Three things at a time, maximum. Everything else in this repo is reference material —
+you do not need to read it to make progress.
 
 ---
 
