@@ -15,7 +15,7 @@ done — extend it and compress a later one.
 
 - [x] **Repo live, SwiftLint configured, secrets handling decided** → `.swiftlint.yml`, [secrets.md](../security/secrets.md)
 - [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
-- [ ] **Vision cost per image measured** → 3 photos, `--provider gemini --limit 3`. §10's real risk is a surprise bill.
+- [x] **Vision cost per image measured** → **$0.000862/image, $1.55/mo at 1,800 calls** — 12–35× under §10's $0.01–0.03 estimate. [Numbers](07-spike-findings.md#cost-per-image--measured-)
 - [ ] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md)
 - [ ] **Apple Developer Program membership active** — needed only for the next item
 - [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
@@ -35,7 +35,7 @@ done — extend it and compress a later one.
 | | Question | If the answer is bad | Urgency |
 |---|---|---|---|
 | **Spike A · HealthKit** | *Can I get weight and step data off my iPhone at all?* | **The project dies.** No UX rescues it. | Real gate |
-| **Cost per image** | *What does one photo estimate cost?* | Surprise bill with real users (§10) | Do it early, 3 photos |
+| **Cost per image** | *What does one photo estimate cost?* | Surprise bill with real users (§10) | ✅ **Done** — $0.000862 |
 | **Accuracy benchmark** | *How wrong is the estimate?* | Correction becomes the primary interaction instead of a secondary one | Whenever |
 
 A **spike** can kill a feature. A **benchmark** calibrates one. Only the first is a gate.
@@ -53,10 +53,9 @@ assumes you are ready to build immediately; the account should arrive just befor
 thing it unblocks.
 
 ```
-Now ─────────── start the Xcode download (~40 GB, hours, no account needed)
-                GEMINI_API_KEY into .env
-                cost check: 3 photos, one command
-                Swift days 1–5
+Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured
+
+Now ─────────── Swift days 1–5
 
 Then ────────── weigh meals as you eat them (slow, passive, no deadline)
                 install the 6 teardown apps and just use them
@@ -81,7 +80,7 @@ you do not need to read it to make progress.
 |---|---|---|---|
 | **Apple Developer Program** | $99/yr + VAT | **now** | HealthKit, Sign in with Apple, TestFlight. Critical path. |
 | GitHub | free | done | Private repo + Actions. Turn on **secret scanning with push protection** in settings. |
-| Anthropic API | pay-as-you-go | week 1 | Spike B. $5 of credit is ample — the 20-meal baseline is ~£0.30. |
+| Google Gemini API | pay-as-you-go | **done** | Spike B, using existing credit ([ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)). Measured at $0.000862/image, so the 20-meal baseline is ~$0.02. Anthropic/OpenAI remain optional comparison arms. |
 | Supabase | free → ~$25/mo | week 2 | Not needed until Phase 1, but create the project so it exists. |
 | PostHog | free | now | Not needed until Phase 3. Create it now so you're not doing admin later (§0.2). |
 | Figma | free | optional | Only if you want to mirror the tokens. `notch.tokens.json` imports via Tokens Studio. |

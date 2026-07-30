@@ -129,7 +129,7 @@ printf '\n\033[1mCheck these yourself\033[0m\n'
 printf '  \033[2m·\033[0m Apple Developer Program membership is ACTIVE — the critical path.\n'
 printf '    developer.apple.com/account. If "HealthKit" is missing from Xcode'"'"'s\n'
 printf '    capability list, or the signing team dropdown is empty, it has not cleared.\n'
-printf '  \033[2m·\033[0m ANTHROPIC_API_KEY is filled in in .env (for Spike B).\n'
+printf '  \033[2m·\033[0m GEMINI_API_KEY is filled in in .env (for Spike B — ADR 0010).\n'
 printf '  \033[2m·\033[0m GitHub secret scanning with push protection is on for this repo.\n\n'
 
 if [ "$FAILED" -ne 0 ]; then

@@ -311,12 +311,13 @@ def render(
         "saving for the write-up."
     )
     L.append(
-        "- Sweep `--model` across `claude-opus-5`, `claude-sonnet-5`, `claude-haiku-4-5` "
-        "for the cost/accuracy curve."
+        "- Sweep `--model` across `gemini-3.5-flash-lite` and `gemini-3.6-flash` for the "
+        "cost/accuracy curve. Add `--provider anthropic --model claude-opus-5` for a "
+        "cross-provider arm if you put credit there."
     )
     L.append(
-        "- Sweep `--effort low medium high` — effort is the primary cost lever, and "
-        "lower levels are unusually strong on this model."
+        "- `--effort` is an ANTHROPIC-only lever and is ignored on Gemini. Skip that "
+        "sweep unless you switch provider."
     )
     L.append(
         "- Record the final numbers in `docs/phase-0/07-spike-findings.md`. §0.7 is "

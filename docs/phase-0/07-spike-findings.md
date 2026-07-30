@@ -55,10 +55,60 @@ them apart.
 
 ---
 
+## Cost per image — **MEASURED** ✅
+
+The Phase 0 gate (see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)).
+§10's real risk was never accuracy, it was a surprise bill.
+
+**Run on:** 2026-07-30 · `gemini-3.5-flash-lite` · 1024 px · 3 photos, no ground truth
+
+| | |
+|---|---:|
+| Input tokens per image | 1,636 |
+| Output tokens per image | ~148 |
+| **Cost per image** | **$0.000862** |
+| Projected at §10's 1,800 calls/month | **$1.55** (~£1.23) |
+| Latency | 1.9 – 3.1 s per call |
+
+### The finding: §10 overestimated this by more than an order of magnitude
+
+§10 budgeted **$0.01–0.03 per image**, i.e. $18–54/month at 1,800 calls. The measured
+figure is **12–35× cheaper**.
+
+| Scenario | Calls/month | Cost |
+|---|---:|---:|
+| §10's projection — 20 users × 3/day | 1,800 | $1.55 |
+| 20 users × 10/day | 6,000 | $5.17 |
+| 100 users × 3/day | 9,000 | $7.76 |
+| 1,000 users × 3/day | 90,000 | $77.58 |
+
+**Consequence for Phase 1:** the per-user daily cap in the Edge Function is an
+**abuse control, not a cost control.** 20–30 photos/day is generous enough that no
+honest user reaches it while still bounding a runaway client loop. §10's instruction —
+*"add the cap before you hand the app to anyone, not after a surprise bill"* — stands;
+the cap just doesn't need to be stingy.
+
+A second consequence: aggressive downscaling is no longer a cost argument. At a tenth
+of a penny per image, the `--max-edge` sweep is now an *accuracy* question only.
+
+> Rates are Google's published paid-tier figures for `gemini-3.5-flash-lite`
+> ($0.30/$2.50 per 1M in/out), taken from third-party trackers rather than Google's
+> pricing page. Confirm before quoting in the write-up. Token counts are measured and
+> recorded in the run manifest, so the figure can be recomputed if a rate has moved.
+
+---
+
 ## Spike B — photo estimate accuracy
 
-**Status:** harness ready and self-tested; needs your 20 weighed meals.
+**Status:** harness proven end-to-end against the live API; needs your 20 weighed meals.
+Not a Phase 0 gate — see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md).
 **Run on:** `TO BE MEASURED` · model `TO BE MEASURED` · effort `TO BE MEASURED` · `TO BE MEASURED` px
+
+> Informal signal from the 3-photo cost run, **not** a measurement: the estimates were
+> broadly plausible against remembered values, and the one large number was a large
+> takeaway pizza rather than an error. That is an eyeball check, not a baseline — its
+> only value is that the model is not fundamentally broken on real photos from this
+> phone, which was genuinely unknown beforehand.
 
 `analyse.py` generates a full report next to each run in
 `spikes/vision-accuracy/runs/`. Paste the headline numbers here so they survive.
@@ -128,25 +178,26 @@ Read together — coverage alone is gameable, since 100–2000 kcal covers every
 
 ### Sweeps
 
-**Does downscaling cost accuracy?** §1.3 says it "barely moves"; `claude-opus-5`
-accepts up to 2576px, so this is testable.
+**Does downscaling cost accuracy?** §1.3 says it "barely moves", and the harness
+accepts up to 2576px, so this is testable rather than assumed.
 
 | Longest edge | MAPE | Image tokens | $/image |
 |---:|---:|---:|---:|
 | 2576 | `TO BE MEASURED` | | |
 | 1568 | | | |
-| 1024 | | | |
+| 1024 | | | 0.000862 |
 | 768 | | | |
 
-**Verdict:** `TO BE MEASURED` — if flat, that's a measured ~4× token saving to quote.
+**Verdict:** `TO BE MEASURED`. Note this is now purely an accuracy question — the cost
+check above put 1024px at a tenth of a penny, so there is no meaningful bill to save.
 
 **Cost/accuracy across models:**
 
-| Model | MAPE | $/image | Projected £/mo at 1,800 calls |
+| Model | MAPE | $/image | Projected $/mo at 1,800 calls |
 |---|---:|---:|---:|
-| claude-opus-5 | `TO BE MEASURED` | | |
-| claude-sonnet-5 | | | |
-| claude-haiku-4-5 | | | |
+| gemini-3.5-flash-lite | `TO BE MEASURED` | 0.000862 | 1.55 |
+| gemini-3.6-flash | | | |
+| claude-opus-5 *(optional cross-provider arm)* | | | |
 
 **Run-to-run variance** (same photo, 3 calls): `TO BE MEASURED` % mean CV
 
