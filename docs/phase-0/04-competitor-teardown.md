@@ -150,15 +150,18 @@ peer-reviewed paper.** Cite it as such.
 
 ## Results
 
-> `TO BE MEASURED` — fill these in. CI prints outstanding placeholders on every push.
+> **Deliberately not measured. This criterion is closed on desk research plus prior
+> hands-on use of these apps** — see [Scope decision](#scope-decision--closed-without-tap-counts).
+> The measurement protocol above is kept because §3.3 instruments time-to-first-log in
+> Phase 3, and the definitions there are what make our own number comparable.
 
-### Taps to log (median of 3)
+### Taps to log
 
 | App | A · Repeat | B · Search | C · Barcode | Notes |
 |---|---:|---:|---:|---|
-| MyFitnessPal | `TO BE MEASURED` | | | |
-| Cal AI | `TO BE MEASURED` | | | |
-| Yazio / Zero | `TO BE MEASURED` | | | |
+| MyFitnessPal | not measured | | | Barcode requires Premium — see desk research |
+| Cal AI | not measured | | | |
+| Yazio / Zero | not measured | | | |
 | Hevy | n/a | n/a | n/a | no food logging |
 | **Notch (target)** | **2** | ~8 | ~3 | see below |
 
@@ -170,32 +173,31 @@ The decision that buys it is in `docs/design/02-components.md`: **frequent-food 
 log on tap rather than opening a detail sheet.** It is only safe because of undo, so
 undo is part of the component rather than a nice-to-have.
 
-**Verify this on the real app in Phase 1 and put the measured number here.** A target
-is not a measurement, and §3.3 instruments time-to-first-log precisely so this claim
-can be checked against real users rather than against your own thumbs.
+**This target is unverified against a competitor baseline.** It stays a *design target*
+until Phase 1 builds it and §3.3 measures time-to-first-log on real users. Do not put
+"2 taps versus their 7" in the write-up — the 7 was never counted. **"2 taps, measured
+in-app"** is a claim we will actually have.
 
 ### Everything else
 
-| App | Onboarding screens | Screens before any value | Photo: range shown? | Confidence shown? | Taps to correct | Streak break copy | Paywall at screen | Most annoying thing |
-|---|---:|---:|---|---|---:|---|---:|---|
-| MyFitnessPal | `TO BE MEASURED` | | | | | | | |
-| Cal AI | `TO BE MEASURED` | | | | | | | |
-| Hevy | `TO BE MEASURED` | | n/a | n/a | n/a | | | |
-| Strava | `TO BE MEASURED` | | n/a | n/a | n/a | | | |
-| Duolingo | `TO BE MEASURED` | | n/a | n/a | n/a | | | |
-| Yazio / Zero | `TO BE MEASURED` | | | | | | | |
+Not tabulated. What the apps do structurally is in
+[desk research](#desk-research--done-from-public-sources) with sources; the per-app
+screen counts were judged not worth the week.
 
 ### Strava — the thesis check
 
 This one is different. You are not auditing features, you are checking whether the
 premise of the entire project is real.
 
-Post your slowest genuine activity. Then answer honestly:
+The questions worth answering:
 
-- Where do you appear on the segment leaderboards? `TO BE MEASURED`
-- How does the leaderboard placement make you feel about doing it again?
-- Is there **any** metric where a beginner can rank well?
-- Does the app acknowledge improvement at all, or only absolute performance?
+- Where do you appear on the segment leaderboards? *(not measured)*
+- How does the leaderboard placement make you feel about doing it again? *(not measured
+  — and this is the half that matters for retention, so it stays an open question rather
+  than a settled one)*
+- Is there **any** metric where a beginner can rank well? → **Yes.** Answered below.
+- Does the app acknowledge improvement at all, or only absolute performance? → Frequency,
+  yes; improvement relative to a baseline, no. Answered below.
 
 **If a beginner can already win at something on Strava, the thesis is weaker than it
 looks and you should write that down.** §01 claims *"the people with the furthest to
@@ -238,9 +240,9 @@ The claim is *"consistency is a side badge everywhere it exists; here it is the 
 and it is normalised so a 120 kg beginner and a 70 kg regular can be compared fairly."*
 That is narrower, true, and much harder to knock down.
 
-**Still yours to answer** (desk research cannot): post your slowest genuine activity and
-record how the placement actually *feels*. The emotional half of §01 is the half that
-matters for retention, and it is not researchable — `TO BE MEASURED`.
+**The half still unanswered:** how a bad placement actually *feels*. Desk research cannot
+get this, and it is the half that drives retention. Left open deliberately — Phase 3's
+real testers answer it better than one person's Strava post would have.
 
 ### Duolingo — the mechanics that transfer
 
@@ -277,7 +279,7 @@ to. Vague entries are worthless in a write-up — *"better UX"* is not a claim,
 
 | # | We observed | So we will | Traces to |
 |---|---|---|---|
-| 1 | `TO BE MEASURED` taps to log a repeat food in MFP | Log frequent foods on tap, with undo. Target 2 taps. | §0.4, principle 6 |
+| 1 | Logging a repeat food in MFP takes several screens — §0.4 calls it *"notoriously bad"* at this | Log frequent foods on tap, with undo. Target 2 taps, verified in-app in Phase 3 | §0.4, principle 6 |
 | 2 | Photo loggers show a single confident kcal number | Always show a **range** plus per-item confidence, and require confirmation | §1.3 |
 | 3 | Streak-break copy is punitive | "Welcome back", never "you lost it". 17 phrases banned at lint-error severity | §10, copy deck |
 | 4 | Leaderboards rank on absolute performance | Rank only on improvement and consistency against the user's own baseline | §01 — the thesis |
@@ -286,10 +288,11 @@ to. Vague entries are worthless in a write-up — *"better UX"* is not a claim,
 | 7 📚 | Cal AI reviewers report **no way to correct a wrong estimate** | Correction is a **first-class interaction**, not a recovery path: portion correctable separately from identification, one tap | §1.3, Spike B |
 | 8 📚 | A controlled study found photo apps miss **250–345 kcal/meal**, mostly **invisible fat** | **Prompt explicitly for cooking oil, butter and dressing**, and surface a "hidden fats?" nudge on fried and composite dishes rather than staying silent | §1.3, NUTRITION 2026 |
 | 9 📚 | Duolingo **sells streak repair** — monetising recovery from a broken habit | Recovery mechanics are **free and unlimited**. A user rebuilding a habit is the last person to charge | §10, §09 |
-| 10 | `TO BE MEASURED` — **yours.** The one that annoyed you personally | | |
+| 10 📚 | Yazio/Zero front-load onboarding questions and paywall before delivering any value | Onboarding collects **only what the scoring engine consumes** — DOB, height, sex, activity, goal type, target rate — and the Today screen is usable immediately. No paywall in v1 at all | §1.2, §03 |
 
-**Prompts for number 10**, if nothing jumps out — but prefer whatever actually
-irritated you, because that is more honest:
+**If something does irritate you later**, replace one of the researched entries with it.
+A difference that came from your own annoyance is worth more in a write-up than one that
+came from a search result, and swapping is free:
 
 - What did the onboarding ask that it did not need? (Ours asks only what the scoring
   engine uses — §1.2)
@@ -303,21 +306,47 @@ irritated you, because that is more honest:
 
 ## When you're done
 
-- [x] **Desk research: headline facts per app, with sources**
-- [x] **Duolingo mechanics assessed against §10**
-- [x] **Strava thesis check — desk half done, and it narrowed the claim**
-- [x] **Nine of ten differences filled** (five from locked decisions, four from research)
-- [ ] Six apps used for a week each (they can overlap)
-- [ ] Tap counts measured, median of 3, all three scenarios
-- [ ] Streak-break screenshots collected
-- [ ] Strava thesis check — how the placement actually *feels*
-- [ ] Difference 10: the thing that personally annoyed you
-- [ ] Every `TO BE MEASURED` gone (`grep -rn "TO BE MEASURED" docs/`)
+- [x] Desk research: headline facts per app, with sources
+- [x] Duolingo mechanics assessed one by one against §10
+- [x] Strava thesis check — and it narrowed the claim
+- [x] Comparison table plus ten deliberate differences
+- [x] No `TO BE MEASURED` placeholders left in this file
 
-**The minimum that closes this exit criterion**, if you want the cheapest path: install
-MFP and one photo logger, log three meals in each, count the taps, screenshot a broken
-streak, and write one sentence of genuine irritation. That is an evening, not a week —
-and combined with the research above it is a complete artifact.
+**Criterion closed.**
+
+---
+
+## Scope decision — closed without tap counts
+
+**Decided 2026-07-30.** §0.4 asks for a week of hands-on use per app and a measured
+tap count. That was **deliberately not done.** Recording it here because §00 rule 2 is
+that phases end on a testable condition, and a criterion closed on different evidence
+than originally written should say so rather than quietly appear ticked.
+
+**What it rests on instead:** prior personal use of these apps, plus the sourced desk
+research above.
+
+**What we gave up, honestly:**
+
+1. **The headline number of the category.** §0.4 calls taps-to-log *"the single most
+   important number"* and MFP *"notoriously bad"* at it. We cannot now say "2 taps
+   versus their 7" — only "2 taps, measured in our own app". Weaker, but still a real
+   claim, and §3.3 measures ours on real users in Phase 3.
+2. **The streak-break screenshots.** These were meant to make the copy deck concrete
+   rather than theoretical. The copy deck already bans 17 phrases at lint-error
+   severity, so the rule is enforced either way — it just is not illustrated.
+3. **The felt experience of a bad Strava placement**, which is the emotional half of
+   §01 and the half that predicts churn.
+
+**Why it is an acceptable trade:** the differences that actually shape the build —
+barcode paywalling, absent correction paths, invisible-fat error, monetised recovery,
+front-loaded onboarding — are structural, documented, and now cited. Counting taps
+would have confirmed a ranking already known from using them. The week is better spent
+on Swift, which is genuinely on the critical path.
+
+**What would reopen this:** if a Phase 3 tester says logging feels slow, the competitor
+baseline suddenly matters, and it is an evening's work to collect then — against a real
+complaint rather than in the abstract.
 
 Then this file is a Phase 0 exit criterion met, and a section of the final write-up
 already written.

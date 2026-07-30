@@ -16,7 +16,7 @@ done — extend it and compress a later one.
 - [x] **Repo live, SwiftLint configured, secrets handling decided** → `.swiftlint.yml`, [secrets.md](../security/secrets.md)
 - [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
 - [x] **Vision cost per image measured** → **$0.000862/image, $1.55/mo at 1,800 calls** — 12–35× under §10's $0.01–0.03 estimate. [Numbers](07-spike-findings.md#cost-per-image--measured-)
-- [ ] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md)
+- [x] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md). Closed on desk research + prior hands-on use; **tap counts deliberately not measured** ([scope decision](04-competitor-teardown.md#scope-decision--closed-without-tap-counts))
 - [ ] **Apple Developer Program membership active** — needed only for the next item
 - [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
 
@@ -58,11 +58,9 @@ Done ────────── Xcode downloaded · GEMINI_API_KEY in .env �
 Now ─────────── Swift days 1–5
 
 Then ────────── weigh meals as you eat them (slow, passive, no deadline)
-                install the 6 teardown apps and just use them
                 Swift days 5–20
 
-Then ────────── teardown numbers + 10 differences (~90 min once you've used the apps)
-                design the app in Claude (fully unblocked, do it whenever)
+Then ────────── design the app in Claude (fully unblocked, do it whenever)
 
 Then ────────── buy the dev account → wait for it to clear → Spike A (~90 min)
 
