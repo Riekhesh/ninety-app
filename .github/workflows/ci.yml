@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Private repos get 2,000 free Actions minutes/month, but macOS runners bill at a
+# 10× multiplier — so 200 real minutes. Everything that can run on Ubuntu does,
+# and the macOS job is gated behind a path filter so documentation and design
+# commits never spend the expensive budget.
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────────
+  # Cheap Ubuntu checks. These run on every push and are the ones that will
+  # actually catch things during Phase 0, when there is no Swift code yet.
+  # ───────────────────────────────────────────────────────────────────────────
+  checks:
+    name: Tokens, docs and spike harness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate design tokens
+        # The tokens JSON is the source of truth for the design system. If it
+        # stops parsing, or the generated Swift drifts from it, the whole
+        # "tokens are the single source of colour" SwiftLint rule is a lie.
+        run: python3 design/tokens/generate.py --check
+
+      - name: Vision harness self-test
+        # Spike B runs against a deterministic mock provider here — no API key,
+        # no cost, no network. Proves the downscale → call → score → report
+        # pipeline is intact so a real run against 20 meals cannot fail on
+        # plumbing.
+        run: |
+          python3 -m pip install --quiet --upgrade pip
+          python3 -m pip install --quiet -r spikes/vision-accuracy/requirements.txt
+          python3 -m pytest spikes/vision-accuracy/tests -q
+
+      - name: Check for TODO markers in shipped docs
+        # Phase 0 deliverables have placeholders you are meant to fill in by
+        # hand (competitor numbers, the measured baseline). This does not fail
+        # the build — it prints what is still outstanding.
+        continue-on-error: true
+        run: |
+          echo "Outstanding Phase 0 placeholders:"
+          grep -rn "TO BE MEASURED\|TBD" docs/ || echo "  none"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # Expensive macOS job. Skipped entirely until there is Swift code to check.
+  # ───────────────────────────────────────────────────────────────────────────
+  swift:
+    name: SwiftLint and tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Is there any Swift yet?
+        id: probe
+        run: |
+          if [ -d Notch ] || [ -d Packages ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            echo "No Swift sources yet — Phase 0 is de-risking, not building (§0.7)."
+          fi
+
+      - name: Select toolchain
+        if: steps.probe.outputs.found == 'true'
+        # Xcode 26+ against the iOS 26 SDK is the App Store submission floor
+        # since 28 April 2026 (§0.1). Pin it rather than trusting the runner
+        # default, which moves without warning.
+        run: |
+          if [ -d /Applications/Xcode_26.6.app ]; then
+            sudo xcode-select -s /Applications/Xcode_26.6.app
+          else
+            echo "::warning::Xcode 26.6 not on this runner image; using default."
+          fi
+          xcodebuild -version
+          swift --version
+
+      - name: SwiftLint
+        if: steps.probe.outputs.found == 'true'
+        run: |
+          brew install swiftlint
+          swiftlint --strict --reporter github-actions-logging
+
+      - name: Test RankingEngine
+        # The engine is a standalone SPM package with no UI dependencies, so it
+        # tests on the command line without a simulator — which is exactly why
+        # §2.1 wants it isolated. This job stays fast for the whole project.
+        if: steps.probe.outputs.found == 'true' && hashFiles('Packages/RankingEngine/Package.swift') != ''
+        run: swift test --package-path Packages/RankingEngine
+
+      - name: Build app
+        if: steps.probe.outputs.found == 'true' && hashFiles('Notch.xcodeproj/project.pbxproj', 'Notch.xcworkspace/contents.xcworkspacedata') != ''
+        run: |
+          xcodebuild build \
+            -scheme Notch \
+            -destination 'platform=iOS Simulator,name=iPhone 17' \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify --renderer github-actions

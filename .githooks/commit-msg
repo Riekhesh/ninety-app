@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Enforce Conventional Commits (see CONTRIBUTING.md).
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+#
+# `spike` and `design` are non-standard types this project adds deliberately:
+# spike code is throwaway by decision (§0.7) and should be legible as such in the
+# log, and the design surface is real enough to deserve its own type.
+
+set -euo pipefail
+
+msg_file="$1"
+subject=$(head -n1 "$msg_file")
+
+# Let git's own generated messages through untouched.
+case "$subject" in
+  "Merge "*|"Revert "*|"fixup!"*|"squash!"*|"Initial commit") exit 0 ;;
+esac
+
+types='feat|fix|perf|refactor|test|docs|design|build|ci|chore|spike|revert'
+pattern="^(${types})(\([a-z0-9,\/-]+\))?!?: [a-z].{0,70}[^.]$"
+
+if ! printf '%s' "$subject" | grep -Eq "$pattern"; then
+  cat >&2 <<EOF
+
+  ✗ Commit subject is not a Conventional Commit.
+
+    got:      ${subject}
+
+    expected: <type>(<scope>): <imperative lower-case subject>
+              no trailing full stop, 72 chars or fewer
+
+    types:    ${types//|/, }
+    scopes:   auth, onboarding, log, search, barcode, photo, weight, health,
+              dashboard, rank, sync, db, design, safety, analytics, deps, repo
+
+    e.g.      feat(barcode): add DataScannerViewController lookup path
+              test(rank): add failing test for sandbagged calibration window
+
+    See CONTRIBUTING.md. Bypass with --no-verify if you must.
+
+EOF
+  exit 1
+fi
+
+exit 0
