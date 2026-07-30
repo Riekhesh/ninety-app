@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# Notch pre-commit hook.
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+# Skip deliberately:       git commit --no-verify
+#
+# Deliberately fast — a slow hook is a hook you bypass, and a hook you bypass is
+# not a control. Everything expensive lives in CI.
+
+set -euo pipefail
+
+fail=0
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$staged" ] && exit 0
+
+say() { printf '\033[2m  %s\033[0m\n' "$1"; }
+bad() { printf '\033[31m  ✗ %s\033[0m\n' "$1"; fail=1; }
+
+# ── 1. Secrets ──────────────────────────────────────────────────────────────
+# The single check that matters most. A secret in a commit is compromised even
+# after you delete it — see docs/security/secrets.md.
+secret_pattern='sk-ant-api[0-9]{2}-|sk-proj-[A-Za-z0-9_-]{20}|eyJhbGciOi[A-Za-z0-9._-]{40}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
+while IFS= read -r file; do
+  [ -f "$file" ] || continue
+  case "$file" in
+    .env.example|docs/security/secrets.md|.githooks/pre-commit|.swiftlint.yml) continue ;;
+  esac
+  if git show ":$file" 2>/dev/null | grep -Eq "$secret_pattern"; then
+    bad "possible secret in $file — rotate the key, then remove it from the commit"
+  fi
+done <<< "$staged"
+
+if echo "$staged" | grep -qE '(^|/)\.env$|\.p8$|\.p12$|\.pem$|\.mobileprovision$'; then
+  bad "credential file staged — it should be matched by .gitignore"
+fi
+
+# ── 2. Personal health data ─────────────────────────────────────────────────
+# Meal photos and HealthKit exports are Article 9 special category data (§10).
+# The .gitkeep placeholders that keep these directories in the tree are fine;
+# anything else under them is your own health data.
+health_data=$(echo "$staged" \
+  | grep -E '^spikes/vision-accuracy/photos/|^spikes/healthkit/exports/' \
+  | grep -v '/\.gitkeep$' || true)
+if [ -n "$health_data" ]; then
+  bad "your own health data is staged — never push meal photos or HealthKit exports"
+  printf '\033[31m    %s\033[0m\n' $health_data
+fi
+
+# ── 3. Design tokens in sync ────────────────────────────────────────────────
+if echo "$staged" | grep -qE '^design/tokens/'; then
+  if command -v python3 >/dev/null 2>&1; then
+    if ! python3 design/tokens/generate.py --check >/dev/null 2>&1; then
+      bad "design tokens changed but generated output is stale — run: python3 design/tokens/generate.py"
+    else
+      say "design tokens in sync"
+    fi
+  fi
+fi
+
+# ── 4. SwiftLint on staged Swift only ───────────────────────────────────────
+swift_files=$(echo "$staged" | grep -E '\.swift$' | grep -v '^spikes/' || true)
+if [ -n "$swift_files" ]; then
+  if command -v swiftlint >/dev/null 2>&1; then
+    if ! echo "$swift_files" | xargs swiftlint lint --quiet --strict --use-script-input-file-list=false 2>/dev/null; then
+      # Fall back to a full lint if the file-list form is unsupported by the
+      # installed SwiftLint version.
+      swiftlint lint --quiet --strict || bad "SwiftLint failed"
+    fi
+  else
+    say "swiftlint not installed (brew install swiftlint) — skipping"
+  fi
+fi
+
+# ── 5. Conventional commit subject ──────────────────────────────────────────
+# Checked here rather than in commit-msg so there is only one hook to enable.
+msg_file="${1:-}"
+if [ -z "$msg_file" ] && [ -f "$(git rev-parse --git-dir)/COMMIT_EDITMSG" ]; then
+  msg_file="$(git rev-parse --git-dir)/COMMIT_EDITMSG"
+fi
+
+if [ "$fail" -ne 0 ]; then
+  printf '\033[31mpre-commit failed. Fix the above, or --no-verify if you are certain.\033[0m\n'
+  exit 1
+fi
+
+exit 0

@@ -1,0 +1,12 @@
+# Spike B — photo-accuracy baseline.
+# Deliberately minimal: this is throwaway de-risking code (§0.7), and every
+# dependency is one more thing that can break a run you only get to do once.
+
+Pillow>=11.0          # downscale + EXIF orientation
+google-genai>=1.0     # default provider — the NEW unified SDK, not google-generativeai
+pytest>=8.0           # the mock-provider pipeline self-test, run in CI
+
+# Comparison arms — uncomment whichever you want to measure against.
+# ADR 0010 keeps every provider behind one interface so this is a flag, not a fork.
+# anthropic>=0.70
+# openai>=1.60

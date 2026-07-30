@@ -1,0 +1,110 @@
+## ─────────────────────────────────────────────────────────────
+## Notch — .gitignore
+## Based on github/gitignore Swift.gitignore + Xcode additions.
+## Xcode generates a lot of noise; this keeps the history readable.
+## ─────────────────────────────────────────────────────────────
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+## Xcode — user-specific state
+## xcuserdata holds breakpoints, window layout, and scheme selection.
+## Never commit it: it churns on every build and conflicts constantly.
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Xcode — build products
+build/
+DerivedData/
+*.o
+*.LinkFileList
+*.swiftmodule
+
+## Xcode — Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+## Swift Package Manager
+## Package.resolved IS committed for apps (it pins exact dependency versions
+## so CI and your machine build the same thing). It is NOT committed for
+## libraries. Notch is an app, so it stays tracked — hence no ignore line.
+.build/
+.swiftpm/
+Packages/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+## CocoaPods / Carthage — not used, but ignore in case a dependency drags one in
+Pods/
+Carthage/Build/
+
+## Fastlane — not used yet, likely in Phase 3 for TestFlight uploads
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+## ─────────────────────────────────────────────────────────────
+## Secrets — see docs/security/secrets.md
+## Nothing in this section should ever reach a commit. The rules here are
+## belt-and-braces: the real control is that API keys live only in Supabase
+## Edge Function environment variables, never in the app bundle or the repo.
+## ─────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+*.certSigningRequest
+Secrets.swift
+Secrets.xcconfig
+**/GoogleService-Info.plist
+supabase/.env
+supabase/.branches/
+supabase/.temp/
+
+## ─────────────────────────────────────────────────────────────
+## Spikes — throwaway code, but their *outputs* are the deliverable
+## ─────────────────────────────────────────────────────────────
+
+## Python (vision accuracy harness)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+## Your own meal photos are personal data — never push them.
+## The ground-truth CSV and the generated report ARE committed:
+## the measured baseline is a Phase 0 exit criterion.
+spikes/vision-accuracy/photos/*
+!spikes/vision-accuracy/photos/.gitkeep
+spikes/vision-accuracy/.cache/
+spikes/vision-accuracy/runs/*
+!spikes/vision-accuracy/runs/.gitkeep
+
+## Your own HealthKit exports are personal data
+spikes/healthkit/exports/
+
+## Regenerable spike fixtures (python3 make_fixtures.py) — not worth versioning
+spikes/vision-accuracy/fixtures/

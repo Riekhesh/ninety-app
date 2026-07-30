@@ -1,0 +1,32 @@
+photo_id,item_name,actual_grams,actual_kcal,notes
+# ─────────────────────────────────────────────────────────────────────────────
+# Copy this to groundtruth.csv and replace every row with YOUR OWN weighed meals.
+# The rows below are illustrative structure only — they are not measurements and
+# must not end up in a baseline.
+#
+# RULES (see README.md § Protocol — these are what make the number defensible):
+#   · photo_id MUST equal the photo filename stem: meal-001.jpg -> meal-001
+#   · one row per distinct food item; several rows per photo
+#   · actual_grams is WEIGHED on a scale, not estimated. If you estimated it,
+#     you are measuring the model against a guess and the baseline is worthless.
+#   · actual_kcal comes from the package label or USDA/Open Food Facts for the
+#     weighed amount — not from another app's estimate
+#   · INCLUDE COOKING OIL AND BUTTER as their own rows. They are the single
+#     biggest thing vision models miss (§1.3), so omitting them makes the model
+#     look better than it is and hides the exact failure you need to measure.
+#   · weigh raw or cooked consistently, and say which in notes
+# ─────────────────────────────────────────────────────────────────────────────
+meal-001,porridge with milk,250,320,50g oats + 200ml semi-skimmed; weighed cooked
+meal-001,banana,118,105,weighed peeled
+meal-002,chicken breast,165,272,weighed raw; pan-fried
+meal-002,white rice,180,234,weighed cooked
+meal-002,olive oil,12,106,IMPORTANT — the invisible calories; measured into the pan
+meal-002,broccoli,90,31,steamed
+meal-003,tuna and sweetcorn sandwich,215,412,shop-bought; label figure
+meal-004,greek yoghurt,170,133,0% fat; label figure
+meal-004,blueberries,75,43,weighed
+meal-004,honey,15,46,drizzled; weighed on the spoon
+meal-005,lasagne,400,608,supermarket ready meal; whole tray; label figure
+meal-006,scrambled eggs,150,222,3 eggs weighed out of shell
+meal-006,butter,10,74,cooked in; weighed
+meal-006,sourdough toast,80,206,2 slices weighed

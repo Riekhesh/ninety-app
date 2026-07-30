@@ -1,0 +1,268 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Notch — SwiftLint configuration
+#
+# Configured in Phase 0, while there are zero violations to fix (§0.6).
+#
+# The interesting part of this file is not the standard rule tuning at the top —
+# it is the `custom_rules` block at the bottom, which turns several of the
+# project's locked decisions and safety requirements into things the compiler
+# pipeline enforces rather than things you have to remember:
+#
+#   · RankingEngine cannot import UI or touch the clock          (§04, §2.1)
+#   · Colours cannot be hardcoded, only taken from tokens        (§0.5)
+#   · Punishment framing cannot reach a user-facing string       (§10)
+#   · Secrets cannot be typed into a Swift file                  (§0.6)
+#
+# Install: brew install swiftlint
+# Run:     swiftlint            (lint)
+#          swiftlint --fix      (autocorrect what is correctable)
+# ─────────────────────────────────────────────────────────────────────────────
+
+included:
+  - Notch
+  - Packages
+  - NotchTests
+
+excluded:
+  - .build
+  - DerivedData
+  - Packages/**/.build
+  - "**/*.generated.swift"
+  # Spike code is deliberately throwaway (§0.7) — optimised for learning speed,
+  # not code quality. Linting it would be enforcing a standard we explicitly
+  # decided not to hold it to.
+  - spikes
+
+# ─── Rules switched off, with reasons ────────────────────────────────────────
+disabled_rules:
+  # SwiftUI view bodies legitimately nest deeply. Fighting this rule produces
+  # worse code (pointless extracted subviews named Container2).
+  - trailing_whitespace # handled by .editorconfig
+  - todo                # TODO/FIXME are a working tool during a build phase
+
+# ─── Opt-in rules worth having ───────────────────────────────────────────────
+opt_in_rules:
+  - array_init
+  - attributes
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - contains_over_first_not_nil
+  - convenience_type
+  - discouraged_object_literal
+  - empty_collection_literal
+  - empty_count
+  - empty_string
+  - enum_case_associated_values_count
+  - explicit_init
+  - fallthrough
+  - fatal_error_message
+  - first_where
+  - flatmap_over_map_reduce
+  - identical_operands
+  - implicitly_unwrapped_optional
+  - joined_default_parameter
+  - last_where
+  - legacy_multiple
+  - literal_expression_end_indentation
+  - lower_acl_than_parent
+  - modifier_order
+  - multiline_arguments
+  - multiline_parameters
+  - operator_usage_whitespace
+  - overridden_super_call
+  - prefer_self_type_over_type_of_self
+  - private_action
+  - private_outlet
+  - prohibited_super_call
+  - reduce_into
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - sorted_first_last
+  - static_operator
+  - toggle_bool
+  - unavailable_function
+  - unneeded_parentheses_in_closure_argument
+  - unowned_variable_capture
+  - untyped_error_in_catch
+  - vertical_parameter_alignment_on_call
+  - yoda_condition
+
+# ─── Rule tuning ─────────────────────────────────────────────────────────────
+
+line_length:
+  warning: 120
+  error: 160
+  ignores_comments: true
+  ignores_urls: true
+
+file_length:
+  warning: 400
+  error: 600
+
+type_body_length:
+  warning: 300
+  error: 450
+
+function_body_length:
+  warning: 60
+  error: 100
+
+# SwiftUI `body` is one expression tree; cyclomatic complexity misreads it.
+cyclomatic_complexity:
+  warning: 12
+  error: 20
+  ignores_case_statements: true
+
+nesting:
+  type_level:
+    warning: 2
+  function_level:
+    warning: 4
+
+identifier_name:
+  min_length:
+    warning: 2
+  max_length:
+    warning: 50
+    error: 60
+  # Domain vocabulary and idiomatic short names. `kg` and `id` are clearer than
+  # `kilograms` and `identifier` in this codebase.
+  allowed_symbols: ["_"]
+  excluded:
+    - id
+    - kg
+    - cm
+    - kJ
+    - x
+    - y
+    - dx
+    - dy
+    - to
+    - up
+    - C   # consistency, in RankingEngine — matches the notation in §2.2
+    - A   # adherence
+    - P   # normalised progress
+    - S   # composite score
+
+type_name:
+  min_length: 3
+  max_length:
+    warning: 50
+    error: 60
+
+large_tuple:
+  warning: 3
+  error: 4
+
+# Force-unwrapping in a health app means a crash mid-log, which means a lost
+# entry, which means a churned user. Warning during Phase 1, tighten to error
+# before the first external tester (Phase 3).
+force_cast: error
+force_try: error
+force_unwrap:
+  severity: warning
+
+implicitly_unwrapped_optional:
+  severity: warning
+
+trailing_comma:
+  mandatory_comma: true
+
+# ─── Project-specific rules ──────────────────────────────────────────────────
+# These encode decisions from the brief. Each has the section it enforces.
+
+custom_rules:
+
+  # ── §04 / §2.1 — RankingEngine purity ────────────────────────────────────
+  # The engine is a standalone package: pure functions, no I/O, no UI imports.
+  # This is what makes it exhaustively testable and portable to the server
+  # before leaderboards ship (the hard gate on Phase 4). A single accidental
+  # `import SwiftUI` quietly destroys that property, and you will not notice
+  # until the port.
+  ranking_engine_no_ui_imports:
+    name: "RankingEngine must not import UI"
+    regex: '^\s*import\s+(SwiftUI|UIKit|AppKit|SwiftData|HealthKit|Supabase)'
+    message: "RankingEngine is pure: data in, score out. No UI, persistence or network imports (§2.1). If you need a value from one of these, pass it in as a parameter."
+    severity: error
+    included: ".*Packages/RankingEngine/Sources/.*\\.swift"
+
+  # Timezone abuse is an explicit exploit in the Phase 2 test suite ("logging
+  # across boundaries to claim extra days"). You cannot write a deterministic
+  # test for it if the engine can read the wall clock. Inject the date.
+  ranking_engine_no_ambient_clock:
+    name: "RankingEngine must not read the clock"
+    regex: '(Date\(\)|Date\.now|Calendar\.current|TimeZone\.current|Locale\.current)'
+    message: "The engine must be deterministic — timezone abuse is one of the exploits under test (§2.4). Inject the date, calendar and timezone instead of reading ambient state."
+    severity: error
+    included: ".*Packages/RankingEngine/Sources/.*\\.swift"
+
+  ranking_engine_no_randomness:
+    name: "RankingEngine must not be random"
+    regex: '(\.random\(|arc4random|SystemRandomNumberGenerator)'
+    message: "Non-deterministic scoring cannot be validated against the server port with identical test vectors (§4 hard gate)."
+    severity: error
+    included: ".*Packages/RankingEngine/Sources/.*\\.swift"
+
+  # ── §0.5 — Design tokens are the single source of colour ─────────────────
+  # The whole point of building a token system in Phase 0 is that Phase 1 does
+  # not re-invent colours inline. One hardcoded hex is how a design system dies.
+  no_hardcoded_colour:
+    name: "Use design tokens, not literal colours"
+    regex: '(Color\(\s*(red|white|hue):|UIColor\(\s*(red|white|hue):|Color\(hex:|#[0-9A-Fa-f]{6}")'
+    message: "Colours come from Notch.Colour (generated from design/tokens/notch.tokens.json). Add a token rather than a literal."
+    severity: warning
+    excluded: ".*DesignTokens\\.generated\\.swift"
+
+  no_magic_corner_radius:
+    name: "Use the radius scale"
+    regex: 'cornerRadius:\s*(?!Notch)[0-9]+'
+    message: "Corner radii come from Notch.Radius (§0.5 token scale). iOS also wants style: .continuous — the token helpers apply it for you."
+    severity: warning
+    excluded: ".*DesignTokens\\.generated\\.swift"
+
+  # ── §10 — No punishment framing ──────────────────────────────────────────
+  # "You broke your streak" becomes "welcome back." Losing a tier is a reset,
+  # never a failure. §10 says to review every string in the app against this.
+  # A lint rule reviews them on every commit instead of once, in a hurry,
+  # the week before TestFlight.
+  no_punishment_framing:
+    name: "No punishment framing in user-facing copy"
+    regex: '(?i)"[^"]*\b(you failed|you lost|lost your streak|streak lost|broke your streak|streak broken|you missed|over budget|exceeded your|you blew|ruined|demoted|dropped to|too many calories|bad day|be better|no excuses)\b'
+    message: "§10: no punishment framing. Regression is a reset, not a failure. See docs/design/04-copy-deck.md for the approved phrasing."
+    severity: error
+    match_kinds:
+      - string
+
+  # False precision is a design bug (§1.2: a band, not a number). This catches
+  # the most common form — formatting a calorie target to a decimal place.
+  no_false_precision_kcal:
+    name: "Calories are never shown to a decimal place"
+    regex: '"%\.[1-9]f\s*(kcal|cal|calories)'
+    message: "§1.2: targets are bands, not points. Hitting exactly 1,847 kcal is not a real human goal. Round, and prefer a range."
+    severity: warning
+    match_kinds:
+      - string
+
+  # ── §0.6 / §04 — Secrets never live in the binary ────────────────────────
+  # Keys embedded in a client binary are extractable in minutes. The vision
+  # model is called from a Supabase Edge Function precisely so this never
+  # happens; this rule is the tripwire.
+  no_embedded_secrets:
+    name: "No secrets in Swift source"
+    regex: '(?i)(sk-ant-|sk-proj-|sk-[A-Za-z0-9]{32}|(api[_-]?key|secret|password|bearer|service[_-]?role)\s*[:=]\s*"[A-Za-z0-9_\-]{16,})'
+    message: "Secrets live in Supabase Edge Function environment variables only (§04, §0.6). A key in the app bundle is a key you have published."
+    severity: error
+
+  # ── Observability ────────────────────────────────────────────────────────
+  # print() does not survive into a shipped app and cannot be filtered by
+  # subsystem. Use os.Logger from the start so Phase 3 crash triage works.
+  no_print:
+    name: "Use Logger, not print"
+    regex: '^\s*print\('
+    message: "Use os.Logger with a subsystem so Phase 3 crash and log triage is possible. print() is fine in spikes, not in the app."
+    severity: warning
+
+reporter: "xcode"
