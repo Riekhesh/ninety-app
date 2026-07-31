@@ -8,6 +8,20 @@ weeks 3–16 turns out to be impossible."*
 
 ---
 
+## Where to look for what
+
+Two trackers, deliberately split so they cannot drift into disagreeing:
+
+| | Answers | Lives in |
+|---|---|---|
+| **This file** | *Is the phase done?* | Exit criteria below — the testable conditions from §0.7 |
+| **[GitHub Issues](https://github.com/Riekhesh/Notch-App/issues)** | *What do I do today?* | One issue per task, labelled by phase |
+
+Exit criteria are the contract; issues are the work. Close an issue with `fixes #12` in a
+commit message and it ticks itself. Tick a box here only when the *criterion* is met.
+
+---
+
 ## Exit criteria
 
 Phases end on a testable condition, not a date. If these aren't met, the phase isn't
