@@ -84,6 +84,17 @@ Nobody has made normalised improvement the headline ranking itself.
   colour-independent tier channel survives.
 - Dark-first, light parity later (ADR 0011 — direction locked, palette values not).
 - Voice: calm, factual, never punitive. Copy deck at design/spec/04-copy-deck.md.
+- **Visual world chosen 2026-08-30: MATCHDAY** — a lit football pitch, not a dark app
+  with green paint. Deep pitch green, mown stripes, a floodlight thrown from the
+  top-left, 2px chalk lines, one gold reserved for the division. Kit stripes are the
+  club device. The product language is football throughout: Matchday (the day), Sub On
+  (logging), The Table (rank), The Squad / On the Bench (frequent / recent foods),
+  First & Second Half (meal periods), Form (7-day consistency), Divisions (tiers,
+  chevrons carrying the count). Two directions were built and cut: Gauge (dark
+  instrument) and Split-Flap (departure board).
+- **Tier = division**, carried by chevron count and the word, never colour alone.
+- **The calorie range renders as a single figure plus tolerance** (`612 ±100`), never
+  as two numbers joined by a dash.
 
 ## Evidence on Hand
 

@@ -7,117 +7,205 @@
 <body>
 <x-dc>
 <helmet>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Martian+Mono:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap">
   <style>
-    body { margin: 0; background: #0B0A09; }
-    a { color: #FF5A24; } a:hover { color: #FF7A4A; }
-    @keyframes needleIn { from { transform: translateX(-40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    body { margin: 0; background: #08210F; }
+    a { color: #E8B54A; } a:hover { color: #F2CB74; }
+    .chalk { border-color: rgba(242,239,230,0.82); }
   </style>
 </helmet>
-<div style="width: 393px; height: 852px; background: #0B0A09; color: #F4F0EA; font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+<div style="width: 393px; height: 852px; background: #08210F; color: #F2EFE6; font-family: 'Saira', 'Trebuchet MS', Arial, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative;">
 
-  <!-- side rail: week context as structure, not eyebrow -->
-  <div style="position: absolute; left: 0; top: 54px; bottom: 86px; width: 34px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-right: 1px solid #221E1A; padding: 10px 0;">
-    <div style="writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2.5px; color: #948A7E;">WEEK OF 3 AUGUST</div>
-    <div style="writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2.5px; color: #7A7168;">WK 32 · 2026</div>
-  </div>
+  <!-- mown pitch stripes -->
+  <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.000) 0px, rgba(255,255,255,0.000) 49px, rgba(255,255,255,0.022) 49px, rgba(255,255,255,0.022) 98px); pointer-events: none;"></div>
+  <!-- floodlight: a lit pitch, thrown from the top-left gantry -->
+  <div style="position: absolute; top: -180px; left: -90px; width: 500px; height: 460px; background: radial-gradient(ellipse at center, rgba(214,255,228,0.13) 0%, rgba(214,255,228,0.05) 42%, rgba(214,255,228,0) 70%); pointer-events: none;"></div>
 
-  <div style="flex: 1; display: flex; flex-direction: column; padding: 54px 22px 0 56px; min-height: 0;">
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; padding: 54px 20px 0; min-height: 0;">
 
-    <!-- tier identity -->
-    <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 12px;">
-      <!-- notch tally: colour-independent tier channel. Gold = 3 of 5 cuts filled -->
-      <div style="display: flex; align-items: flex-end; gap: 7px; height: 30px;">
-        <div style="width: 9px; height: 30px; background: #FF5A24;"></div>
-        <div style="width: 9px; height: 24px; background: #FF5A24;"></div>
-        <div style="width: 9px; height: 18px; background: #FF5A24;"></div>
-        <div style="width: 9px; height: 13px; background: #2A2521;"></div>
-        <div style="width: 9px; height: 9px; background: #2A2521;"></div>
-        <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 9px; color: #948A7E; letter-spacing: 1.5px; margin-left: 8px; padding-bottom: 2px;">TIER 3/5</div>
+    <!-- masthead: kit stripes as the club device -->
+    <div style="display: flex; align-items: center; gap: 11px; border-bottom: 2px solid rgba(242,239,230,0.82); padding-bottom: 9px;">
+      <div style="display: flex; gap: 2px; height: 19px;">
+        <div style="width: 3px; background: #E8B54A;"></div>
+        <div style="width: 3px; background: #F2EFE6;"></div>
+        <div style="width: 3px; background: #E8B54A;"></div>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 4px;">
-        <div style="font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1; color: #F4F0EA;">Gold</div>
-        <div style="font-size: 13px; font-weight: 500; color: #E8863F;">Up from Silver</div>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 21px; font-weight: 800; letter-spacing: 2.5px;">MATCHDAY</div>
+      <div style="margin-left: auto; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; color: #9FBBA8;">MON 3 AUG · MW 32</div>
+    </div>
+
+    <!-- the reading: one number, honest tolerance. Not "512–712". -->
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-top: 18px;">
+      <div style="display: flex; flex-direction: column; gap: 1px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; color: #9FBBA8;">STILL TO PLAY WITH</div>
+        <div style="display: flex; align-items: flex-start; gap: 7px;">
+          <div style="font-size: 82px; font-weight: 700; line-height: 0.86; letter-spacing: -2.5px; font-variant-numeric: tabular-nums;">612</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; padding-top: 8px;">
+            <div style="font-size: 19px; font-weight: 600; line-height: 1; color: #E8B54A; font-variant-numeric: tabular-nums;">±100</div>
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: #9FBBA8;">KCAL</div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; padding-top: 15px;">
+        <div style="padding: 4px 9px; border: 1.5px solid #E8B54A; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #E8B54A;">ON FOR THE BAND</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">1,238 IN · BAND 1,750–1,950</div>
       </div>
     </div>
 
-    <!-- composite score: the instrument reading -->
-    <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 30px; border-top: 1px solid #221E1A; padding-top: 22px;">
-      <div style="font-size: 96px; font-weight: 700; line-height: 0.9; letter-spacing: -3px; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.71</div>
-      <div style="display: flex; flex-direction: column; gap: 3px; padding-bottom: 8px;">
-        <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2px; color: #948A7E;">COMPOSITE</div>
-        <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2px; color: #948A7E;">THIS WEEK</div>
+    <!-- the pitch: intake advances up it, the band is the box you're aiming into -->
+    <div style="margin-top: 15px; position: relative; height: 46px; border: 2px solid rgba(242,239,230,0.82);">
+      <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(242,239,230,0.38);"></div>
+      <div style="position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; border: 2px solid rgba(242,239,230,0.38); border-radius: 50%; transform: translate(-50%, -50%);"></div>
+      <!-- the box: the target band, 1750–1950 on a 0–2400 pitch -->
+      <div style="position: absolute; left: 72.9%; top: -2px; bottom: -2px; width: 8.4%; border: 2px solid #E8B54A; background: rgba(232,181,74,0.16);"></div>
+      <!-- six-yard box inside it -->
+      <div style="position: absolute; left: 75.4%; top: 25%; bottom: 25%; width: 3.4%; border: 1.5px solid rgba(232,181,74,0.55);"></div>
+      <!-- possession: how far up the pitch today's intake has got -->
+      <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 51.6%; background: rgba(242,239,230,0.14);"></div>
+      <div style="position: absolute; left: 51.6%; top: 0; bottom: 0; width: 2.5px; background: #F2EFE6;"></div>
+      <div style="position: absolute; left: 51.6%; top: 50%; width: 13px; height: 13px; border-radius: 50%; background: #F2EFE6; transform: translate(-50%, -50%); box-shadow: 0 2px 7px rgba(0,0,0,0.55);"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 1.2px; color: #9FBBA8;">
+      <div>KICK OFF</div><div>1,200</div><div style="color: #E8B54A;">THE BAND</div>
+    </div>
+
+    <!-- two instruments -->
+    <div style="display: flex; gap: 11px; margin-top: 16px;">
+      <!-- form guide -->
+      <div style="width: 132px; border: 2px solid rgba(242,239,230,0.82); padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 9px; background: rgba(4,18,11,0.5);">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">FORM · 7 DAYS</div>
+        <div style="display: flex; align-items: baseline; gap: 3px;">
+          <div style="font-size: 34px; font-weight: 700; line-height: 0.9; font-variant-numeric: tabular-nums;">5</div>
+          <div style="font-size: 15px; font-weight: 500; color: #9FBBA8;">/7</div>
+        </div>
+        <div style="display: flex; gap: 4px;">
+          <div style="flex: 1; height: 22px; background: #F2EFE6;"></div>
+          <div style="flex: 1; height: 22px; background: #F2EFE6;"></div>
+          <div style="flex: 1; height: 22px; background: #F2EFE6;"></div>
+          <div style="flex: 1; height: 22px; border: 1.5px solid rgba(242,239,230,0.4); box-sizing: border-box;"></div>
+          <div style="flex: 1; height: 22px; background: #F2EFE6;"></div>
+          <div style="flex: 1; height: 22px; background: #F2EFE6;"></div>
+          <div style="flex: 1; height: 22px; border: 1.5px solid rgba(242,239,230,0.4); box-sizing: border-box;"></div>
+        </div>
+      </div>
+      <!-- weight: the trend drawn as a touchline, baseline as the halfway mark -->
+      <div style="flex: 1; border: 2px solid rgba(242,239,230,0.82); padding: 10px 12px 8px; display: flex; flex-direction: column; gap: 6px; background: rgba(4,18,11,0.5);">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8; white-space: nowrap;">WEIGHT · 7-DAY</div>
+        <div style="display: flex; align-items: baseline; gap: 5px; white-space: nowrap;">
+          <div style="font-size: 34px; font-weight: 700; line-height: 0.9; font-variant-numeric: tabular-nums;">78.4</div>
+          <div style="font-size: 13px; font-weight: 500; color: #9FBBA8;">kg</div>
+          <div style="margin-left: auto; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 12px; font-weight: 700; color: #E8B54A;">−1.2</div>
+        </div>
+        <svg width="100%" height="34" viewBox="0 0 178 34" preserveAspectRatio="none" role="img" aria-label="Weight trend over four weeks, falling steadily below the four-week baseline">
+          <defs>
+            <linearGradient id="wfade" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#F2EFE6" stop-opacity="0.24"></stop>
+              <stop offset="100%" stop-color="#F2EFE6" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <path d="M0 7 L178 10" stroke="rgba(242,239,230,0.42)" stroke-width="1.5" stroke-dasharray="5 4"></path>
+          <path d="M0 8 C 30 10, 58 14, 88 18 S 148 26, 178 27 L178 34 L0 34 Z" fill="url(#wfade)"></path>
+          <path d="M0 8 C 30 10, 58 14, 88 18 S 148 26, 178 27" fill="none" stroke="#F2EFE6" stroke-width="2.5" stroke-linecap="round"></path>
+          <circle cx="178" cy="27" r="4" fill="#E8B54A"></circle>
+        </svg>
       </div>
     </div>
 
-    <!-- hold line: a calibrated scale, 0.71 marked against the 0.65 hold -->
-    <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 6px;">
-      <div style="position: relative; height: 26px;">
-        <div style="position: absolute; left: 0; right: 0; top: 12px; height: 2px; background: #221E1A;"></div>
-        <div style="position: absolute; left: 0; right: 35%; top: 12px; height: 2px; background: #3A332C;"></div>
-        <div style="position: absolute; left: 65%; top: 5px; width: 2px; height: 16px; background: #948A7E;"></div>
-        <div style="position: absolute; left: 71%; top: 0; width: 3px; height: 26px; background: #FF5A24; animation: needleIn 700ms cubic-bezier(0.16, 1, 0.3, 1);"></div>
+    <!-- division strip -->
+    <div style="display: flex; align-items: center; gap: 11px; margin-top: 11px; border: 2px solid #E8B54A; background: rgba(232,181,74,0.09); padding: 9px 12px;">
+      <svg width="21" height="19" viewBox="0 0 34 30" fill="none">
+        <path d="M4 26l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"></path>
+        <path d="M4 17l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"></path>
+        <path d="M4 8l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"></path>
+      </svg>
+      <div style="display: flex; flex-direction: column; gap: 0px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 1.8px; color: #E8B54A;">GOLD DIVISION</div>
+        <div style="font-size: 10.5px; font-weight: 500; color: #9FBBA8;">0.71 this week · safe at 0.65</div>
       </div>
-      <div style="display: flex; justify-content: space-between; font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 1.5px; color: #948A7E;">
-        <div>0</div>
-        <div style="color: #A89E93;">GOLD HOLDS AT 0.65</div>
-        <div>1.00</div>
-      </div>
+      <svg style="margin-left: auto;" width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="#E8B54A" stroke-width="2.2" stroke-linecap="square"></path></svg>
     </div>
 
-    <!-- breakdown: attempt-card rows, weights visible -->
-    <div style="display: flex; flex-direction: column; margin-top: 24px; border-top: 1px solid #221E1A;">
-      <div style="display: flex; align-items: center; gap: 12px; padding: 15px 0; border-bottom: 1px solid #191612;">
-        <div style="width: 118px; display: flex; flex-direction: column; gap: 3px;">
-          <div style="font-size: 13px; font-weight: 600; color: #F4F0EA;">Consistency</div>
-          <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8px; letter-spacing: 1.5px; color: #948A7E;">WEIGHTED 0.50</div>
-        </div>
-        <div style="flex: 1; height: 4px; background: #221E1A; position: relative;">
-          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 86%; background: #FF5A24;"></div>
-        </div>
-        <div style="width: 44px; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.86</div>
+    <!-- TEAM SHEET: the day's meals as a squad list, grouped by period -->
+    <div style="display: flex; flex-direction: column; margin-top: 14px; min-height: 0; overflow: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid rgba(242,239,230,0.82); padding-bottom: 5px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2.2px;">TEAM SHEET</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">3 STARTED · 1,238 KCAL</div>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px; padding: 15px 0; border-bottom: 1px solid #191612;">
-        <div style="width: 118px; display: flex; flex-direction: column; gap: 3px;">
-          <div style="font-size: 13px; font-weight: 600; color: #F4F0EA;">Adherence</div>
-          <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8px; letter-spacing: 1.5px; color: #948A7E;">WEIGHTED 0.25</div>
-        </div>
-        <div style="flex: 1; height: 4px; background: #221E1A; position: relative;">
-          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 71%; background: #B8642F;"></div>
-        </div>
-        <div style="width: 44px; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.71</div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 12px; padding: 15px 0;">
-        <div style="width: 118px; display: flex; flex-direction: column; gap: 3px;">
-          <div style="font-size: 13px; font-weight: 600; color: #F4F0EA;">Progress</div>
-          <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8px; letter-spacing: 1.5px; color: #948A7E;">WEIGHTED 0.25</div>
-        </div>
-        <div style="flex: 1; height: 4px; background: #221E1A; position: relative;">
-          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 52%; background: #6E4A32;"></div>
-        </div>
-        <div style="width: 44px; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.52</div>
-      </div>
-    </div>
 
-    <!-- next step -->
-    <div style="margin-top: 30px; border-left: 2px solid #FF5A24; padding: 4px 0 4px 14px;">
-      <div style="font-size: 14px; font-weight: 500; line-height: 1.45; color: #C9BFB4;">One more logged day next week keeps Gold.</div>
+      <!-- FIRST HALF -->
+      <div style="display: flex; align-items: center; gap: 8px; padding: 9px 0 6px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; color: #E8B54A;">FIRST HALF</div>
+        <div style="flex: 1; height: 1px; background: rgba(242,239,230,0.18);"></div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; color: #9FBBA8;">120</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 7px 0;">
+        <div style="width: 27px; height: 27px; border: 1.5px solid rgba(242,239,230,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">9</div>
+        <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Flat white</div>
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; color: #9FBBA8;">09:15 · MEDIUM</div>
+            <div style="display: flex; gap: 3px;">
+              <div style="width: 15px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 8px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 11px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums;">120</div>
+      </div>
+
+      <!-- SECOND HALF -->
+      <div style="display: flex; align-items: center; gap: 8px; padding: 7px 0 6px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.8px; color: #E8B54A;">SECOND HALF</div>
+        <div style="flex: 1; height: 1px; background: rgba(242,239,230,0.18);"></div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; color: #9FBBA8;">778</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 7px 0;">
+        <div style="width: 27px; height: 27px; border: 1.5px solid rgba(242,239,230,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">10</div>
+        <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Chicken salad bowl</div>
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; color: #9FBBA8;">13:05 · OWN RECIPE</div>
+            <div style="display: flex; gap: 3px;">
+              <div style="width: 24px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 13px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 9px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums;">545</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 7px 0;">
+        <div style="width: 27px; height: 27px; border: 1.5px solid rgba(242,239,230,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 13px; font-weight: 700; flex-shrink: 0;">7</div>
+        <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Greek yogurt &amp; berries</div>
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; color: #9FBBA8;">16:20 · 170 G</div>
+            <div style="display: flex; gap: 3px;">
+              <div style="width: 18px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 15px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 6px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums;">233</div>
+      </div>
     </div>
   </div>
 
   <!-- tab bar -->
-  <div style="height: 86px; border-top: 1px solid #221E1A; display: flex; align-items: flex-start; padding: 12px 30px 0;">
+  <div style="position: relative; height: 86px; border-top: 2px solid rgba(242,239,230,0.82); background: rgba(4,18,11,0.72); display: flex; align-items: flex-start; padding: 11px 26px 0;">
     <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#857A6D" stroke-width="1.5"></circle><path d="M10 6v4l2.5 2.5" stroke="#857A6D" stroke-width="1.5" stroke-linecap="round"></path></svg>
-      <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 7.5px; letter-spacing: 2px; color: #857A6D;">TODAY</div>
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" stroke="#E8B54A" stroke-width="2"></rect><path d="M3 10h14" stroke="#E8B54A" stroke-width="2"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #E8B54A;">MATCHDAY</div>
     </div>
     <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="#857A6D" stroke-width="1.5" stroke-linecap="round"></path></svg>
-      <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 7.5px; letter-spacing: 2px; color: #857A6D;">LOG</div>
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M3 10h14" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">SUB ON</div>
     </div>
     <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V9M10 16V4M16 16v-5" stroke="#FF5A24" stroke-width="1.5" stroke-linecap="round"></path></svg>
-      <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 7.5px; letter-spacing: 2px; color: #FF5A24;">RANK</div>
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M4 17V10M10 17V3M16 17v-4" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">TABLE</div>
     </div>
   </div>
 </div>

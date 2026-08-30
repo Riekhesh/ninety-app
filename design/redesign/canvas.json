@@ -1,17 +1,15 @@
 {
   "artboards": [
-    { "file": "Main.dc.html", "title": "A · Gauge — Rank", "x": 0, "y": 0, "w": 393, "h": 852 },
-    { "file": "GaugeToday.dc.html", "title": "A · Gauge — Today", "x": 0, "y": 1010, "w": 393, "h": 852 },
-    { "file": "FlapRank.dc.html", "title": "B · Split-Flap — Rank", "x": 500, "y": 0, "w": 393, "h": 852 },
-    { "file": "FlapToday.dc.html", "title": "B · Split-Flap — Today", "x": 500, "y": 1010, "w": 393, "h": 852 },
-    { "file": "MatchdayRank.dc.html", "title": "C · Matchday — Rank", "x": 1000, "y": 0, "w": 393, "h": 852 },
-    { "file": "MatchdayToday.dc.html", "title": "C · Matchday — Today", "x": 1000, "y": 1010, "w": 393, "h": 852 }
+    { "file": "Main.dc.html", "title": "Matchday — the day", "x": 0, "y": 0, "w": 393, "h": 852 },
+    { "file": "SubOn.dc.html", "title": "Sub On — logging", "x": 500, "y": 0, "w": 393, "h": 852 },
+    { "file": "Table.dc.html", "title": "The Table — rank", "x": 1000, "y": 0, "w": 393, "h": 852 }
   ],
   "annotations": [
-    { "id": "intro", "x": -560, "y": 0, "w": 460, "text": "THREE DIRECTIONS — pick one, kill two.\n\nSame content on every board: band 1,750–1,950 · 512–712 left · 5/7 days · 78.4 kg · Gold, 0.71, holds at 0.65.\n\nFixed in all three (safety, not taste): no punishment copy · missed day renders EMPTY, never crossed · no red for going over · tier readable without colour · weights visible on the breakdown · band, never a single number.\n\nEverything else is up for grabs. React to what pulls you — the winner gets the other four screens." },
-    { "id": "dir-a", "x": 0, "y": -175, "w": 400, "text": "A · GAUGE — your pick, raised.\nThe orange mock rebuilt as a real instrument: calibrated band scale, notch tally as the tier mark, Archivo numerals + Martian Mono micro-labels, one burnt-orange accent.\nRisk: dark + hot accent is a known AI look — the discipline (ticks, tabular digits, no glow) is what separates it." },
-    { "id": "dir-b", "x": 500, "y": -175, "w": 400, "text": "B · SPLIT-FLAP — the wildcard the dice dealt.\nDeparture board: every live number in its own flap tile, amber on true black, B612 Mono (a real cockpit face), GOLD spelled out in tiles. Your NetDiary density, as a board.\nRisk: novelty vs daily comfort — tiles carry data only, labels stay calm." },
-    { "id": "dir-c", "x": 1000, "y": -175, "w": 400, "text": "C · MATCHDAY — the bold one.\nLeague-table broadcast: drenched pitch green with mowing stripes, chalk lines, tiers as divisions (chevrons carry the count), consistency as a form guide, Saira Condensed.\nRisk: strongest metaphor, most football-coded. Also the only one that isn't black." }
+    { "id": "world", "x": -560, "y": 0, "w": 470, "text": "MATCHDAY — the world, committed.\n\nA lit pitch, not a dark app with green paint. Mown stripes, a floodlight thrown from the top-left gantry, chalk lines at 2px, one gold that belongs to the division and nothing else. Kit stripes are the club device in every masthead.\n\nThe language runs all the way through: Matchday · Sub On · The Table · The Squad · On the Bench · First/Second Half · Form. Tabs are the three places you actually go." },
+    { "id": "range", "x": 0, "y": -235, "w": 400, "text": "THE RANGE, FIXED.\n\n\"512–712\" was two numbers pretending to be one. Now it reads 612 ±100 — one figure to act on, the uncertainty stated beside it in gold rather than hidden in a dash.\n\nUnder it, the pitch does the honest work: you've advanced 1,238 of the way, the BAND is the box you're playing into, and the ball marks where you actually are. The range is a place on a pitch, not punctuation." },
+    { "id": "sheet", "x": 500, "y": -235, "w": 400, "text": "THE FOOD LOG, REBUILT.\n\nFour routes in as equal peers (search · barcode · snap · squad), then THE SQUAD — your regulars, tap to bring on, with appearance counts. ON THE BENCH is recents, shirt numbers dashed because they haven't started today.\n\nEvery row carries a P/C/F macro bar, keyed at the bottom. That's the NetDiary density you wanted, in this world's grammar. On Matchday the same rows become the TEAM SHEET, split First Half / Second Half." },
+    { "id": "table", "x": 1000, "y": -235, "w": 400, "text": "THE TABLE.\n\nThe breakdown is a league table now — position numbers, weights in their own column, the leader's row tinted gold. Consistency sits top because it is weighted 0.50, and the table says so out loud.\n\nThe survival bar shows 0.71 against the 0.65 safety line, +0.06 clear. Relegation language stays factual and always names the way back — never \"you dropped\"." },
+    { "id": "later", "x": 1500, "y": 0, "w": 400, "text": "PARKED, NOT BUILT — your teams/fixtures idea.\n\nThe world already has room for it: MW33 is named on the Table screen, divisions imply promotion and relegation, form implies a run.\n\nWorth knowing before you build it: v1 shows no other user's name, number or percentile (safety, docs/safety). So \"teams\" has to mean you against your own fixture list first — a season, a run of weeks, a personal best — and only becomes other people in Phase 4, if at all." }
   ],
   "launch": { "view": "canvas" }
 }

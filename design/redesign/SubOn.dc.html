@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #08210F; }
+    a { color: #E8B54A; } a:hover { color: #F2CB74; }
+  </style>
+</helmet>
+<div style="width: 393px; height: 852px; background: #08210F; color: #F2EFE6; font-family: 'Saira', 'Trebuchet MS', Arial, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+
+  <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.000) 0px, rgba(255,255,255,0.000) 49px, rgba(255,255,255,0.022) 49px, rgba(255,255,255,0.022) 98px); pointer-events: none;"></div>
+  <div style="position: absolute; top: -180px; left: -90px; width: 500px; height: 460px; background: radial-gradient(ellipse at center, rgba(214,255,228,0.13) 0%, rgba(214,255,228,0.05) 42%, rgba(214,255,228,0) 70%); pointer-events: none;"></div>
+
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; padding: 54px 0 0; min-height: 0;">
+
+    <!-- masthead + period: the substitution board -->
+    <div style="padding: 0 20px;">
+      <div style="display: flex; align-items: center; gap: 11px; border-bottom: 2px solid rgba(242,239,230,0.82); padding-bottom: 9px;">
+        <div style="display: flex; gap: 2px; height: 19px;">
+          <div style="width: 3px; background: #E8B54A;"></div>
+          <div style="width: 3px; background: #F2EFE6;"></div>
+          <div style="width: 3px; background: #E8B54A;"></div>
+        </div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 21px; font-weight: 800; letter-spacing: 2.5px;">SUB ON</div>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 6px; border: 1.5px solid rgba(242,239,230,0.55); padding: 3px 9px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px;">SECOND HALF</div>
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="#F2EFE6" stroke-width="1.8" stroke-linecap="square"></path></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- how to bring it on: four routes, equal peers -->
+    <div style="display: flex; margin-top: 14px; padding: 0 20px; gap: 7px;">
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0 9px; border: 2px solid #E8B54A; background: rgba(232,181,74,0.11);">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#E8B54A" stroke-width="2"></circle><path d="M13 13l4 4" stroke="#E8B54A" stroke-width="2" stroke-linecap="square"></path></svg>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #E8B54A;">SEARCH</div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0 9px; border: 2px solid rgba(242,239,230,0.4);">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 4v12M6.5 4v12M10 4v12M13.5 4v12M17 4v12" stroke="#9FBBA8" stroke-width="1.8"></path></svg>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8;">BARCODE</div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0 9px; border: 2px solid rgba(242,239,230,0.4);">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="5" width="15" height="11" stroke="#9FBBA8" stroke-width="1.8"></rect><circle cx="10" cy="10.5" r="3" stroke="#9FBBA8" stroke-width="1.8"></circle><path d="M7 5l1.5-2h3L13 5" stroke="#9FBBA8" stroke-width="1.8"></path></svg>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8;">SNAP</div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0 9px; border: 2px solid rgba(242,239,230,0.4);">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16v-4M8 16V7M12 16v-6M16 16V4" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8;">SQUAD</div>
+      </div>
+    </div>
+
+    <!-- search field -->
+    <div style="margin: 13px 20px 0; display: flex; align-items: center; gap: 10px; border: 2px solid rgba(242,239,230,0.55); padding: 11px 13px; background: rgba(4,18,11,0.5);">
+      <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#9FBBA8" stroke-width="2"></circle><path d="M13 13l4 4" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-size: 15px; font-weight: 500; color: #7F9C88;">Search foods, brands, recipes</div>
+    </div>
+
+    <!-- THE SQUAD: your regulars, log on tap -->
+    <div style="display: flex; flex-direction: column; margin-top: 16px; min-height: 0; overflow: hidden;">
+      <div style="display: flex; align-items: center; gap: 9px; padding: 0 20px 6px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2.2px;">THE SQUAD</div>
+        <div style="flex: 1; height: 2px; background: rgba(242,239,230,0.82);"></div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">TAP TO BRING ON</div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid rgba(242,239,230,0.13);">
+        <div style="width: 34px; height: 34px; border: 2px solid #E8B54A; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #E8B54A; flex-shrink: 0;">9</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Flat white</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #9FBBA8;">MEDIUM · 12 APPS</div>
+            <div style="display: flex; gap: 3px; align-items: center;">
+              <div style="width: 14px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 8px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 10px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;">120</div>
+          <div style="width: 30px; height: 30px; border: 2px solid rgba(242,239,230,0.55); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#F2EFE6" stroke-width="2" stroke-linecap="square"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid rgba(242,239,230,0.13);">
+        <div style="width: 34px; height: 34px; border: 2px solid rgba(242,239,230,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; flex-shrink: 0;">4</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Porridge &amp; semi-skimmed</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #9FBBA8;">50 G + 200 ML · 9 APPS</div>
+            <div style="display: flex; gap: 3px; align-items: center;">
+              <div style="width: 9px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 20px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 7px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;">320</div>
+          <div style="width: 30px; height: 30px; border: 2px solid rgba(242,239,230,0.55); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#F2EFE6" stroke-width="2" stroke-linecap="square"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid rgba(242,239,230,0.13);">
+        <div style="width: 34px; height: 34px; border: 2px solid rgba(242,239,230,0.55); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; flex-shrink: 0;">10</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Chicken salad bowl</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #9FBBA8;">OWN RECIPE · 8 APPS</div>
+            <div style="display: flex; gap: 3px; align-items: center;">
+              <div style="width: 22px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 12px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 8px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;">545</div>
+          <div style="width: 30px; height: 30px; border: 2px solid rgba(242,239,230,0.55); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#F2EFE6" stroke-width="2" stroke-linecap="square"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ON THE BENCH: recents -->
+      <div style="display: flex; align-items: center; gap: 9px; padding: 14px 20px 6px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2.2px;">ON THE BENCH</div>
+        <div style="flex: 1; height: 2px; background: rgba(242,239,230,0.82);"></div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">RECENT</div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-bottom: 1px solid rgba(242,239,230,0.13);">
+        <div style="width: 34px; height: 34px; border: 1.5px dashed rgba(242,239,230,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #9FBBA8; flex-shrink: 0;">7</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Greek yogurt &amp; berries</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #9FBBA8;">170 G · YESTERDAY</div>
+            <div style="display: flex; gap: 3px; align-items: center;">
+              <div style="width: 16px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 14px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 6px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;">233</div>
+          <div style="width: 30px; height: 30px; border: 2px solid rgba(242,239,230,0.55); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#F2EFE6" stroke-width="2" stroke-linecap="square"></path></svg>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 20px;">
+        <div style="width: 34px; height: 34px; border: 1.5px dashed rgba(242,239,230,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #9FBBA8; flex-shrink: 0;">2</div>
+        <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Sourdough toast &amp; butter</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #9FBBA8;">2 SLICES · SAT</div>
+            <div style="display: flex; gap: 3px; align-items: center;">
+              <div style="width: 8px; height: 3px; background: #E8B54A;"></div>
+              <div style="width: 18px; height: 3px; background: rgba(242,239,230,0.7);"></div>
+              <div style="width: 12px; height: 3px; background: rgba(242,239,230,0.32);"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;">280</div>
+          <div style="width: 30px; height: 30px; border: 2px solid rgba(242,239,230,0.55); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#F2EFE6" stroke-width="2" stroke-linecap="square"></path></svg>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; border-top: 1px solid rgba(242,239,230,0.13);">
+        <div style="width: 34px; height: 34px; border: 1.5px dashed rgba(242,239,230,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0;">
+          <div style="font-size: 15px; font-weight: 600; line-height: 1.1;">Quick add by calories</div>
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: #9FBBA8;">WHEN YOU ONLY KNOW THE NUMBER</div>
+        </div>
+        <svg width="15" height="15" viewBox="0 0 14 14" fill="none"><path d="M5 3l4 4-4 4" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+      </div>
+    </div>
+
+    <!-- what today still has room for -->
+    <div style="margin: auto 20px 14px; border: 2px solid rgba(242,239,230,0.82); background: rgba(4,18,11,0.5); padding: 11px 13px; display: flex; align-items: center; gap: 13px;">
+      <div style="display: flex; flex-direction: column; gap: 1px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; color: #9FBBA8;">ROOM LEFT TODAY</div>
+        <div style="display: flex; align-items: baseline; gap: 5px;">
+          <div style="font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums;">612</div>
+          <div style="font-size: 14px; font-weight: 600; color: #E8B54A;">±100</div>
+        </div>
+      </div>
+      <div style="width: 2px; align-self: stretch; background: rgba(242,239,230,0.28);"></div>
+      <div style="font-size: 12.5px; font-weight: 500; line-height: 1.35; color: #DCE6DD;">Three on the sheet. Anything here still fits inside the band.</div>
+    </div>
+  </div>
+
+  <!-- macro key + tab bar -->
+  <div style="position: relative; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 7px 0; border-top: 1px solid rgba(242,239,230,0.16); background: rgba(4,18,11,0.72);">
+    <div style="display: flex; align-items: center; gap: 5px;"><div style="width: 11px; height: 3px; background: #E8B54A;"></div><div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">PROTEIN</div></div>
+    <div style="display: flex; align-items: center; gap: 5px;"><div style="width: 11px; height: 3px; background: rgba(242,239,230,0.7);"></div><div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">CARBS</div></div>
+    <div style="display: flex; align-items: center; gap: 5px;"><div style="width: 11px; height: 3px; background: rgba(242,239,230,0.32);"></div><div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">FAT</div></div>
+  </div>
+  <div style="position: relative; height: 86px; border-top: 2px solid rgba(242,239,230,0.82); background: rgba(4,18,11,0.72); display: flex; align-items: flex-start; padding: 11px 26px 0;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" stroke="#9FBBA8" stroke-width="2"></rect><path d="M3 10h14" stroke="#9FBBA8" stroke-width="2"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">MATCHDAY</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M3 10h14" stroke="#E8B54A" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #E8B54A;">SUB ON</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M4 17V10M10 17V3M16 17v-4" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">TABLE</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800&family=Saira:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #08210F; }
+    a { color: #E8B54A; } a:hover { color: #F2CB74; }
+    @keyframes riseIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  </style>
+</helmet>
+<div style="width: 393px; height: 852px; background: #08210F; color: #F2EFE6; font-family: 'Saira', 'Trebuchet MS', Arial, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+
+  <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.000) 0px, rgba(255,255,255,0.000) 49px, rgba(255,255,255,0.022) 49px, rgba(255,255,255,0.022) 98px); pointer-events: none;"></div>
+  <div style="position: absolute; top: -180px; left: -90px; width: 500px; height: 460px; background: radial-gradient(ellipse at center, rgba(214,255,228,0.13) 0%, rgba(214,255,228,0.05) 42%, rgba(214,255,228,0) 70%); pointer-events: none;"></div>
+
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; padding: 54px 20px 0; min-height: 0;">
+
+    <!-- masthead -->
+    <div style="display: flex; align-items: center; gap: 11px; border-bottom: 2px solid rgba(242,239,230,0.82); padding-bottom: 9px;">
+      <div style="display: flex; gap: 2px; height: 19px;">
+        <div style="width: 3px; background: #E8B54A;"></div>
+        <div style="width: 3px; background: #F2EFE6;"></div>
+        <div style="width: 3px; background: #E8B54A;"></div>
+      </div>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 21px; font-weight: 800; letter-spacing: 2.5px;">MATCHWEEK 32</div>
+      <div style="margin-left: auto; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; color: #9FBBA8;">W/E 3 AUG</div>
+    </div>
+
+    <!-- the promotion moment: crest, division, result -->
+    <div style="display: flex; align-items: stretch; gap: 14px; margin-top: 20px;">
+      <div style="width: 88px; border: 2px solid #E8B54A; background: rgba(232,181,74,0.09); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;">
+        <svg width="42" height="37" viewBox="0 0 34 30" fill="none">
+          <path d="M4 26l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"></path>
+          <path d="M4 17l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"></path>
+          <path d="M4 8l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"></path>
+        </svg>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #9FBBA8;">DIV 3 OF 5</div>
+      </div>
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 3px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 52px; font-weight: 800; line-height: 0.86; letter-spacing: 0.5px; color: #E8B54A;">GOLD</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 3px; color: #F2EFE6;">DIVISION</div>
+        <div style="display: flex; align-items: center; gap: 6px; margin-top: 5px;">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1.5L11 10H1z" fill="#F2EFE6"></path></svg>
+          <div style="font-size: 13px; font-weight: 600; color: #F2EFE6;">Promoted from Silver</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- the scoreline: composite against the safety line -->
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 22px; border-top: 2px solid rgba(242,239,230,0.82); padding-top: 15px;">
+      <div style="display: flex; flex-direction: column; gap: 1px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; color: #9FBBA8;">COMPOSITE</div>
+        <div style="font-size: 88px; font-weight: 700; line-height: 0.86; letter-spacing: -3px; font-variant-numeric: tabular-nums;">0.71</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px; padding-bottom: 9px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #9FBBA8;">SAFE ABOVE</div>
+        <div style="font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: #E8B54A;">0.65</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">+0.06 CLEAR</div>
+      </div>
+    </div>
+
+    <!-- the survival line: where 0.71 sits against relegation and the next division -->
+    <div style="margin-top: 14px; position: relative; height: 26px;">
+      <div style="position: absolute; left: 0; right: 0; top: 11px; height: 4px; background: rgba(242,239,230,0.16);"></div>
+      <div style="position: absolute; left: 0; width: 71%; top: 11px; height: 4px; background: #F2EFE6; transform-origin: left; animation: riseIn 800ms cubic-bezier(0.16, 1, 0.3, 1);"></div>
+      <div style="position: absolute; left: 65%; top: 3px; width: 2px; height: 20px; background: #E8B54A;"></div>
+      <div style="position: absolute; left: 71%; top: 0; width: 15px; height: 26px; transform: translateX(-7px); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 15px; height: 15px; border-radius: 50%; background: #F2EFE6; box-shadow: 0 2px 8px rgba(0,0,0,0.6);"></div>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 1.2px; color: #9FBBA8;">
+      <div>0</div><div style="color: #E8B54A;">SAFETY LINE 0.65</div><div>1.00</div>
+    </div>
+
+    <!-- the league table: components as standings, weights visible -->
+    <div style="display: flex; flex-direction: column; margin-top: 20px; border: 2px solid rgba(242,239,230,0.82); background: rgba(4,18,11,0.5);">
+      <div style="display: grid; grid-template-columns: 22px 1fr 44px 58px; gap: 9px; padding: 7px 12px; border-bottom: 2px solid rgba(242,239,230,0.42);">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8;">#</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8;">COMPONENT</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8; text-align: right;">WT</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8; text-align: right;">SCORE</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 22px 1fr 44px 58px; gap: 9px; align-items: center; padding: 11px 12px; border-bottom: 1px solid rgba(242,239,230,0.16); background: rgba(232,181,74,0.07);">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #E8B54A;">1</div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 1.2px;">CONSISTENCY</div>
+          <div style="width: 100%; height: 6px; background: rgba(242,239,230,0.16);"><div style="width: 86%; height: 6px; background: #E8B54A;"></div></div>
+        </div>
+        <div style="font-size: 13px; font-weight: 600; color: #9FBBA8; text-align: right; font-variant-numeric: tabular-nums;">0.50</div>
+        <div style="font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;">0.86</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 22px 1fr 44px 58px; gap: 9px; align-items: center; padding: 11px 12px; border-bottom: 1px solid rgba(242,239,230,0.16);">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #9FBBA8;">2</div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 1.2px;">ADHERENCE</div>
+          <div style="width: 100%; height: 6px; background: rgba(242,239,230,0.16);"><div style="width: 71%; height: 6px; background: rgba(242,239,230,0.78);"></div></div>
+        </div>
+        <div style="font-size: 13px; font-weight: 600; color: #9FBBA8; text-align: right; font-variant-numeric: tabular-nums;">0.25</div>
+        <div style="font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;">0.71</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 22px 1fr 44px 58px; gap: 9px; align-items: center; padding: 11px 12px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 700; color: #9FBBA8;">3</div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 1.2px;">PROGRESS</div>
+          <div style="width: 100%; height: 6px; background: rgba(242,239,230,0.16);"><div style="width: 52%; height: 6px; background: rgba(242,239,230,0.5);"></div></div>
+        </div>
+        <div style="font-size: 13px; font-weight: 600; color: #9FBBA8; text-align: right; font-variant-numeric: tabular-nums;">0.25</div>
+        <div style="font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;">0.52</div>
+      </div>
+    </div>
+
+    <!-- next fixture: what keeps the division -->
+    <div style="margin-top: 14px; border: 2px solid rgba(242,239,230,0.82); padding: 11px 13px; display: flex; align-items: center; gap: 12px; background: rgba(4,18,11,0.5);">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.2px; color: #9FBBA8;">NEXT</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 22px; font-weight: 800; line-height: 1; color: #E8B54A;">MW33</div>
+      </div>
+      <div style="width: 2px; align-self: stretch; background: rgba(242,239,230,0.28);"></div>
+      <div style="font-size: 14px; font-weight: 500; line-height: 1.35; color: #DCE6DD;">One more logged day keeps you in Gold.</div>
+    </div>
+
+    <!-- the season: six matchweeks of composite against the safety line -->
+    <div style="margin-top: auto; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 9px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px;">THE SEASON</div>
+        <div style="flex: 1; height: 2px; background: rgba(242,239,230,0.82);"></div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 1px; color: #9FBBA8;">MW27–32</div>
+      </div>
+      <div style="position: relative; height: 62px; display: flex; align-items: flex-end; gap: 7px;">
+        <!-- the safety line runs across every week -->
+        <div style="position: absolute; left: 0; right: 0; bottom: 35.7px; height: 0; border-top: 2px dashed #E8B54A; z-index: 2;"></div>
+        <div style="flex: 1; height: 30px; background: rgba(242,239,230,0.42);"></div>
+        <div style="flex: 1; height: 26px; background: rgba(242,239,230,0.42);"></div>
+        <div style="flex: 1; height: 34px; background: rgba(242,239,230,0.42);"></div>
+        <div style="flex: 1; height: 31px; background: rgba(242,239,230,0.42);"></div>
+        <div style="flex: 1; height: 41px; background: rgba(242,239,230,0.7);"></div>
+        <div style="flex: 1; height: 44px; background: #E8B54A;"></div>
+      </div>
+      <div style="display: flex; gap: 7px;">
+        <div style="flex: 1; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #9FBBA8; text-align: center;">27</div>
+        <div style="flex: 1; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #9FBBA8; text-align: center;">28</div>
+        <div style="flex: 1; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #9FBBA8; text-align: center;">29</div>
+        <div style="flex: 1; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #9FBBA8; text-align: center;">30</div>
+        <div style="flex: 1; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; color: #9FBBA8; text-align: center;">31</div>
+        <div style="flex: 1; font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 700; color: #E8B54A; text-align: center;">32</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tab bar -->
+  <div style="position: relative; height: 86px; border-top: 2px solid rgba(242,239,230,0.82); background: rgba(4,18,11,0.72); display: flex; align-items: flex-start; padding: 11px 26px 0;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" stroke="#9FBBA8" stroke-width="2"></rect><path d="M3 10h14" stroke="#9FBBA8" stroke-width="2"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">MATCHDAY</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M3 10h14" stroke="#9FBBA8" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #9FBBA8;">SUB ON</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="21" height="21" viewBox="0 0 20 20" fill="none"><path d="M4 17V10M10 17V3M16 17v-4" stroke="#E8B54A" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 1.8px; color: #E8B54A;">TABLE</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
