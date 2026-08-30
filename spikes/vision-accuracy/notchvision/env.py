@@ -15,7 +15,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-__all__ = ["find_dotenv", "load_dotenv", "parse_dotenv"]
+__all__ = ["find_all_dotenv", "find_dotenv", "load_dotenv", "parse_dotenv"]
 
 
 def parse_dotenv(text: str) -> dict[str, str]:
@@ -46,17 +46,30 @@ def parse_dotenv(text: str) -> dict[str, str]:
     return out
 
 
+def find_all_dotenv(start: Path) -> list[Path]:
+    """Every `.env` on the search path, nearest first.
+
+    Only the first is ever loaded. This exists so `load_dotenv` can *say* when there
+    is more than one, because the alternative is silent: a second `.env` in the spike
+    directory shadows the repo-root one completely, and the symptom is a key or a
+    model id that is definitely in a file having no effect at all.
+    """
+    found: list[Path] = []
+    for directory in (start, *start.parents):
+        candidate = directory / ".env"
+        if candidate.is_file():
+            found.append(candidate)
+    return found
+
+
 def find_dotenv(start: Path) -> Path | None:
-    """Walk up from `start` looking for a `.env`.
+    """The nearest `.env` walking up from `start`, or None.
 
     The spike lives two directories below the repo root, where `.env` is. Walking up
     means the file is found whether you run from the spike directory or the repo root.
     """
-    for directory in (start, *start.parents):
-        candidate = directory / ".env"
-        if candidate.is_file():
-            return candidate
-    return None
+    found = find_all_dotenv(start)
+    return found[0] if found else None
 
 
 def load_dotenv(start: Path | None = None) -> Path | None:
@@ -68,9 +81,23 @@ def load_dotenv(start: Path | None = None) -> Path | None:
     are ignored too, since `.env.example` ships every key blank and a blank key would
     otherwise read as "set" and fail at the API instead of at startup.
     """
-    path = find_dotenv(start or Path.cwd())
-    if path is None:
+    candidates = find_all_dotenv(start or Path.cwd())
+    if not candidates:
         return None
+    path = candidates[0]
+    if len(candidates) > 1:
+        # Nearest wins and the rest are never opened. Never guess which the user
+        # meant — say plainly that the others are inert, so a key that is "definitely
+        # in the file" has a visible reason for not being seen.
+        import sys
+
+        print(f"! {len(candidates)} .env files on the search path. Using the nearest:",
+              file=sys.stderr)
+        for i, candidate in enumerate(candidates):
+            note = "  <- loaded" if i == 0 else "  <- IGNORED, entirely"
+            print(f"    {candidate}{note}", file=sys.stderr)
+        print("  Keep one, at the repo root. See docs/security/secrets.md.",
+              file=sys.stderr)
     try:
         text = path.read_text(encoding="utf-8")
     except OSError:

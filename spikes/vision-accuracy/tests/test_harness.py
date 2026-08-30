@@ -548,6 +548,31 @@ def test_dotenv_sets_the_key_the_provider_actually_looks_for(tmp_path: Path, mon
     assert os.environ.get("GEMINI_API_KEY") == "from-dotenv"
 
 
+def test_a_second_dotenv_shadows_the_first_and_says_so(tmp_path: Path, monkeypatch, capsys):
+    """The footgun: a .env in the spike directory silently hides the repo-root one.
+    Nearest still wins — but it must not win quietly."""
+    root, nested = tmp_path, tmp_path / "spikes" / "vision-accuracy"
+    nested.mkdir(parents=True)
+    (root / ".env").write_text("GEMINI_API_KEY=from-root\n", encoding="utf-8")
+    (nested / ".env").write_text("GEMINI_API_KEY=from-nested\n", encoding="utf-8")
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+
+    assert load_dotenv(nested) == nested / ".env"
+    assert os.environ["GEMINI_API_KEY"] == "from-nested"
+
+    err = capsys.readouterr().err
+    assert "2 .env files" in err
+    assert "IGNORED" in err, "the shadowed file must be named as having no effect"
+
+
+def test_one_dotenv_says_nothing(tmp_path: Path, monkeypatch, capsys):
+    """The warning must not fire on the normal single-file case."""
+    (tmp_path / ".env").write_text("GEMINI_API_KEY=only-one\n", encoding="utf-8")
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    load_dotenv(tmp_path)
+    assert capsys.readouterr().err == ""
+
+
 def test_a_nonexistent_start_directory_is_not_an_error(tmp_path: Path):
     """Called before the photo-directory check, so it must never be the thing that
     raises. Returning None and letting the provider report a missing key is the
