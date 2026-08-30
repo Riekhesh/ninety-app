@@ -100,8 +100,18 @@ of a penny per image, the `--max-edge` sweep is now an *accuracy* question only.
 
 ## Spike B — photo estimate accuracy
 
-**Status:** harness proven end-to-end against the live API; needs your 20 weighed meals.
+**Status:** harness proven end-to-end against the live API; needs 20 weighed meals.
 Not a Phase 0 gate — see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md).
+
+> **Folded into Phase 1, decided 2026-08-30.** Phase 1's exit criteria already require
+> **21 days of logged food**, so a separate 20-meal collection exercise would be
+> gathering data that phase produces anyway. The meals come from real use instead.
+>
+> **The one thing this requires of the Phase 1 build:** the logging flow has to **keep
+> the photo** and the confirmed values together, so a run can be scored afterwards.
+> Discard the image once the estimate is shown and there are 21 days of logs with
+> nothing to score — and the separate exercise is back. Weigh what is easy to weigh as
+> you go; a partial ground truth over 21 days beats a perfect one over zero.
 **Run on:** `TO BE MEASURED` · model `TO BE MEASURED` · effort `TO BE MEASURED` · `TO BE MEASURED` px
 
 > Informal signal from the 3-photo cost run, **not** a measurement: the estimates were

@@ -25,8 +25,11 @@ done — extend it and compress a later one.
 - **Photo accuracy across 20 weighed meals.** The photo estimate is always presented as
   a helper — ranges, visible uncertainty, one-tap correction — so a bad number changes
   the UX weighting rather than killing the feature. That makes it a **benchmark, not a
-  spike**: valuable, but not a gate. Do it during or after Phase 1, whenever the meals
-  accumulate. Results still go in [07-spike-findings.md](07-spike-findings.md).
+  spike**: valuable, but not a gate. **Folded into Phase 1** (decided 2026-08-30) —
+  its exit criteria already require 21 days of logged food, so the meals arrive from
+  real use rather than a separate evening's collection. Requires only that Phase 1's
+  logging keeps the photo alongside the confirmed values. Results still go in
+  [07-spike-findings.md](07-spike-findings.md).
 
 ---
 
