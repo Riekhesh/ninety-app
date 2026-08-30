@@ -52,9 +52,32 @@ PRICING: dict[str, tuple[float, float]] = {
     # Retired for new API keys as of July 2026 — kept so old run files still price.
     "gemini-2.5-flash": (0.30, 2.50),
     "gemini-2.5-pro": (1.25, 10.00),
+    # The mock calls nothing, so it really is free. Declared rather than defaulted:
+    # a zero that means "free" and a zero that means "we have no idea" have to be
+    # different things, which is the whole point of UnpricedModelError below.
+    "mock-v1": (0.00, 0.00),
 }
 CACHE_WRITE_MULTIPLIER = 1.25
 CACHE_READ_MULTIPLIER = 0.10
+
+
+class UnpricedModelError(KeyError):
+    """No rate card for this model, so its cost is unknown — not zero.
+
+    The failure mode this exists to prevent: `PRICING.get(model, (0.0, 0.0))`
+    returns a real-looking $0.0000/image for a model id nobody has priced, and the
+    report prints it next to the measured figures as though it were one. A run that
+    cannot be priced is worth less than a run that refuses to start, because the
+    first one lies quietly and the second one tells you to add two numbers.
+    """
+
+    def __str__(self) -> str:  # KeyError repr()s its argument, which adds quotes
+        return self.args[0] if self.args else ""
+
+
+def is_priced(model: str) -> bool:
+    """Whether `model` has a rate card. Preflight for the harness (§10 cost controls)."""
+    return model in PRICING
 
 
 @dataclass(slots=True)
@@ -65,7 +88,15 @@ class Usage:
     cache_read_tokens: int = 0
 
     def cost_usd(self, model: str) -> float:
-        rate_in, rate_out = PRICING.get(model, (0.0, 0.0))
+        """Raises UnpricedModelError rather than pricing an unknown model at zero."""
+        try:
+            rate_in, rate_out = PRICING[model]
+        except KeyError:
+            raise UnpricedModelError(
+                f"no pricing entry for {model!r}. Add its input/output rates in "
+                f"USD per million tokens to PRICING in notchvision/providers.py, "
+                f"taken from the provider's own pricing page."
+            ) from None
         per_token_in = rate_in / 1_000_000
         return (
             self.input_tokens * per_token_in
@@ -460,6 +491,16 @@ DEFAULT_MODELS = {
 }
 
 
+def resolve_model(provider: str, model: str | None) -> str | None:
+    """The model id `build` would use, without constructing anything.
+
+    Separate from `build` so the caller can preflight the rate card before an SDK
+    import or an API key is required — an unpriced model id should not cost you a
+    `pip install` to discover.
+    """
+    return model or DEFAULT_MODELS.get(provider)
+
+
 def build(provider: str, model: str | None) -> VisionProvider:
     """Factory. `model=None` uses each provider's default (see DEFAULT_MODELS).
 
@@ -467,7 +508,7 @@ def build(provider: str, model: str | None) -> VisionProvider:
     found", pass `--model` with a current id rather than assuming the harness is
     broken.
     """
-    resolved = model or DEFAULT_MODELS.get(provider)
+    resolved = resolve_model(provider, model)
     match provider:
         case "gemini":
             return GeminiProvider(resolved or "gemini-3.5-flash-lite")

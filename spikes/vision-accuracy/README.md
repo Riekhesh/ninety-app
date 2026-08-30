@@ -149,6 +149,29 @@ python3 run_baseline.py --repeats 3 --tag variance
 python3 analyse.py --compare runs/*.jsonl
 ```
 
+### If a model id is newer than this harness
+
+Model ids move faster than `PRICING` in `notchvision/providers.py` does, so a sweep
+across a just-released model is the normal way to hit this:
+
+```
+✗ no pricing entry for 'gemini-4.0-flash' — refusing to run.
+```
+
+**That refusal is deliberate.** The alternative is a run that reports **$0.0000/image**
+and looks exactly like a free model — and "the vision feature is free" is the one §10
+conclusion that has to be measured rather than inferred. The check runs before the
+SDK import and before the key lookup, so it costs nothing to hit.
+
+Two ways out, in order of preference:
+
+1. **Add the rates.** Two numbers, USD per million tokens, from the provider's own
+   pricing page, into `PRICING`. Takes a minute and every future run is priced.
+2. `--unpriced-ok`, if you want the responses now and the price later. Costs are
+   recorded as `null`, never as `0.0`, and the report says **not priced** rather than
+   `$0.0000`. Token counts are still real, so adding the rates later and re-running
+   `analyse.py` on the same file recovers the cost figure without re-calling the API.
+
 ---
 
 ## What the report tells you that a single MAPE does not

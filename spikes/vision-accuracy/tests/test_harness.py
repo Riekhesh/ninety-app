@@ -24,7 +24,7 @@ sys.path.insert(0, str(SPIKE))
 from notchvision import imaging, metrics  # noqa: E402
 from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
 from notchvision.env import find_dotenv, load_dotenv, parse_dotenv  # noqa: E402
-from notchvision.providers import MockProvider, Usage  # noqa: E402
+from notchvision.providers import MockProvider, UnpricedModelError, Usage  # noqa: E402
 from notchvision.report import render  # noqa: E402
 from notchvision.schema import EstimateParseError, parse_estimate  # noqa: E402
 
@@ -328,14 +328,102 @@ def test_unknown_provider_names_the_valid_ones():
 
 
 def test_every_default_model_is_priced():
-    """A model with no price silently reports $0.0000/image, which is worse than
-    an error — it looks like the feature is free."""
+    """A model with no price used to silently report $0.0000/image, which is worse
+    than an error — it looks like the feature is free. The mock is in the table too,
+    at a declared zero: "free" and "unknown" must not share a representation."""
     from notchvision.providers import DEFAULT_MODELS, PRICING
 
-    for provider, model in DEFAULT_MODELS.items():
-        if provider == "mock":
-            continue  # the mock is genuinely free
+    for model in DEFAULT_MODELS.values():
         assert model in PRICING, f"{model} has no pricing entry"
+
+
+# ─── Unpriced models (NA-14) ─────────────────────────────────────────────────
+# The whole point: an unknown cost must never render as $0.00 anywhere between the
+# API response and the markdown report.
+
+
+def test_costing_an_unpriced_model_raises_rather_than_returning_zero():
+    usage = Usage(input_tokens=1_636, output_tokens=148)
+    with pytest.raises(UnpricedModelError, match="gemini-9.9-imaginary"):
+        usage.cost_usd("gemini-9.9-imaginary")
+
+
+def test_unpriced_error_names_the_file_to_edit():
+    """The error is the documentation. It has to say what to add and where."""
+    usage = Usage(input_tokens=1)
+    try:
+        usage.cost_usd("nope-1")
+    except UnpricedModelError as exc:
+        message = str(exc)
+    assert "providers.py" in message and "per million tokens" in message
+
+
+def test_a_priced_zero_is_still_a_number():
+    """The mock costs nothing, and that is a measurement, not a missing one."""
+    assert Usage(input_tokens=5_000, output_tokens=500).cost_usd("mock-v1") == 0.0
+
+
+def test_run_baseline_refuses_an_unpriced_model(photo_dir: Path, truth_csv: Path, capsys):
+    import run_baseline
+
+    rc = run_baseline.main([
+        "--provider", "mock", "--model", "mock-unpriced",
+        "--photos", str(photo_dir), "--truth", str(truth_csv),
+        "--tag", "pytest-unpriced", "--no-cache", "--no-analyse",
+    ])
+    assert rc == 2, "an unpriced model must not produce a run"
+    assert not sorted((SPIKE / "runs").glob("*-pytest-unpriced.jsonl"))
+
+    err = capsys.readouterr().err
+    assert "refusing to run" in err
+    assert "mock-unpriced" in err
+    assert "--unpriced-ok" in err, "the refusal must name its own escape hatch"
+
+
+def test_unpriced_ok_records_null_and_the_report_never_says_zero(
+    photo_dir: Path, truth_csv: Path, tmp_path: Path
+):
+    """The escape hatch collects responses without inventing a price. Everything
+    downstream has to carry the unknown through as an unknown."""
+    import analyse
+    import run_baseline
+
+    rc = run_baseline.main([
+        "--provider", "mock", "--model", "mock-unpriced", "--unpriced-ok",
+        "--photos", str(photo_dir), "--truth", str(truth_csv),
+        "--tag", "pytest-unpriced-ok", "--no-cache", "--no-analyse",
+    ])
+    assert rc == 0
+
+    run_path = sorted((SPIKE / "runs").glob("*-pytest-unpriced-ok.jsonl"))[-1]
+    lines = [json.loads(l) for l in run_path.read_text().splitlines() if l.strip()]
+    manifest, records = lines[0], lines[1:]
+    assert manifest["priced"] is False
+    assert records and all(r["cost_usd"] is None for r in records)
+    # Token counts are still real, so the run can be re-costed later from the file.
+    assert all(r["usage"]["input_tokens"] > 0 for r in records)
+
+    out_md = tmp_path / "unpriced.md"
+    assert analyse.main(["--run", str(run_path), "--truth", str(truth_csv),
+                         "--out", str(out_md)]) == 0
+    text = out_md.read_text()
+    assert "not priced" in text
+    assert "$0.0000" not in text, "an unknown cost must never render as a zero one"
+
+    run_path.unlink()
+
+
+def test_a_partly_unpriced_run_has_no_total(photo_dir: Path, truth_csv: Path):
+    """A total that silently omits the unpriced calls reads as the cost of the whole
+    run, which is the same lie in a quieter voice."""
+    summary = metrics.summarise(
+        [metrics.MealResult("m1", 0, 500.0, 550.0)],
+        [],
+        costs=[0.000862],
+        unpriced_calls=1,
+    )
+    assert summary.total_cost_usd is None
+    assert summary.unpriced_calls == 1
 
 
 # ─── Gemini schema adaptation ────────────────────────────────────────────────

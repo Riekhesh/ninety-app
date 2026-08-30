@@ -68,6 +68,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="ignore the response cache and re-call the model")
     p.add_argument("--no-analyse", action="store_true",
                    help="write the run but skip the report")
+    p.add_argument("--unpriced-ok", action="store_true",
+                   help="run a model with no entry in PRICING. Costs are recorded as "
+                        "null and the report says 'not priced' — it never invents a "
+                        "$0.00. Prefer adding the rates to PRICING.")
     return p.parse_args(argv)
 
 
@@ -115,6 +119,34 @@ def main(argv: list[str] | None = None) -> int:
                   f"collected but not scored: {', '.join(missing[:6])}"
                   f"{'…' if len(missing) > 6 else ''}\n")
 
+    # Preflight the rate card before anything is constructed, imported or spent.
+    # An unpriced model used to sail through and report $0.0000/image, which reads
+    # exactly like "this feature is free" — the one conclusion §10 most needs to be
+    # true and least wants assumed. Model ids move faster than PRICING does, so
+    # `--model` on a new id is the normal way to hit this; the fix is two numbers,
+    # not a workaround. Checked before providers.build so the answer does not
+    # depend on having the provider's SDK installed or its key set.
+    resolved_model = providers.resolve_model(args.provider, args.model)
+    priced = resolved_model is not None and providers.is_priced(resolved_model)
+    if not priced and not args.unpriced_ok:
+        print(f"✗ no pricing entry for {resolved_model!r} — refusing to run.",
+              file=sys.stderr)
+        print("  A run that cannot be priced would report $0.0000/image, which is",
+              file=sys.stderr)
+        print("  indistinguishable from a genuinely free model.\n", file=sys.stderr)
+        print("  Fix it: add the input/output rates in USD per million tokens to",
+              file=sys.stderr)
+        print("  PRICING in notchvision/providers.py, from the provider's pricing page:",
+              file=sys.stderr)
+        print(f'      "{resolved_model}": (<in>, <out>),\n', file=sys.stderr)
+        print("  Or, to collect responses now and price them later:", file=sys.stderr)
+        print("      --unpriced-ok    (costs recorded as null, never as zero)",
+              file=sys.stderr)
+        return 2
+    if not priced:
+        print(f"! {resolved_model} is unpriced — cost will be recorded as null, "
+              f"not $0.00.\n")
+
     provider = providers.build(args.provider, args.model)
     cache = imaging.ResponseCache(HERE / ".cache")
 
@@ -135,6 +167,7 @@ def main(argv: list[str] | None = None) -> int:
         "repeats": args.repeats,
         "prompt_version": PROMPT_VERSION,
         "prompt_hash": prompt_hash(),
+        "priced": priced,
         "n_photos": len(photos),
         "photos_dir": str(args.photos),
         "truth_file": str(args.truth),
@@ -196,7 +229,10 @@ def main(argv: list[str] | None = None) -> int:
                             "cache_write_tokens": result.usage.cache_write_tokens,
                             "cache_read_tokens": result.usage.cache_read_tokens,
                         },
-                        "cost_usd": result.usage.cost_usd(result.model),
+                        # null, never 0.0, when the model has no rate card
+                        "cost_usd": (
+                            result.usage.cost_usd(result.model) if priced else None
+                        ),
                         "latency_ms": result.latency_ms,
                         "model": result.model,
                         "image": {
