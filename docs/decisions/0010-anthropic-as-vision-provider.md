@@ -163,12 +163,18 @@ in/out).
 - It is the realistic production choice for a helper-with-correction feature at §10's
   volumes, so the measured cost is the cost actually payable.
 
-**A trap this exposed, recorded because it is silent.** `Usage.cost_usd` falls back to
-`(0.0, 0.0)` for an unknown model, so running an unpriced `--model` reports **$0.00 per
+**A trap this exposed, recorded because it is silent.** `Usage.cost_usd` fell back to
+`(0.0, 0.0)` for an unknown model, so running an unpriced `--model` reported **$0.00 per
 image** rather than failing. For the one number the cost check exists to produce, that
 is a wrong answer that looks like a clean result. `gemini-3.6-flash` and
 `gemini-3.5-flash` are now priced alongside flash-lite; the 2.5 entries are kept so
 existing run files still price correctly.
+
+> **Fixed 2026-08-30.** Pricing an unknown model at zero is now impossible rather than
+> merely documented: `cost_usd` raises, `run_baseline` refuses before it imports an SDK
+> or reads a key, and `--unpriced-ok` records `null` so the report prints *not priced*
+> instead of `$0.0000`. Adding the two rates later re-costs the existing run file from
+> its recorded token counts, with no second API call.
 
 **Reversal trigger unchanged**, plus one: if the 20-meal benchmark shows flash-lite's
 accuracy is materially worse than `gemini-3.6-flash`, the 5× input cost is easily

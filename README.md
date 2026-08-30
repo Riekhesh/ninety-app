@@ -4,7 +4,7 @@
 
 **A native iOS health app that ranks you on improvement and consistency — not on absolute numbers.**
 
-*Every fitness app compares you to other people. This one compares you to who you were last month — and ranks you on that.*
+*Consistency is a side badge wherever it exists. Here it is the rank — and it is normalised, so a 120 kg beginner and a 70 kg regular can be compared fairly.*
 
 `Swift 6.3` · `SwiftUI` · `iOS 18+` · `Supabase` · TestFlight target **Nov 2026**
 
@@ -23,6 +23,27 @@ furthest to go get the least encouragement, and they quit first.
 at** — and they are also the two variables that most strongly predict long-term
 weight-loss outcomes. The product design and the underlying science point the same
 way, which is rare and worth building the whole app around.
+
+### What this claim is *not* — tested in Phase 0
+
+It is not *"nobody rewards consistency."* They do. Strava's
+[Local Legend](https://support.strava.com/en-us/articles/15401751-local-legends) crowns
+whoever runs a segment **most often over 90 days, regardless of pace** — a ranking a slow
+beginner can genuinely top. The Phase 0 teardown went looking for that counter-example
+and found it, so the claim is stated narrowly on purpose ([ADR 0013](docs/decisions/0013-narrowed-thesis-claim.md)):
+
+| | Strava Local Legend | Notch |
+|---|---|---|
+| Rewards | raw **frequency** on one segment | **improvement rate + consistency** |
+| Normalised for starting point? | **No** | **Yes** — DOTS/Wilks-style coefficient (§2.2) |
+| Scope | one segment you chose | your whole logged behaviour |
+| Is it the headline? | no — the fastest time is | **yes — it *is* the rank** |
+
+Consistency is a **side badge** everywhere it exists today. Making normalised
+improvement the rank itself is the part nobody has done, and normalising across starting
+points is the part §01 correctly calls the hard engineering problem. Local Legend is
+cited as prior art here the way §01 already cites Wilks and DOTS —
+[the full check](docs/phase-0/04-competitor-teardown.md#strava--the-thesis-check).
 
 The app is not the hard part; calorie loggers are a solved problem. The hard part is
 a rating system that is simultaneously **fair across starting points**, **resistant

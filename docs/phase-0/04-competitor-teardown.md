@@ -244,6 +244,12 @@ That is narrower, true, and much harder to knock down.
 get this, and it is the half that drives retention. Left open deliberately — Phase 3's
 real testers answer it better than one person's Strava post would have.
 
+> **Acted on 2026-08-30.** The narrowed wording is now the wording, everywhere the claim
+> is stated — README, the design system page, and the paste-into-Claude design brief. The
+> decision and the exact replacement sentence are in
+> [ADR 0013](../decisions/0013-narrowed-thesis-claim.md). This section is the evidence;
+> the ADR is the call.
+
 ### Duolingo — the mechanics that transfer
 
 Duolingo is on the list because it gamifies well, but the domain difference is
