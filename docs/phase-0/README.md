@@ -16,8 +16,8 @@ done — extend it and compress a later one.
 - [x] **Repo live, SwiftLint configured, secrets handling decided** → `.swiftlint.yml`, [secrets.md](../security/secrets.md)
 - [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
 - [x] **Vision cost per image measured** → **$0.000862/image, $1.55/mo at 1,800 calls** — 12–35× under §10's $0.01–0.03 estimate. [Numbers](07-spike-findings.md#cost-per-image--measured-)
-- [x] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md). Closed on desk research + prior hands-on use; **tap counts deliberately not measured** ([scope decision](04-competitor-teardown.md#scope-decision--closed-without-tap-counts))
-- [ ] **Apple Developer Program membership active** — needed only for the next item
+- [x] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md). Closed on desk research + prior hands-on use; **tap counts deliberately not measured** ([scope decision](04-competitor-teardown.md#scope-decision--closed-without-tap-counts)). The teardown's one finding that changed the project — Strava already rewards pace-agnostic consistency — is settled in [ADR 0013](../decisions/0013-narrowed-thesis-claim.md) and the narrowed wording is now live in the README, the design system page and the design brief.
+- [ ] **Apple Developer Program membership active** — **purchased, awaiting enrolment.** Needed only for the next item, and the only thing gating it
 - [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
 
 **Moved out of the exit criteria** (see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)):
@@ -54,18 +54,24 @@ thing it unblocks.
 
 ```
 Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured
+                thesis narrowed (ADR 0013) · harness refuses unpriced models
+                dev account purchased — waiting on Apple to clear enrolment
+                Swift ramp-up — 100 Days of SwiftUI, days 1–30
 
-Now ─────────── Swift days 1–5
+Now ─────────── Supabase + PostHog projects (~25 min, runbook: accounts.md)
+                send the clinician pack (docs/safety/clinician-review-pack.md)
 
 Then ────────── weigh meals as you eat them (slow, passive, no deadline)
                 Swift days 5–20
 
 Then ────────── design the app in Claude (fully unblocked, do it whenever)
 
-Then ────────── buy the dev account → wait for it to clear → Spike A (~90 min)
-
-Then ────────── Phase 1
+Then ────────── enrolment clears → Spike A (~90 min) → Phase 1
 ```
+
+**The two remaining exit criteria are both downstream of Apple**, and nothing else in
+this phase is. Everything under *Now* is work the enrolment wait does not block — which
+is the point of doing it during the wait rather than after it.
 
 Three things at a time, maximum. Everything else in this repo is reference material —
 you do not need to read it to make progress.
@@ -76,15 +82,19 @@ you do not need to read it to make progress.
 
 | Service | Cost | When | Why |
 |---|---|---|---|
-| **Apple Developer Program** | $99/yr + VAT | **now** | HealthKit, Sign in with Apple, TestFlight. Critical path. |
+| **Apple Developer Program** | $99/yr + VAT | **purchased — awaiting enrolment** | HealthKit, Sign in with Apple, TestFlight. Critical path. |
 | GitHub | free | done | Private repo + Actions. Turn on **secret scanning with push protection** in settings. |
 | Google Gemini API | pay-as-you-go | **done** | Spike B, using existing credit ([ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)). Measured at $0.000862/image, so the 20-meal baseline is ~$0.02. Anthropic/OpenAI remain optional comparison arms. |
-| Supabase | free → ~$25/mo | week 2 | Not needed until Phase 1, but create the project so it exists. |
-| PostHog | free | now | Not needed until Phase 3. Create it now so you're not doing admin later (§0.2). |
+| Supabase | free → ~$25/mo | week 2 | Not needed until Phase 1, but create the project so it exists. Click-path: [accounts.md](accounts.md) |
+| PostHog | free | now | Not needed until Phase 3. Create it now so you're not doing admin later (§0.2). Click-path: [accounts.md](accounts.md) |
 | Figma | free | optional | Only if you want to mirror the tokens. `notch.tokens.json` imports via Tokens Studio. |
 
 Keys go in `.env` (gitignored) or Supabase Edge Function env vars. Never the app
 bundle — see [secrets.md](../security/secrets.md).
+
+Click-path for the two that are still outstanding: **[accounts.md](accounts.md)**,
+~25 minutes for both. Then `scripts/verify-accounts.sh`, which is the testable
+condition — it checks every value is present and the right shape, and never prints one.
 
 ---
 
@@ -116,6 +126,10 @@ September. You need enough Swift to be dangerous, not enough to be comfortable."
 **Work days 1–30 of [100 Days of SwiftUI](https://www.hackingwithswift.com/100/swiftui)
 concurrently with this phase, then learn the rest by building.** Roughly an hour a
 day. Do not wait until you've finished.
+
+> **Done.** Days 1–30 complete. The list below is now a *reference* for Phase 1 rather
+> than a plan — when something in Phase 1 doesn't behave, it is most often one of
+> these five, in this order.
 
 What Phase 1 actually needs from those 30 days, in priority order:
 
@@ -149,7 +163,7 @@ Committed in this phase, so you don't have to redo it:
 | `design/tokens/` | `notch.tokens.json` is the single source of truth; `generate.py` emits Swift + CSS and **validates every text/surface pair against WCAG AA**, failing the build on a regression. It caught three real failures in the first draft. |
 | `docs/decisions/` | 12 ADRs — the seven locked decisions from §02 plus three new Phase 0 ones |
 | `docs/design/` | Principles, component specs, and a full copy deck reviewed against §10 |
-| `docs/safety/` | §10 as numbered rules with concrete thresholds and test names. **The numbers need a clinician before Phase 3.** |
+| `docs/safety/` | §10 as numbered rules with concrete thresholds and test names. **The numbers need a clinician before Phase 3** — [clinician-review-pack.md](../safety/clinician-review-pack.md) is the self-contained ~30-minute document to send them, and [who to ask](../safety/safety-requirements.md#the-pack-to-send-them) is written down. |
 | `spikes/` | Both spikes. B is runnable now; A is blocked on the dev account. |
 
 ---

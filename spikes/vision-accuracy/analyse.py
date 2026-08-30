@@ -40,6 +40,7 @@ def score(run_path: Path, truth_path: Path) -> tuple[metrics.Summary, dict, list
     latencies: list[int] = []
     n_predicted = 0
     warnings = 0
+    unpriced = 0
 
     for rec in records:
         pid = rec["photo_id"]
@@ -58,7 +59,12 @@ def score(run_path: Path, truth_path: Path) -> tuple[metrics.Summary, dict, list
         meals.append(meal)
         items.extend(item_results)
 
-        if (cost := rec.get("cost_usd")) is not None:
+        # An explicit null means the model had no rate card at run time. Counting
+        # it as zero, or silently leaving it out of the total, both turn an unknown
+        # into a number — see providers.UnpricedModelError.
+        if (cost := rec.get("cost_usd")) is None:
+            unpriced += 1
+        else:
             costs.append(float(cost))
         if (lat := rec.get("latency_ms")) is not None:
             latencies.append(int(lat))
@@ -69,6 +75,7 @@ def score(run_path: Path, truth_path: Path) -> tuple[metrics.Summary, dict, list
         costs=costs,
         latencies=latencies,
         parse_warnings=warnings,
+        unpriced_calls=unpriced,
     )
 
     # Token totals straight from the run records — real usage, not an estimate.
@@ -91,7 +98,8 @@ def compare(paths: list[Path], truth_path: Path) -> str:
             print(f"! skipping {p.name}: {exc}", file=sys.stderr)
             continue
         calls = max(1, s.n_meals * max(1, s.n_runs))
-        rows.append((m, s, s.total_cost_usd / calls))
+        per_img = None if s.total_cost_usd is None else s.total_cost_usd / calls
+        rows.append((m, s, per_img))
 
     if not rows:
         return "No runs could be scored."
@@ -108,7 +116,7 @@ def compare(paths: list[Path], truth_path: Path) -> str:
         out.append(
             f"| `{m.get('model','?')}` | {m.get('effort','?')} | {m.get('max_edge','?')}px "
             f"| {f(s.mape)} | {f(s.bias)} | {f(s.noise,' pts')} | {f(s.within_20)} "
-            f"| {f(s.coverage)} | ${per_img:.4f} |"
+            f"| {f(s.coverage)} | {'—' if per_img is None else f'${per_img:.4f}'} |"
         )
 
     out += ["", "**Reading this table.** Compare *bias* and *noise* separately, not just "

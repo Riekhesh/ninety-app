@@ -274,16 +274,33 @@ def render(
     L.append("")
     L.append("| Metric | Value |")
     L.append("|---|---:|")
-    L.append(f"| Total cost | ${summary.total_cost_usd:.4f} |")
     calls = summary.n_meals * max(1, summary.n_runs)
-    L.append(f"| Cost per image | ${summary.total_cost_usd / calls:.4f} |" if calls else "| Cost per image | — |")
-    L.append(f"| Projected 1,800 calls/month (§10) | ${summary.total_cost_usd / calls * 1800:.2f} |" if calls else "| Projected | — |")
+    if summary.total_cost_usd is None:
+        # Never $0.0000 here. An unpriced model reads as a free one, and "the vision
+        # feature costs nothing" is precisely the §10 claim that has to be measured.
+        L.append("| Total cost | **not priced** |")
+        L.append("| Cost per image | **not priced** |")
+        L.append("| Projected 1,800 calls/month (§10) | **not priced** |")
+    else:
+        L.append(f"| Total cost | ${summary.total_cost_usd:.4f} |")
+        L.append(f"| Cost per image | ${summary.total_cost_usd / calls:.4f} |" if calls else "| Cost per image | — |")
+        L.append(f"| Projected 1,800 calls/month (§10) | ${summary.total_cost_usd / calls * 1800:.2f} |" if calls else "| Projected | — |")
     L.append(f"| Mean latency | {_n(summary.mean_latency_ms, ' ms', 0)} |")
     L.append(f"| p90 latency | {_n(summary.p90_latency_ms, ' ms', 0)} |")
     L.append(f"| Input tokens | {summary.total_input_tokens:,} |")
     L.append(f"| Output tokens | {summary.total_output_tokens:,} |")
     L.append(f"| Served from prompt cache | {summary.cache_read_tokens:,} |")
     L.append("")
+    if summary.total_cost_usd is None:
+        L.append(
+            f"**This run has no cost figure.** {summary.unpriced_calls} of "
+            f"{calls} call(s) used a model with no entry in `PRICING`, so the run "
+            f"cannot be costed — which is a different statement from costing "
+            f"nothing. Add the model's input/output rates in USD per million tokens "
+            f"to `PRICING` in `notchvision/providers.py` and re-run `analyse.py`; "
+            f"the token counts above are real and the cost recomputes from them."
+        )
+        L.append("")
 
     if worst:
         L.append("## Worst five meals")

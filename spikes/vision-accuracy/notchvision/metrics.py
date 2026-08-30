@@ -261,8 +261,12 @@ class Summary:
     mean_run_cv: float | None = None
     max_run_cv: float | None = None
 
-    # Operational
-    total_cost_usd: float = 0.0
+    # Operational.
+    # `None` means "not priced", which is a different fact from $0.00 and has to
+    # stay distinguishable all the way to the rendered report — see
+    # providers.UnpricedModelError.
+    total_cost_usd: float | None = None
+    unpriced_calls: int = 0
     mean_latency_ms: float | None = None
     p90_latency_ms: float | None = None
     total_input_tokens: int = 0
@@ -281,8 +285,10 @@ def summarise(
     latencies: list[int] | None = None,
     parse_warnings: int = 0,
     refusals: int = 0,
+    unpriced_calls: int = 0,
 ) -> Summary:
     s = Summary()
+    s.unpriced_calls = unpriced_calls
     if not meals:
         return s
 
@@ -377,7 +383,9 @@ def summarise(
     s.max_run_cv = max(cvs) if cvs else None
 
     # ── Operational ──
-    if costs:
+    # A partial total is as misleading as a zero one: it reads as the cost of the
+    # whole run. If any call could not be priced, the run has no total.
+    if costs and not unpriced_calls:
         s.total_cost_usd = sum(costs)
     if latencies:
         s.mean_latency_ms = _mean([float(x) for x in latencies])

@@ -18,10 +18,11 @@ automated check on this file (deliberately — it's a convenience, not a build i
 
 I'm designing **Notch**, a native iOS health app (Swift 6.3 / SwiftUI, iOS 18+).
 
-**Thesis:** every fitness app compares you to other people. Notch compares you to who
-you were last month, and ranks you on rate of improvement and consistency rather than
-absolute performance. This solves the Strava problem where beginners are demoralised
-by leaderboards they can never win.
+**Thesis:** fitness apps rank you on absolute performance, and where consistency is
+rewarded at all it is a side badge next to that leaderboard (Strava's Local Legend is
+the closest prior art). Notch makes **normalised** improvement and consistency the rank
+itself, so a beginner is compared fairly against their own starting point rather than
+buried under people who started years earlier.
 
 Design direction: **quiet premium, dark-first.** Build screens as self-contained HTML
 in an iPhone frame (393×852). Use the tokens below and nothing else.
