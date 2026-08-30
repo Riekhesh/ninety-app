@@ -26,11 +26,34 @@ reviewed by anyone clinically qualified, and I am not qualified to set them.**
 - Before Phase 3 external testers, get them reviewed. A GP, a registered dietitian, or
   a university health-sciences contact. This is a half-hour conversation, not a
   research project.
-- Record who reviewed them and when, at the bottom of this file.
+- Record who reviewed them and when, in the [review log](#review-log) at the bottom of
+  this file.
 - Until then, the app is used by one person who knows the limitation.
 
 The *structure* here — floors, ceilings, refusals, opt-outs — is right regardless of
 whether a specific number moves.
+
+### The pack to send them
+
+**[clinician-review-pack.md](clinician-review-pack.md)** is this file rewritten for
+someone who has never seen the repo: self-contained, ~30 minutes, and it asks
+**specific numbered questions** rather than "does this look alright?" A reviewer who is
+doing you a favour needs to know exactly what is being asked and exactly what is not —
+it says plainly that it is not asking them to endorse the app or take responsibility
+for it, and offers to record them anonymously.
+
+**Who to ask, roughly in order of how easy they are to reach:**
+
+| Who | How |
+|---|---|
+| **A university contact** — health sciences, nutrition, sports science, or dietetics | The easiest door. Email a lecturer directly; a 30-minute review of a student project is a normal ask, and they will often hand it to a colleague who is a better fit. |
+| **A registered dietitian** | The best fit for S1–S3 specifically. The BDA's "find a dietitian" directory lists freelancers; a short paid consultation is a legitimate way to do this and is not expensive. |
+| **A GP you already have a relationship with** | Good on S4 and S7, less specific on the calorie numbers than a dietitian. |
+| **Beat** (the eating disorder charity) | Will not review your thresholds, but their published guidance for app developers is worth reading before you send the pack — it may answer Q5.3 on its own. |
+
+You do not need all of them. **One qualified reader is the difference between "numbers
+from public guidance" and "numbers a professional looked at"**, and that is the
+sentence you want to be able to write in Phase 3 and in the write-up.
 
 ---
 
@@ -324,7 +347,9 @@ is not a substitute for professional advice."*
 - [ ] Named tests for every S3 assertion above
 
 **Phase 3 — before the first external tester:**
-- [ ] Thresholds reviewed by someone clinically qualified
+- [ ] Thresholds reviewed by someone clinically qualified — send
+      [clinician-review-pack.md](clinician-review-pack.md), then record the result in
+      the [review log](#review-log)
 - [ ] Privacy policy live
 - [ ] Export and deletion working and tested
 - [ ] App Privacy labels accurate

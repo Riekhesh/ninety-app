@@ -159,7 +159,7 @@ Committed in this phase, so you don't have to redo it:
 | `design/tokens/` | `notch.tokens.json` is the single source of truth; `generate.py` emits Swift + CSS and **validates every text/surface pair against WCAG AA**, failing the build on a regression. It caught three real failures in the first draft. |
 | `docs/decisions/` | 12 ADRs — the seven locked decisions from §02 plus three new Phase 0 ones |
 | `docs/design/` | Principles, component specs, and a full copy deck reviewed against §10 |
-| `docs/safety/` | §10 as numbered rules with concrete thresholds and test names. **The numbers need a clinician before Phase 3.** |
+| `docs/safety/` | §10 as numbered rules with concrete thresholds and test names. **The numbers need a clinician before Phase 3** — [clinician-review-pack.md](../safety/clinician-review-pack.md) is the self-contained ~30-minute document to send them, and [who to ask](../safety/safety-requirements.md#the-pack-to-send-them) is written down. |
 | `spikes/` | Both spikes. B is runnable now; A is blocked on the dev account. |
 
 ---
