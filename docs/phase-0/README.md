@@ -92,6 +92,10 @@ you do not need to read it to make progress.
 Keys go in `.env` (gitignored) or Supabase Edge Function env vars. Never the app
 bundle — see [secrets.md](../security/secrets.md).
 
+Click-path for the two that are still outstanding: **[accounts.md](accounts.md)**,
+~25 minutes for both. Then `scripts/verify-accounts.sh`, which is the testable
+condition — it checks every value is present and the right shape, and never prints one.
+
 ---
 
 ## Toolchain
