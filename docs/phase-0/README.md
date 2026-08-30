@@ -56,9 +56,13 @@ buy it about a week before you want to run Spike A rather than on day one where 
 unused while you learn Swift. Either way this deviates from §0.1's week-one purchase,
 which assumes you are ready to build immediately.
 
-The free tier's real cost is **7-day signing**: a build stops launching a week after you
-install it. Irrelevant for a 90-minute spike; a genuine nuisance for the 21-consecutive-day
-dogfood run in Phase 1, which is the point at which paying stops being optional.
+**Buy it anyway, just not for this.** Only 9 of Apple's 57 iOS capabilities are open to
+the free tier, and **Sign in with Apple is not one of them** — it is ADP-only, and
+[ADR 0003](../decisions/0003-supabase-backend.md) puts it in Phase 1 auth, the first
+thing built. Add push notifications, TestFlight, and 7-day signing expiry breaking the
+21-day dogfood run, and the honest sequencing is: **purchase during the Swift weeks, so
+enrolment overlaps work that was never blocked on it.** What the gate changes is that
+Spike A no longer waits in that queue.
 
 ```
 Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured

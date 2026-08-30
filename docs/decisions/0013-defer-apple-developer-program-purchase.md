@@ -16,13 +16,24 @@ free provisioning "gives you no HealthKit at all." Because enrolment takes sever
 that claim put a multi-day purchase-and-wait on the critical path of the only remaining
 gate — and that clock had not been started.
 
-**The claim appears to be wrong.** Apple's
+**The claim is wrong.** Apple's
 [capabilities table](https://developer.apple.com/support/app-capabilities/) — the page
-Apple staff point to for exactly this question — lists three membership columns (Apple
-Developer Program, Apple Developer Enterprise Program, and the free **Apple Developer**
-account) and marks **HealthKit available in all three**. The neighbouring row,
-*HealthKit Estimate Recalibration*, is marked paid-only, which is what a genuine paid
-restriction looks like on that page. Spike A does not use recalibration.
+Apple staff point to for exactly this question — has three membership columns (ADP,
+ADEP, and the free **Apple Developer** account). Parsed from the page's HTML rather
+than read off a rendering:
+
+```
+HealthKit                          ADP ✓   ADEP ✓   Apple Developer ✓
+HealthKit Estimate Recalibration   ADP ✓   ADEP ✓   Apple Developer ✗
+```
+
+**Exactly 9 of the 57 iOS capabilities are available to the free tier, and HealthKit is
+one of them**: App groups, Background modes, Data protection, HealthKit, HomeKit,
+Inter-App Audio, Keychain sharing, Maps, Wireless Accessory Configuration. The
+neighbouring *Estimate Recalibration* row is paid-only — that is what a genuine paid
+restriction looks like on this page — and Spike A does not use recalibration.
+
+The narrowness of that list is why the old claim was plausible. It was still wrong.
 
 The likely origin of the old claim is
 [this forum thread](https://developer.apple.com/forums/thread/125980), where a
@@ -38,10 +49,24 @@ expires after 7 days.
 
 **Do not buy the membership to unblock Spike A. Run a ten-minute signing gate first —
 free Personal Team, HealthKit capability, ⌘R onto the phone — and buy the account only
-if a signing error names the HealthKit capability.** Buy it regardless before the 21-day
-dogfood run in Phase 1, and before TestFlight.
+if a signing error names the HealthKit capability.**
 
 Procedure: [the ten-minute gate](../../spikes/healthkit/README.md#the-ten-minute-gate).
+
+**The membership is deferred, not avoided.** From the same table, the first hard
+deadline is earlier than it looks:
+
+| Trigger | Why | When |
+|---|---|---|
+| **Sign in with Apple** | **ADP only — not even Enterprise.** [ADR 0003](0003-supabase-backend.md) puts it in Phase 1 auth, the first thing built | **Phase 1, week 1** |
+| Push notifications | Free tier ✗ | Whenever notifications land |
+| 21-day dogfood run | 7-day signing expiry; a missed re-sign is a hole in the streak data | Phase 1 |
+| TestFlight, submission | No distribution on the free tier at all | Phase 2/3 |
+
+So: **buy it during Phase 0's remaining Swift weeks, not to unblock Spike A.** The
+enrolment wait then overlaps work that was never blocked on it, which is what §0.1 was
+reaching for and the old claim got backwards — it put the purchase on the critical path
+of the *gate* instead of the critical path of the *build*.
 
 ## Trade-off accepted
 
@@ -52,11 +77,13 @@ in ways the table does not predict. If the gate fails, the several-day enrolment
 starts ten minutes later than it would have — a small, bounded cost, and the reason the
 gate is a gate rather than an assumption.
 
-**The 7-day expiry is a real bill, later.** A free-signed build stops launching a week
-after install. For a 90-minute spike that is nothing. For Phase 1's 21-consecutive-day
-dogfood run it means plugging the phone in every week, and one forgotten re-sign is a
-hole in the streak data the ranking engine is being validated against. The membership is
-deferred, not avoided, and Phase 1 is where deferring it stops being free.
+**The saving is days, not dollars.** The $99 is still spent, and spent within Phase 0.
+What this buys is that Spike A — the gate that can kill the project — stops waiting on
+an enrolment queue. Anyone reading the decision as "we avoided the fee" has misread it.
+
+**The 7-day expiry is a real bill if the purchase slips.** A free-signed build stops
+launching a week after install; one forgotten re-sign during the 21-day dogfood run is a
+hole in the streak data the ranking engine is being validated against.
 
 **A wrong claim sat in the repo for the length of Phase 0 and shaped its sequencing.**
 The cost already paid is that Spike A — the one gate that can kill the project — was
