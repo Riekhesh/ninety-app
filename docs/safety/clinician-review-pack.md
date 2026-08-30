@@ -1,5 +1,42 @@
 # Clinician review pack — Notch safety thresholds
 
+<details>
+<summary><strong>The email to send with this — click to expand, edit, paste</strong></summary>
+
+> **Subject:** 30-minute sanity check on some health thresholds in a student project?
+>
+> Hello,
+>
+> I'm a computer science student building an iOS calorie and weight tracker as a
+> final-year project. It'll go to about twenty friends-and-family testers.
+>
+> The app sets a minimum daily calorie target, refuses goal weights below a healthy
+> BMI, caps the rate of weight loss it will let someone aim for, and surfaces Beat's
+> helpline when certain patterns show up. I took all those numbers from NHS and NICE
+> guidance, but I'm not qualified to set them and I'd rather have someone who is tell
+> me where I've got them wrong — before anyone else uses it, not after.
+>
+> I've written it up as a single self-contained document, about 30 minutes to read.
+> It asks specific numbered questions rather than "does this look OK", so you can skip
+> anything outside your area.
+>
+> To be clear about what I'm not asking: I'm not asking you to endorse the app,
+> approve it for anything, or take any responsibility for it. I'd just like to record
+> in the project that the numbers were reviewed by someone qualified — a role rather
+> than a name is completely fine, and so is anonymous.
+>
+> Happy to send it over, or to talk it through in a call if that's easier.
+>
+> Thank you,
+> Ranjit
+
+**Attach or paste this file.** If you're emailing a lecturer, say which module or
+course you're on in the first line — it roughly doubles the reply rate. If they say no,
+ask who they'd suggest; that referral is usually the actual result.
+
+</details>
+
+
 **For the reviewer.** This is a self-contained document. You do not need to see the
 app, install anything, or read any other file. **It should take about 30 minutes.**
 

@@ -56,9 +56,9 @@ thing it unblocks.
 Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured
                 thesis narrowed (ADR 0013) · harness refuses unpriced models
                 dev account purchased — waiting on Apple to clear enrolment
+                Swift ramp-up — 100 Days of SwiftUI, days 1–30
 
-Now ─────────── Swift days 1–5
-                Supabase + PostHog projects (~25 min, runbook: accounts.md)
+Now ─────────── Supabase + PostHog projects (~25 min, runbook: accounts.md)
                 send the clinician pack (docs/safety/clinician-review-pack.md)
 
 Then ────────── weigh meals as you eat them (slow, passive, no deadline)
@@ -126,6 +126,10 @@ September. You need enough Swift to be dangerous, not enough to be comfortable."
 **Work days 1–30 of [100 Days of SwiftUI](https://www.hackingwithswift.com/100/swiftui)
 concurrently with this phase, then learn the rest by building.** Roughly an hour a
 day. Do not wait until you've finished.
+
+> **Done.** Days 1–30 complete. The list below is now a *reference* for Phase 1 rather
+> than a plan — when something in Phase 1 doesn't behave, it is most often one of
+> these five, in this order.
 
 What Phase 1 actually needs from those 30 days, in priority order:
 
