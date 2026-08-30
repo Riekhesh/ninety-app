@@ -39,6 +39,8 @@ ROOT = Path(__file__).resolve().parents[2]
 TOKENS = ROOT / "design" / "tokens" / "notch.tokens.json"
 OUT_SWIFT = ROOT / "design" / "generated" / "DesignTokens.generated.swift"
 OUT_CSS = ROOT / "design" / "generated" / "tokens.generated.css"
+BRIEF_TEMPLATE = ROOT / "design" / "spec" / "brief.template.md"
+OUT_BRIEF = ROOT / "design" / "generated" / "claude-design-brief.md"
 
 BANNER = (
     "// GENERATED FILE — DO NOT EDIT.\n"
@@ -593,6 +595,82 @@ def render_css(tokens: dict) -> str:
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 
+# ─── Paste-into-chat brief ───────────────────────────────────────────────────
+# The brief used to be hand-maintained, which meant its hex values were a second
+# source of truth that drifted from the first one. The prose lives in
+# design/spec/brief.template.md; the tables below are derived, so a token change
+# cannot leave the brief quietly wrong.
+
+# Which semantic colours are worth pasting into a chat. The full set is in the
+# generated Swift and CSS; a brief that lists all of them is one nobody reads.
+BRIEF_COLOURS = [
+    "canvas", "surface", "surfaceSunken", "stroke", "strokeStrong",
+    "textPrimary", "textSecondary", "textTertiary",
+    "accent", "positive", "safety", "critical",
+    "chartLine", "chartBaseline", "chartBand",
+]
+
+
+BRIEF_NOTE_BUDGET = 95
+
+
+def _use_note(node: dict) -> str:
+    """The 'Use' column: the token's description, trimmed to fit a chat window.
+
+    Descriptions in the tokens file are long on purpose — they carry the contrast
+    measurements and the reasoning. The brief exists to be pasted into a chat, so it
+    takes whole leading sentences up to a character budget rather than the lot. The
+    full text stays in the tokens file and in the generated Swift doc comments.
+    """
+    text = (node.get("$description")
+            or node.get("$extensions", {}).get("notch.usage") or "").strip()
+    if len(text) <= BRIEF_NOTE_BUDGET:
+        return text
+    kept: list[str] = []
+    for sentence in text.replace(". ", ".\x00").split("\x00"):
+        candidate = " ".join(kept + [sentence])
+        if kept and len(candidate) > BRIEF_NOTE_BUDGET:
+            break
+        kept.append(sentence)
+    return " ".join(kept).strip()
+
+
+def render_brief_colour_table(tokens: dict) -> str:
+    dark, light = tokens["theme"]["dark"], tokens["theme"]["light"]
+    rows = ["| Token | Dark | Light | Use |", "|---|---|---|---|"]
+    for name in BRIEF_COLOURS:
+        if name not in dark:
+            continue
+        rows.append(
+            f"| {name} | `{dark[name]['$value']}` | `{light[name]['$value']}` "
+            f"| {_use_note(dark[name])} |"
+        )
+    return "\n".join(rows)
+
+
+def render_brief_type_table(tokens: dict) -> str:
+    rows = ["| Style | Size/line | Weight | Use |", "|---|---|---|---|"]
+    for name, node in _entries(tokens["type"]):
+        v = node["$value"]
+        rows.append(
+            f"| {name} | {v['fontSize']}/{v['lineHeight']} | {v['fontWeight']} "
+            f"| {_use_note(node)} |"
+        )
+    return "\n".join(rows)
+
+
+def render_brief(tokens: dict) -> str:
+    text = BRIEF_TEMPLATE.read_text()
+    for placeholder, table in (
+        ("{{COLOUR_TABLE}}", render_brief_colour_table(tokens)),
+        ("{{TYPE_TABLE}}", render_brief_type_table(tokens)),
+    ):
+        if placeholder not in text:
+            raise SystemExit(f"brief.template.md is missing {placeholder}")
+        text = text.replace(placeholder, table)
+    return text
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
@@ -622,7 +700,11 @@ def main() -> int:
     for note in tier_notes:
         print(f"  · {note}")
 
-    outputs = {OUT_SWIFT: render_swift(tokens), OUT_CSS: render_css(tokens)}
+    outputs = {
+        OUT_SWIFT: render_swift(tokens),
+        OUT_CSS: render_css(tokens),
+        OUT_BRIEF: render_brief(tokens),
+    }
 
     if args.check:
         stale = [

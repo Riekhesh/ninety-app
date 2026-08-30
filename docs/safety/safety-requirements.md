@@ -168,7 +168,7 @@ bypass** — no "continue anyway", no parental-consent path.
 
 §10: *"The safeguarding considerations for minors and body-image content are
 substantial and well beyond what a solo v1 should attempt."* That is the honest
-reason, and the copy says it (`04-copy-deck.md`) rather than pretending it is a legal
+reason, and the copy says it (`design/spec/04-copy-deck.md`) rather than pretending it is a legal
 technicality.
 
 The rejection screen signposts Beat's youth helpline. A user turned away should not
@@ -195,7 +195,7 @@ test_age_gate_screen_includes_support_signposting
 
 1. **`no_punishment_framing`** in `.swiftlint.yml`, severity **error** — 17 banned
    phrases, matched against string literals. Fails the build.
-2. **`docs/design/04-copy-deck.md`** — every string written out, with the rewrite rule
+2. **`../../design/spec/04-copy-deck.md`** — every string written out, with the rewrite rule
    and a second list of phrases that need human judgement (`cheat meal`, `burn off`,
    `earn it`, `on track`).
 3. **PR template** — an explicit safety-review checkbox on anything touching copy.

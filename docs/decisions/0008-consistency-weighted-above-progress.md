@@ -47,7 +47,7 @@ loses 2 kg in a fortnight but logged 4 days a week will rank below someone who l
 
 **Mitigate through copy, not by reweighting.** The rank screen must explain what moved
 and what would move it next, so an unresponsive-feeling rank becomes legible rather
-than arbitrary. See `docs/design/04-copy-deck.md`.
+than arbitrary. See `design/spec/04-copy-deck.md`.
 
 The temptation to reweight after the first person complains is exactly what §02 is
 written to prevent.

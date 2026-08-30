@@ -146,10 +146,10 @@ itself information. You will get back an empty result set that looks identical t
 - Every data surface needs a designed empty state from the first commit — not an
   error state, and not a spinner that never resolves.
 - The empty-state copy must not claim a permission problem, because the app does not
-  know. `docs/design/04-copy-deck.md` words no-data and permission-not-granted
+  know. `design/spec/04-copy-deck.md` words no-data and permission-not-granted
   **identically** for this reason.
 
-This is principle 5 in `docs/design/00-design-principles.md`, and it exists because
+This is principle 5 in `design/spec/00-design-principles.md`, and it exists because
 of this spike.
 
 ### 2 · The persisted anchor is the performance story

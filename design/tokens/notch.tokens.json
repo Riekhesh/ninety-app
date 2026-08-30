@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "direction": "Quiet premium, dark-first (ADR 0011)",
     "contrastPolicy": "Every text-on-surface pair below carries its measured WCAG 2.1 contrast ratio. Text tokens meet AA (4.5:1) at body size; tokens that do not are named and scoped explicitly.",
-    "colourBudget": "Tier metals are the only saturated colour in the product. Semantic colours are rationed to state, safety, and destruction. See docs/design/00-design-principles.md (principle 2)."
+    "colourBudget": "Tier metals are the only saturated colour in the product. Semantic colours are rationed to state, safety, and destruction. See design/spec/00-design-principles.md (principle 2)."
   },
 
   "theme": {
@@ -34,7 +34,7 @@
 
       "positive":      { "$value": "#4FBF8B", "$description": "Jade. 'Inside your band', 'synced'. NEVER used to reward faster weight loss (safety §10 / rate ceiling)." },
       "safety":        { "$value": "#E2A03F", "$description": "RESERVED for §10 safety interventions: calorie floor breach, unsafe goal weight, rate-of-loss ceiling. Named 'safety', not 'warning', so its scope cannot creep." },
-      "critical":      { "$value": "#E5674E", "$description": "Destructive confirmation and hard safety blocks ONLY. There is deliberately no 'error' colour for logged intake — going over your band is not an error. See docs/design/00-design-principles.md." },
+      "critical":      { "$value": "#E5674E", "$description": "Destructive confirmation and hard safety blocks ONLY. There is deliberately no 'error' colour for logged intake — going over your band is not an error. See design/spec/00-design-principles.md." },
 
       "chartLine":     { "$value": "#F6F4F1", "$description": "The weight trend line (the 7-day EWMA). Primary data gets the primary text colour, not the accent." },
       "chartBaseline": { "$value": "#6E6960", "$description": "The 'you, four weeks ago' reference line. Present on every chart — the thesis rendered as a gridline." },

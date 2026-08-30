@@ -18,7 +18,7 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |
-| What a screen should look like | `docs/design/` + `design/preview/design-system.html` |
+| What a screen should look like | `design/spec/` + `design/preview/design-system.html` |
 | What a colour or spacing value is | `design/tokens/notch.tokens.json` — **generated, never hand-edit the Swift/CSS** |
 | How the vision harness works | `spikes/vision-accuracy/README.md` |
 | HealthKit patterns for Phase 1 | `spikes/healthkit/HealthSpike.swift` (the notes at the bottom) |
@@ -38,12 +38,12 @@ docs/
   decisions/   13 ADRs. Index first, then one file. Never renumber
   safety/      §10 as numbered rules S1-S7 with test names. Load-bearing for Phase 1
   security/    secrets policy. The anon key is public; RLS is the security boundary
-  design/      principles, component specs, copy deck (17 phrases banned at lint-error)
 
 design/
   tokens/      notch.tokens.json is the SINGLE SOURCE OF TRUTH for every colour
   generated/   emitted by generate.py. Never edit by hand — CI fails on drift
-  preview/     design-system.html (the visual reference) + a paste-into-chat brief
+  preview/     design-system.html — the visual reference
+  spec/        principles, component specs, copy deck (17 phrases banned at lint-error)
 
 spikes/        THROWAWAY de-risking code, not app code. Different quality bar
   vision-accuracy/   photo->calorie harness. Runs, scores, reports. Python

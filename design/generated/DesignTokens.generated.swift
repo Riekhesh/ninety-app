@@ -49,7 +49,7 @@ public extension Notch {
         public static let positive = Color(light: 0x1E8A5F, dark: 0x4FBF8B)
         /// RESERVED for §10 safety interventions: calorie floor breach, unsafe goal weight, rate-of-loss ceiling. Named 'safety', not 'warning', so its scope cannot creep.
         public static let safety = Color(light: 0xA66A00, dark: 0xE2A03F)
-        /// Destructive confirmation and hard safety blocks ONLY. There is deliberately no 'error' colour for logged intake — going over your band is not an error. See docs/design/00-design-principles.md.
+        /// Destructive confirmation and hard safety blocks ONLY. There is deliberately no 'error' colour for logged intake — going over your band is not an error. See design/spec/00-design-principles.md.
         public static let critical = Color(light: 0xB4341A, dark: 0xE5674E)
         /// The weight trend line (the 7-day EWMA). Primary data gets the primary text colour, not the accent.
         public static let chartLine = Color(light: 0x17150F, dark: 0xF6F4F1)

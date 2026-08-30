@@ -231,7 +231,7 @@ custom_rules:
   no_punishment_framing:
     name: "No punishment framing in user-facing copy"
     regex: '(?i)"[^"]*\b(you failed|you lost|lost your streak|streak lost|broke your streak|streak broken|you missed|over budget|exceeded your|you blew|ruined|demoted|dropped to|too many calories|bad day|be better|no excuses)\b'
-    message: "§10: no punishment framing. Regression is a reset, not a failure. See docs/design/04-copy-deck.md for the approved phrasing."
+    message: "§10: no punishment framing. Regression is a reset, not a failure. See design/spec/04-copy-deck.md for the approved phrasing."
     severity: error
     match_kinds:
       - string

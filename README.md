@@ -88,26 +88,25 @@ docs/
     README.md                     the live tracker: exit criteria, critical path, accounts
     04-competitor-teardown.md     measurement protocol + the numbers + 10 differences
     07-spike-findings.md          results of both spikes, written down
-  design/
-    00-design-principles.md       seven rules, each traceable to the thesis or §10
-    02-components.md              the seven components, with their states
-    04-copy-deck.md               every string, reviewed against the no-punishment rule
   safety/                       §10 turned into rules with numbers and test names
   security/secrets.md           where every secret lives, and why none is in the app
 
-design/
+design/                         ONE design tree — values, specs and preview together
   tokens/notch.tokens.json      single source of truth for the design system
-  tokens/generate.py            → Swift + CSS, and validates contrast against WCAG AA
+  tokens/generate.py            → Swift + CSS + the chat brief; validates WCAG AA
   generated/                    DO NOT EDIT — regenerate from the tokens
+  spec/                         principles, components, and the copy deck
   preview/design-system.html    the interactive design system page
-  preview/claude-design-brief.md a compact block to paste into Claude and iterate on screens
 
 spikes/                         THROWAWAY. De-risking only — never promoted into the app
   healthkit/                    Spike A — read 30 days of real data on a real device
   vision-accuracy/              cost per image (done) + the 20-meal accuracy benchmark
 
-scripts/verify-toolchain.sh     checks macOS, Xcode, disk, device, CLI tools, repo setup
+scripts/                        verify-toolchain.sh (the Mac) · verify-accounts.sh (.env)
 ```
+
+**[`CLAUDE.md`](CLAUDE.md) is the routing table** — which file answers which question,
+so neither you nor an agent reads twelve to find two.
 
 The brief itself is not in the repo — it is the source PDF. Its locked decisions are
 in [`docs/decisions/`](docs/decisions/), and every doc here cites the section it came
@@ -178,7 +177,7 @@ the build if any text-on-surface pair drops below WCAG AA**. It caught three gen
 contrast failures in its first run.
 
 To iterate on screens conversationally, paste
-[`design/preview/claude-design-brief.md`](design/preview/claude-design-brief.md) into a
+[`design/generated/claude-design-brief.md`](design/generated/claude-design-brief.md) into a
 fresh Claude chat — it's a compact, self-contained version of the tokens, the seven
 rules, the copy rules and all six screens. Bring anything you land back into the
 tokens file and regenerate.

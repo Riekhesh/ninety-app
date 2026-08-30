@@ -89,7 +89,7 @@ Six requirements, each with its copy. All use the `safety` token, never `critica
 them blames the user** — they describe a limit the app holds.
 
 > ⚠️ The numeric thresholds below are drawn from widely-used public guidance (NHS, NICE) and
-> are recorded in [`docs/safety/safety-requirements.md`](../safety/safety-requirements.md).
+> are recorded in [`docs/safety/safety-requirements.md`](../../docs/safety/safety-requirements.md).
 > They are not clinical advice and have not been reviewed by a clinician. **Get them reviewed
 > before Phase 3 external testers.**
 

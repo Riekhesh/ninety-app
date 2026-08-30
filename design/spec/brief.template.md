@@ -4,13 +4,16 @@
 chat, in one self-contained block. Paste the section between the two `═══` rules into
 a fresh Claude conversation, then ask for whatever screen you want.
 
-It's deliberately compact — the full versions live in `docs/design/` and
+It's deliberately compact — the full versions live in `design/spec/` and
 `design/tokens/notch.tokens.json`, but you can't paste a 1,400-line HTML file into a
 chat window and you shouldn't have to.
 
-**Keep it in sync.** If you change `notch.tokens.json`, run
-`python3 design/tokens/generate.py` and update the hex values below. There's no
-automated check on this file (deliberately — it's a convenience, not a build input).
+**This file is a TEMPLATE. Do not paste from it — the tables are placeholders.**
+Paste from `design/generated/claude-design-brief.md`, which `generate.py` writes by
+filling those placeholders from the tokens. Edit the prose here; never edit the
+generated copy. CI's `--check` fails if the two fall out of step, which is the point:
+the brief used to carry hand-copied hex values that were a second source of truth,
+and a second source of truth is just a bug with a delay on it.
 
 ---
 
@@ -31,23 +34,7 @@ in an iPhone frame (393×852). Use the tokens below and nothing else.
 
 Dark is the default. Light is full parity, not an afterthought.
 
-| Token | Dark | Light | Use |
-|---|---|---|---|
-| canvas | `#0C0B0A` | `#FBFAF7` | app background (warm graphite, not blue-black) |
-| surface | `#171614` | `#FFFFFF` | cards, rows, sheets |
-| surfaceSunken | `#070606` | `#F2F0EB` | inputs, chart wells |
-| stroke | `#2C2A26` | `#E5E2DB` | hairline dividers |
-| strokeStrong | `#3D3A34` | `#CFCBC1` | input borders |
-| textPrimary | `#F6F4F1` | `#17150F` | body text |
-| textSecondary | `#A8A29A` | `#5C574D` | supporting copy, units |
-| textTertiary | `#8A8479` | `#767063` | least-emphasis labels |
-| accent | `#7C9EFF` | `#3B5BDB` | **interactive only** — never for data |
-| positive | `#4FBF8B` | `#1E8A5F` | "in your band", "synced" |
-| safety | `#E2A03F` | `#A66A00` | safety interventions ONLY (calorie floor etc.) |
-| critical | `#E5674E` | `#B4341A` | destructive confirmation ONLY |
-| chartLine | `#F6F4F1` | `#17150F` | the data line — primary text colour, not accent |
-| chartBaseline | `#6E6960` | `#9A9488` | dashed "you, 4 weeks ago" reference line |
-| chartBand | `#1E2A24` | `#E6F2EB` | target band fill |
+{{COLOUR_TABLE}}
 
 **Tier metals (the only saturated colour in the entire app):**
 bronze `#C8834E` · silver `#C3C7CE` · gold `#E7B23C` · platinum `#E3EAF0` · diamond `#8AE0F2`
@@ -60,18 +47,7 @@ budget", that's the rule working.
 
 SF Pro (`system-ui`). Numbers that update in place use **tabular figures**.
 
-| Style | Size/line | Weight | Use |
-|---|---|---|---|
-| display | 40/44 | 600 | tier name |
-| title1 | 28/34 | 600 | screen titles |
-| headline | 17/22 | 600 | food name, card titles |
-| body | 17/22 | 400 | body copy |
-| subhead | 15/20 | 400 | brand + portion under a food name |
-| footnote | 13/18 | 400 | "of 1,750–1,950 band" |
-| label | 11/14 | 600 | UPPERCASE, +0.6 tracking — eyebrows, stat labels |
-| metricXL | 56/58 | 600 | tabular. The composite score. **Once per app, rank screen only** |
-| metricL | 40/44 | 600 | tabular. Calories remaining |
-| metricM | 28/32 | 600 | tabular. "5/7" |
+{{TYPE_TABLE}}
 
 ## Space, radius, motion
 

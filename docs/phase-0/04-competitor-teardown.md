@@ -169,7 +169,7 @@ peer-reviewed paper.** Cite it as such.
 frequent food (2) — which logs immediately at its last-used portion, with an undo
 toast. That is the whole interaction.
 
-The decision that buys it is in `docs/design/02-components.md`: **frequent-food rows
+The decision that buys it is in `design/spec/02-components.md`: **frequent-food rows
 log on tap rather than opening a detail sheet.** It is only safe because of undo, so
 undo is part of the component rather than a nice-to-have.
 
