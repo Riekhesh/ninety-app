@@ -24,15 +24,21 @@ apps get scraped and used, and the bill is yours.
 | Secret | Lives in | Reachable from the app? |
 |---|---|---|
 | Anthropic / OpenAI API key | Supabase Edge Function env var | **No.** The app calls the Edge Function; the function calls the model. |
-| Supabase `service_role` key | Supabase Edge Function env var, and your local `.env` for migrations | **No.** It bypasses Row-Level Security — treat it like a root password. |
-| Supabase `anon` key | App bundle, and it is *designed* to be there | Yes. Safe by design: it only grants what RLS policies allow. **This makes RLS the actual security boundary — see below.** |
+| Supabase **secret** key (`sb_secret_…`, formerly `service_role`) | Supabase Edge Function env var, and your local `.env` for migrations | **No.** It bypasses Row-Level Security — treat it like a root password. |
+| Supabase **publishable** key (`sb_publishable_…`, formerly `anon`) | App bundle, and it is *designed* to be there | Yes. Safe by design: it only grants what RLS policies allow. **This makes RLS the actual security boundary — see below.** |
 | Supabase project URL | App bundle | Yes. Not a secret. |
 | Apple signing certs, `.p8` App Store Connect key | macOS Keychain, and Xcode-managed | No |
 | PostHog project API key | App bundle | Yes. Write-only ingest key; safe by design. |
 
-### The `anon` key consequence worth internalising
+### The publishable key consequence worth internalising
 
-The `anon` key being public means **Row-Level Security is not a defence-in-depth
+> **Naming.** Supabase renamed these to *publishable* and *secret*; the roles are
+> unchanged, and everything below applies identically. Prefer them over the legacy
+> tab — a legacy key can only be rotated by rotating the project JWT secret, which
+> invalidates every key and signs out every user at once, whereas the new ones revoke
+> one at a time. Rotation being cheap is what makes the rule below workable.
+
+The publishable key being public means **Row-Level Security is not a defence-in-depth
 nicety — it is the only thing standing between one user and everybody's health
 data.** Anyone can extract the anon key and hit your Postgres directly with it.
 
