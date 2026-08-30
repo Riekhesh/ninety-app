@@ -70,7 +70,20 @@ nothing to do today.
 
 ---
 
-## 2 · PostHog (~10 min)
+## 2 · PostHog — **deferred to Phase 3** (decided 2026-08-30)
+
+> **Not done, on purpose.** PostHog is not needed until there are real testers
+> generating behaviour worth measuring, and it blocks nothing before then. §0.2's
+> argument for doing it in Phase 0 was only that admin is cheaper when batched — which
+> is a weak reason to sign up for a third service today. `verify-accounts.sh` treats a
+> blank PostHog key as a note rather than a failure, so this does not sit in the output
+> looking like an outstanding task.
+>
+> **What changes when you do come back to it:** the two toggles below are the whole
+> point, and they have to be off *before* the first event, not after. Everything else
+> here is ten minutes of clicking.
+
+### The instructions, for when you get to Phase 3
 
 [eu.posthog.com](https://eu.posthog.com) — **note the `eu.`**. Same Article 9 reasoning
 as the Supabase region, and `.env.example` already points `POSTHOG_HOST` at

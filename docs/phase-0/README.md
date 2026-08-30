@@ -55,14 +55,12 @@ thing it unblocks.
 ```
 Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured
                 thesis narrowed (ADR 0013) · harness refuses unpriced models
+                Supabase project live (PostHog deferred to Phase 3)
                 dev account purchased — waiting on Apple to clear enrolment
                 Swift ramp-up — 100 Days of SwiftUI, days 1–30
 
-Now ─────────── Supabase + PostHog projects (~25 min, runbook: accounts.md)
-                send the clinician pack (docs/safety/clinician-review-pack.md)
-
-Then ────────── weigh meals as you eat them (slow, passive, no deadline)
-                Swift days 5–20
+Now ─────────── send the clinician pack (docs/safety/clinician-review-pack.md)
+                weigh meals as you eat them (slow, passive, no deadline)
 
 Then ────────── design the app in Claude (fully unblocked, do it whenever)
 
@@ -86,7 +84,7 @@ you do not need to read it to make progress.
 | GitHub | free | done | Private repo + Actions. Turn on **secret scanning with push protection** in settings. |
 | Google Gemini API | pay-as-you-go | **done** | Spike B, using existing credit ([ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)). Measured at $0.000862/image, so the 20-meal baseline is ~$0.02. Anthropic/OpenAI remain optional comparison arms. |
 | Supabase | free → ~$25/mo | week 2 | Not needed until Phase 1, but create the project so it exists. Click-path: [accounts.md](accounts.md) |
-| PostHog | free | now | Not needed until Phase 3. Create it now so you're not doing admin later (§0.2). Click-path: [accounts.md](accounts.md) |
+| PostHog | free | **deferred to Phase 3** | §0.2 wanted it in Phase 0 to batch the admin. Deferred 2026-08-30: it measures testers who do not exist yet and blocks nothing. [Why, and the instructions](accounts.md#2--posthog--deferred-to-phase-3-decided-2026-08-30) |
 | Figma | free | optional | Only if you want to mirror the tokens. `notch.tokens.json` imports via Tokens Studio. |
 
 Keys go in `.env` (gitignored) or Supabase Edge Function env vars. Never the app
