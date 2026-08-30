@@ -126,9 +126,9 @@ fi
 
 # ── Things this script cannot check ─────────────────────────────────────────
 printf '\n\033[1mCheck these yourself\033[0m\n'
-printf '  \033[2m·\033[0m Apple Developer Program membership is ACTIVE — the critical path.\n'
-printf '    developer.apple.com/account. If "HealthKit" is missing from Xcode'"'"'s\n'
-printf '    capability list, or the signing team dropdown is empty, it has not cleared.\n'
+printf '  \033[2m·\033[0m Signing for Spike A. Apple lists HealthKit as a FREE-tier capability,\n'
+printf '    so run the ten-minute gate in spikes/healthkit/README.md before paying.\n'
+printf '    Only a signing error that NAMES HealthKit means you need the $99 account.\n'
 printf '  \033[2m·\033[0m GEMINI_API_KEY is filled in in .env (for Spike B — ADR 0010).\n'
 printf '  \033[2m·\033[0m GitHub secret scanning with push protection is on for this repo.\n\n'
 

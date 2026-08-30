@@ -45,5 +45,6 @@ Re-litigating settled decisions is the most expensive habit in solo projects.
 | [0010](0010-anthropic-as-vision-provider.md) | Anthropic as the vision provider, behind an interface | Locked | 0 |
 | [0011](0011-dark-first-visual-direction.md) | Quiet premium, dark-first visual direction | Locked | 0 |
 | [0012](0012-tier-encoded-as-notch-count.md) | Tier encoded as notch count, not colour alone | Locked | 0 |
+| [0013](0013-defer-apple-developer-program-purchase.md) | Defer the Apple Developer Program purchase until a signing test says otherwise | Locked | 0 |
 
 New decisions get the next number. Do not renumber; a stale link is worse than a gap.

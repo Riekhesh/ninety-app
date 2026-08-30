@@ -10,8 +10,20 @@ tells you what's outstanding; CI prints it on every push.
 
 ## Spike A — HealthKit
 
-**Status:** blocked on Apple Developer Program enrolment.
+**Status:** unblocked pending the ten-minute signing gate — Apple lists HealthKit as a
+free-tier capability, so this may never have needed the paid account.
 **Run on:** `TO BE MEASURED` (date, device, iOS version)
+
+### The signing gate — run this first
+
+[Procedure](../../spikes/healthkit/README.md#the-ten-minute-gate). Record the result so
+it is never re-tested.
+
+| | |
+|---|---|
+| Free Personal Team signed a HealthKit build | `TO BE MEASURED` (pass / fail) |
+| Exact error string, if it failed | `TO BE MEASURED` |
+| Xcode version used | `TO BE MEASURED` |
 
 ### Did it work
 

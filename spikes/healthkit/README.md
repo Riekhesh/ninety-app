@@ -4,13 +4,78 @@
 > rendering on your own iPhone"* (§0.7 exit criteria) plus what you learn. Delete the
 > project afterwards.
 
-**Blocked until the Apple Developer Program clears.** HealthKit is a paid-programme
-entitlement — free provisioning gives you 7-day certificates and no HealthKit at all,
-so you cannot complete this spike without paying. §0.1 moves the purchase to week one
-for exactly this reason, and enrolment can take several days.
+**Probably not blocked. Test that for ten minutes before you spend $99.**
 
-Do the design work and Spike B while you wait. This spike is roughly 90 minutes once
-you can actually build.
+This file used to say HealthKit was a paid-programme entitlement. Apple's own
+capabilities table says otherwise: **HealthKit is listed as available to the free
+Apple Developer account** — the "Personal Team" Xcode gives you for signing in with an
+ordinary Apple ID. Only *HealthKit Estimate Recalibration*, which this spike does not
+touch, is restricted to the paid programmes.
+[Supported capabilities](https://developer.apple.com/support/app-capabilities/).
+
+Apple's table is authoritative but Xcode's signing behaviour has surprised people
+before, so treat this as a claim to **verify**, not a fact to build on — see
+[the ten-minute gate](#the-ten-minute-gate) below. If it fails you have lost ten
+minutes, you buy the account, and nothing else about this spike changes.
+
+The spike itself is roughly 90 minutes once you can build.
+
+### What the free tier genuinely cannot do
+
+None of it affects this spike:
+
+| Limit | Bites when |
+|---|---|
+| Build stops launching after **7 days** | Dogfooding. ⌘R from Xcode re-signs it; the phone must be plugged in weekly |
+| 3 devices, 10 App IDs per 7 days | Never, at this stage |
+| No TestFlight, no App Store, no external testers | Phase 2/3 |
+
+So the $99 is still on the critical path — for TestFlight, for submission, and for the
+21-consecutive-day dogfood run, where a 7-day expiry means a missed re-sign is a broken
+streak. It is just **not** on the critical path for reading your own step and weight
+history onto your own phone, which is what §0.7 actually asks for.
+
+---
+
+## The ten-minute gate
+
+Do this before you pay. No spike code, no Health data, no `Info.plist` — the only
+question is whether Xcode will sign a HealthKit app with a free team.
+
+1. Xcode → **Settings → Accounts → +** → **Apple ID** → sign in with your normal Apple
+   ID. No enrolment, no payment.
+2. **File → New → Project → iOS → App.** Product name `HKGate`, Interface SwiftUI.
+   Save it somewhere throwaway.
+3. Target → **Signing & Capabilities** → tick *Automatically manage signing*, Team =
+   **`<Your Name> (Personal Team)`**.
+4. Set the bundle identifier to something globally unique —
+   `com.<yourname>.hkgate<four random digits>`. An identifier someone else already
+   registered fails signing for reasons that have nothing to do with HealthKit, and
+   will send you down the wrong path for an hour.
+5. **+ Capability → HealthKit.** Double-click it. *Appearing in the picker proves
+   nothing* — Xcode lists every capability and only complains when it signs.
+6. Plug the iPhone in, pick it as the run destination, **⌘R**.
+
+**PASS — it builds, installs and launches on the phone.** HealthKit works on the free
+tier. Do the whole spike today; buy the account when TestFlight needs it.
+
+**FAIL — a signing error that names the capability**, e.g. *"Personal development teams
+do not support the HealthKit capability"* or *"Your development team does not support
+the HealthKit capability."* The old claim was right. Buy the account, and paste the
+exact string into
+[`07-spike-findings.md`](../../docs/phase-0/07-spike-findings.md) so nobody re-tests
+this.
+
+Anything else — *Untrusted Developer*, bundle ID taken, empty team dropdown, a plain
+provisioning-profile error — is ordinary free-provisioning friction, not the answer.
+**The gate is specifically whether the error names HealthKit.**
+
+The one report behind the old claim is
+[a forum thread](https://developer.apple.com/forums/thread/125980) where a *university
+team* account refused the capability while the same person's *personal* account built
+it fine. That is an education-account limit, not a free-tier one.
+
+Do the design work and Spike B either way — neither ever needed the account.
 
 ---
 
@@ -21,7 +86,7 @@ you can actually build.
 | Mac | macOS Tahoe 26.2+ (Xcode 26.6's hard floor), ~40 GB free |
 | Xcode | 26.6 stable. **Not** the Xcode 27 beta — §04 |
 | iPhone | Physical device, iOS 18+. **The Simulator will not do.** |
-| Apple Developer Program | Active. Non-negotiable for HealthKit. |
+| Apple Developer Program | **Probably not needed yet** — run [the ten-minute gate](#the-ten-minute-gate) first. Needed for TestFlight regardless. |
 
 On the Simulator, HealthKit compiles and the authorisation sheet appears, but there
 is no data behind it and background delivery does nothing. §0.1: *"you cannot fake
@@ -63,12 +128,12 @@ Target → **Signing & Capabilities** → **+ Capability** → **HealthKit**.
 
 - Leave *Clinical Health Records* and *Background Delivery* unchecked. Background
   delivery is a Phase 1 concern (§1.4); the spike only needs a foreground read.
-- Under **Signing**, tick *Automatically manage signing* and pick your team. If the
-  team dropdown is empty, your Developer Program membership has not finished
-  activating.
+- Under **Signing**, tick *Automatically manage signing* and pick your team —
+  `(Personal Team)` is fine if the gate passed. An empty dropdown means no Apple ID is
+  signed in under Xcode → Settings → Accounts, not that you need to pay.
 
-**If "HealthKit" is not in the capability list, your membership is not active.** That
-is the single most common blocker here — it is not a missing setting.
+If signing fails here with an error **naming HealthKit**, you are in the gate's FAIL
+case above and the account is genuinely required. Any other signing error is not that.
 
 ### 4 · Add the Info.plist key
 
@@ -169,8 +234,9 @@ two years of step data the gap is dramatic, and it is invisible until you look.
 | Symptom | Cause |
 |---|---|
 | Crash on requesting authorisation | `NSHealthShareUsageDescription` missing — step 4 |
-| "HealthKit" absent from capabilities | Developer Program not active |
-| Signing team dropdown empty | Same |
+| Signing error naming the HealthKit capability | The free tier really is refused here — buy the account, and record the error string in `07-spike-findings.md` |
+| Signing team dropdown empty | No Apple ID added under Xcode → Settings → Accounts. Not a payment problem |
+| App stops launching about a week after you installed it | Free-tier 7-day signing. Plug in, ⌘R, carry on |
 | Everything returns empty on a real device | Nothing recorded yet, **or** read denied — you cannot tell, and that is the point. Add a manual weight entry in Health to confirm the pipeline works. |
 | `bodyMass` returns a number near 235 | You summed a discrete type. Weight is `.discreteAverage`, not `.cumulativeSum` — the code handles this; if you edit it, do not break it. |
 | Data appears in the app but not the console | Console filter is on, or you are looking at the wrong device log |

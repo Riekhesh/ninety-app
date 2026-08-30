@@ -17,7 +17,7 @@ done — extend it and compress a later one.
 - [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
 - [x] **Vision cost per image measured** → **$0.000862/image, $1.55/mo at 1,800 calls** — 12–35× under §10's $0.01–0.03 estimate. [Numbers](07-spike-findings.md#cost-per-image--measured-)
 - [x] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md). Closed on desk research + prior hands-on use; **tap counts deliberately not measured** ([scope decision](04-competitor-teardown.md#scope-decision--closed-without-tap-counts))
-- [ ] **Apple Developer Program membership active** — needed only for the next item
+- [ ] **Signing sorted for Spike A** — free Personal Team if [the ten-minute gate](../../spikes/healthkit/README.md#the-ten-minute-gate) passes, paid membership only if it fails. **No longer a purchase, and no longer a multi-day wait.**
 - [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
 
 **Moved out of the exit criteria** (see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)):
@@ -44,16 +44,28 @@ A **spike** can kill a feature. A **benchmark** calibrates one. Only the first i
 
 ## Sequencing
 
-The Apple Developer Program is $99 + VAT and its *only* purpose is unblocking Spike A.
-Enrolment takes several days, so buy it about a week before you want to run Spike A —
-not on day one, where it sits unused while you learn Swift.
+**The account was never the blocker it looked like** ([ADR 0013](../decisions/0013-defer-apple-developer-program-purchase.md)). Apple's
+[capabilities table](https://developer.apple.com/support/app-capabilities/) lists
+HealthKit as available to the **free** Apple Developer account, i.e. the Personal Team
+you get by signing into Xcode with an ordinary Apple ID. If that holds — ten minutes to
+prove, see [the gate](../../spikes/healthkit/README.md#the-ten-minute-gate) — Spike A
+can run today and the $99 moves to whenever TestFlight needs it.
 
-This is a deliberate deviation from §0.1, which puts the purchase in week one. §0.1
-assumes you are ready to build immediately; the account should arrive just before the
-thing it unblocks.
+If the gate fails, the old plan applies unchanged: $99 + VAT, several days to enrol, so
+buy it about a week before you want to run Spike A rather than on day one where it sits
+unused while you learn Swift. Either way this deviates from §0.1's week-one purchase,
+which assumes you are ready to build immediately.
+
+The free tier's real cost is **7-day signing**: a build stops launching a week after you
+install it. Irrelevant for a 90-minute spike; a genuine nuisance for the 21-consecutive-day
+dogfood run in Phase 1, which is the point at which paying stops being optional.
 
 ```
 Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured
+
+Now ─────────── the ten-minute signing gate
+                  passes → Spike A (~90 min), today, no purchase
+                  fails  → buy the dev account → wait → Spike A
 
 Now ─────────── Swift days 1–5
 
@@ -62,9 +74,8 @@ Then ────────── weigh meals as you eat them (slow, passive, 
 
 Then ────────── design the app in Claude (fully unblocked, do it whenever)
 
-Then ────────── buy the dev account → wait for it to clear → Spike A (~90 min)
-
-Then ────────── Phase 1
+Then ────────── Phase 1 — buy the account before the 21-day dogfood run
+                if the gate spared you it earlier
 ```
 
 Three things at a time, maximum. Everything else in this repo is reference material —
@@ -76,7 +87,7 @@ you do not need to read it to make progress.
 
 | Service | Cost | When | Why |
 |---|---|---|---|
-| **Apple Developer Program** | $99/yr + VAT | **now** | HealthKit, Sign in with Apple, TestFlight. Critical path. |
+| **Apple Developer Program** | $99/yr + VAT | **after the [gate](../../spikes/healthkit/README.md#the-ten-minute-gate)**, else before dogfooding | TestFlight, submission, signing that lasts longer than 7 days. **Not** HealthKit, if the gate passes. |
 | GitHub | free | done | Private repo + Actions. Turn on **secret scanning with push protection** in settings. |
 | Google Gemini API | pay-as-you-go | **done** | Spike B, using existing credit ([ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)). Measured at $0.000862/image, so the 20-meal baseline is ~$0.02. Anthropic/OpenAI remain optional comparison arms. |
 | Supabase | free → ~$25/mo | week 2 | Not needed until Phase 1, but create the project so it exists. |
@@ -147,10 +158,10 @@ Committed in this phase, so you don't have to redo it:
 | `.swiftlint.yml` | Standard rules **plus custom rules that enforce brief decisions**: RankingEngine purity (no UI imports, no ambient clock, no randomness — [ADR 0006](../decisions/0006-ranking-engine-client-side-first.md)), no hardcoded colours, no punishment framing in strings (§10), no embedded secrets |
 | `.githooks/` | Secret + health-data tripwires, token-sync check, conventional-commit enforcement. Enable with `git config core.hooksPath .githooks` |
 | `design/tokens/` | `notch.tokens.json` is the single source of truth; `generate.py` emits Swift + CSS and **validates every text/surface pair against WCAG AA**, failing the build on a regression. It caught three real failures in the first draft. |
-| `docs/decisions/` | 12 ADRs — the seven locked decisions from §02 plus three new Phase 0 ones |
+| `docs/decisions/` | 13 ADRs — the seven locked decisions from §02 plus the Phase 0 ones |
 | `docs/design/` | Principles, component specs, and a full copy deck reviewed against §10 |
 | `docs/safety/` | §10 as numbered rules with concrete thresholds and test names. **The numbers need a clinician before Phase 3.** |
-| `spikes/` | Both spikes. B is runnable now; A is blocked on the dev account. |
+| `spikes/` | Both spikes. B is runnable now; A is runnable as soon as the ten-minute signing gate passes. |
 
 ---
 
