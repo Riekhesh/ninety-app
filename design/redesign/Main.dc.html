@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Martian+Mono:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; background: #0B0A09; }
+    a { color: #FF5A24; } a:hover { color: #FF7A4A; }
+    @keyframes needleIn { from { transform: translateX(-40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</helmet>
+<div style="width: 393px; height: 852px; background: #0B0A09; color: #F4F0EA; font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+
+  <!-- side rail: week context as structure, not eyebrow -->
+  <div style="position: absolute; left: 0; top: 54px; bottom: 86px; width: 34px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border-right: 1px solid #221E1A; padding: 10px 0;">
+    <div style="writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2.5px; color: #948A7E;">WEEK OF 3 AUGUST</div>
+    <div style="writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2.5px; color: #7A7168;">WK 32 · 2026</div>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; padding: 54px 22px 0 56px; min-height: 0;">
+
+    <!-- tier identity -->
+    <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 12px;">
+      <!-- notch tally: colour-independent tier channel. Gold = 3 of 5 cuts filled -->
+      <div style="display: flex; align-items: flex-end; gap: 7px; height: 30px;">
+        <div style="width: 9px; height: 30px; background: #FF5A24;"></div>
+        <div style="width: 9px; height: 24px; background: #FF5A24;"></div>
+        <div style="width: 9px; height: 18px; background: #FF5A24;"></div>
+        <div style="width: 9px; height: 13px; background: #2A2521;"></div>
+        <div style="width: 9px; height: 9px; background: #2A2521;"></div>
+        <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 9px; color: #948A7E; letter-spacing: 1.5px; margin-left: 8px; padding-bottom: 2px;">TIER 3/5</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1; color: #F4F0EA;">Gold</div>
+        <div style="font-size: 13px; font-weight: 500; color: #E8863F;">Up from Silver</div>
+      </div>
+    </div>
+
+    <!-- composite score: the instrument reading -->
+    <div style="display: flex; align-items: baseline; gap: 12px; margin-top: 30px; border-top: 1px solid #221E1A; padding-top: 22px;">
+      <div style="font-size: 96px; font-weight: 700; line-height: 0.9; letter-spacing: -3px; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.71</div>
+      <div style="display: flex; flex-direction: column; gap: 3px; padding-bottom: 8px;">
+        <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2px; color: #948A7E;">COMPOSITE</div>
+        <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 2px; color: #948A7E;">THIS WEEK</div>
+      </div>
+    </div>
+
+    <!-- hold line: a calibrated scale, 0.71 marked against the 0.65 hold -->
+    <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 6px;">
+      <div style="position: relative; height: 26px;">
+        <div style="position: absolute; left: 0; right: 0; top: 12px; height: 2px; background: #221E1A;"></div>
+        <div style="position: absolute; left: 0; right: 35%; top: 12px; height: 2px; background: #3A332C;"></div>
+        <div style="position: absolute; left: 65%; top: 5px; width: 2px; height: 16px; background: #948A7E;"></div>
+        <div style="position: absolute; left: 71%; top: 0; width: 3px; height: 26px; background: #FF5A24; animation: needleIn 700ms cubic-bezier(0.16, 1, 0.3, 1);"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8.5px; letter-spacing: 1.5px; color: #948A7E;">
+        <div>0</div>
+        <div style="color: #A89E93;">GOLD HOLDS AT 0.65</div>
+        <div>1.00</div>
+      </div>
+    </div>
+
+    <!-- breakdown: attempt-card rows, weights visible -->
+    <div style="display: flex; flex-direction: column; margin-top: 24px; border-top: 1px solid #221E1A;">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 15px 0; border-bottom: 1px solid #191612;">
+        <div style="width: 118px; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 13px; font-weight: 600; color: #F4F0EA;">Consistency</div>
+          <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8px; letter-spacing: 1.5px; color: #948A7E;">WEIGHTED 0.50</div>
+        </div>
+        <div style="flex: 1; height: 4px; background: #221E1A; position: relative;">
+          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 86%; background: #FF5A24;"></div>
+        </div>
+        <div style="width: 44px; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.86</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 15px 0; border-bottom: 1px solid #191612;">
+        <div style="width: 118px; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 13px; font-weight: 600; color: #F4F0EA;">Adherence</div>
+          <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8px; letter-spacing: 1.5px; color: #948A7E;">WEIGHTED 0.25</div>
+        </div>
+        <div style="flex: 1; height: 4px; background: #221E1A; position: relative;">
+          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 71%; background: #B8642F;"></div>
+        </div>
+        <div style="width: 44px; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.71</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 15px 0;">
+        <div style="width: 118px; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 13px; font-weight: 600; color: #F4F0EA;">Progress</div>
+          <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 8px; letter-spacing: 1.5px; color: #948A7E;">WEIGHTED 0.25</div>
+        </div>
+        <div style="flex: 1; height: 4px; background: #221E1A; position: relative;">
+          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 52%; background: #6E4A32;"></div>
+        </div>
+        <div style="width: 44px; text-align: right; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; color: #F4F0EA;">0.52</div>
+      </div>
+    </div>
+
+    <!-- next step -->
+    <div style="margin-top: 30px; border-left: 2px solid #FF5A24; padding: 4px 0 4px 14px;">
+      <div style="font-size: 14px; font-weight: 500; line-height: 1.45; color: #C9BFB4;">One more logged day next week keeps Gold.</div>
+    </div>
+  </div>
+
+  <!-- tab bar -->
+  <div style="height: 86px; border-top: 1px solid #221E1A; display: flex; align-items: flex-start; padding: 12px 30px 0;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#857A6D" stroke-width="1.5"></circle><path d="M10 6v4l2.5 2.5" stroke="#857A6D" stroke-width="1.5" stroke-linecap="round"></path></svg>
+      <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 7.5px; letter-spacing: 2px; color: #857A6D;">TODAY</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="#857A6D" stroke-width="1.5" stroke-linecap="round"></path></svg>
+      <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 7.5px; letter-spacing: 2px; color: #857A6D;">LOG</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V9M10 16V4M16 16v-5" stroke="#FF5A24" stroke-width="1.5" stroke-linecap="round"></path></svg>
+      <div style="font-family: 'Martian Mono', ui-monospace, monospace; font-size: 7.5px; letter-spacing: 2px; color: #FF5A24;">RANK</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

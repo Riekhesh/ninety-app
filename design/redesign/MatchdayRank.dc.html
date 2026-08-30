@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Saira:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #0B2C1D; }
+    a { color: #E8B54A; } a:hover { color: #F2CB74; }
+  </style>
+</helmet>
+<div style="width: 393px; height: 852px; background: repeating-linear-gradient(90deg, #0B2C1D 0px, #0B2C1D 56px, #0D3021 56px, #0D3021 112px); color: #F2EFE6; font-family: 'Saira', 'Trebuchet MS', Arial, sans-serif; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="flex: 1; display: flex; flex-direction: column; padding: 54px 22px 0; min-height: 0;">
+
+    <!-- matchweek masthead -->
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(242,239,230,0.85); padding-bottom: 10px;">
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 20px; font-weight: 700; letter-spacing: 2px;">MATCHWEEK 32</div>
+      <div style="font-size: 10px; font-weight: 500; color: #9DB5A4; letter-spacing: 1px;">WEEK OF 3 AUG</div>
+    </div>
+
+    <!-- division crest: chevrons carry the tier count, colour-independent -->
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 22px;">
+      <div style="width: 76px; height: 88px; border: 2px solid rgba(242,239,230,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: rgba(6,26,17,0.45);">
+        <svg width="34" height="30" viewBox="0 0 34 30" fill="none">
+          <path d="M4 26l13-8 13 8" stroke="#E8B54A" stroke-width="3" stroke-linecap="square"></path>
+          <path d="M4 17l13-8 13 8" stroke="#E8B54A" stroke-width="3" stroke-linecap="square"></path>
+          <path d="M4 8l13-8 13 8" stroke="#E8B54A" stroke-width="3" stroke-linecap="square"></path>
+        </svg>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; color: #9DB5A4;">DIV 3/5</div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 46px; font-weight: 700; line-height: 0.95; letter-spacing: 1px; color: #E8B54A;">GOLD</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 2px; color: #F2EFE6;">DIVISION</div>
+        <div style="font-size: 12px; font-weight: 600; color: #9DB5A4; margin-top: 2px;">▲ Promoted from Silver</div>
+      </div>
+    </div>
+
+    <!-- composite: the week's points -->
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 24px; border-top: 2px solid rgba(242,239,230,0.85); padding-top: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; color: #9DB5A4;">COMPOSITE · THIS WEEK</div>
+        <div style="font-size: 84px; font-weight: 700; line-height: 0.95; letter-spacing: -2px; font-variant-numeric: tabular-nums; color: #F2EFE6;">0.71</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; padding-bottom: 10px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; color: #9DB5A4;">GOLD HOLDS AT</div>
+        <div style="font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; color: #E8B54A;">0.65</div>
+      </div>
+    </div>
+
+    <!-- the table: breakdown as league standings, weights visible -->
+    <div style="display: flex; flex-direction: column; margin-top: 20px; background: rgba(6,26,17,0.45); border: 2px solid rgba(242,239,230,0.85);">
+      <div style="display: grid; grid-template-columns: 1fr 48px 64px; gap: 8px; padding: 8px 14px; border-bottom: 1px solid rgba(242,239,230,0.3);">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: #9DB5A4;">COMPONENT</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: #9DB5A4; text-align: right;">WT</div>
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: #9DB5A4; text-align: right;">SCORE</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 48px 64px; gap: 8px; align-items: center; padding: 12px 14px; border-bottom: 1px solid rgba(242,239,230,0.14);">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;">CONSISTENCY</div>
+          <div style="width: 100%; height: 5px; background: rgba(242,239,230,0.14);"><div style="width: 86%; height: 5px; background: #E8B54A;"></div></div>
+        </div>
+        <div style="font-size: 12px; font-weight: 500; color: #9DB5A4; text-align: right;">0.50</div>
+        <div style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;">0.86</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 48px 64px; gap: 8px; align-items: center; padding: 12px 14px; border-bottom: 1px solid rgba(242,239,230,0.14);">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;">ADHERENCE</div>
+          <div style="width: 100%; height: 5px; background: rgba(242,239,230,0.14);"><div style="width: 71%; height: 5px; background: rgba(242,239,230,0.7);"></div></div>
+        </div>
+        <div style="font-size: 12px; font-weight: 500; color: #9DB5A4; text-align: right;">0.25</div>
+        <div style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;">0.71</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 48px 64px; gap: 8px; align-items: center; padding: 12px 14px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;">PROGRESS</div>
+          <div style="width: 100%; height: 5px; background: rgba(242,239,230,0.14);"><div style="width: 52%; height: 5px; background: rgba(242,239,230,0.45);"></div></div>
+        </div>
+        <div style="font-size: 12px; font-weight: 500; color: #9DB5A4; text-align: right;">0.25</div>
+        <div style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right;">0.52</div>
+      </div>
+    </div>
+
+    <!-- form guide + next step -->
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; margin-bottom: 16px; gap: 14px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: #9DB5A4;">FORM · LAST 7 DAYS</div>
+        <div style="display: flex; gap: 5px;">
+          <div style="width: 14px; height: 14px; border-radius: 50%; background: #F2EFE6;"></div>
+          <div style="width: 14px; height: 14px; border-radius: 50%; background: #F2EFE6;"></div>
+          <div style="width: 14px; height: 14px; border-radius: 50%; background: #F2EFE6;"></div>
+          <div style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(242,239,230,0.35); box-sizing: border-box;"></div>
+          <div style="width: 14px; height: 14px; border-radius: 50%; background: #F2EFE6;"></div>
+          <div style="width: 14px; height: 14px; border-radius: 50%; background: #F2EFE6;"></div>
+          <div style="width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(242,239,230,0.35); box-sizing: border-box;"></div>
+        </div>
+      </div>
+      <div style="flex: 1; font-size: 13px; font-weight: 500; line-height: 1.4; color: #C9D6CB; text-align: right;">One more logged day next week keeps Gold.</div>
+    </div>
+  </div>
+
+  <!-- tab bar -->
+  <div style="height: 86px; border-top: 2px solid rgba(242,239,230,0.85); background: rgba(6,26,17,0.55); display: flex; align-items: flex-start; padding: 12px 30px 0;">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#9DB5A4" stroke-width="2"></circle><path d="M10 6v4l2.5 2.5" stroke="#9DB5A4" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: #9DB5A4;">TODAY</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="#9DB5A4" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: #9DB5A4;">LOG</div>
+    </div>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V9M10 16V4M16 16v-5" stroke="#E8B54A" stroke-width="2" stroke-linecap="square"></path></svg>
+      <div style="font-family: 'Saira Condensed', 'Arial Narrow', Arial, sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: #E8B54A;">RANK</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
