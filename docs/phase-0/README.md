@@ -17,8 +17,8 @@ done — extend it and compress a later one.
 - [x] **Design tokens, component set, six wireframes, one hero screen** → `design/`, and the [design system page](../../design/preview/design-system.html)
 - [x] **Vision cost per image measured** → **$0.000862/image, $1.55/mo at 1,800 calls** — 12–35× under §10's $0.01–0.03 estimate. [Numbers](07-spike-findings.md#cost-per-image--measured-)
 - [x] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md). Closed on desk research + prior hands-on use; **tap counts deliberately not measured** ([scope decision](04-competitor-teardown.md#scope-decision--closed-without-tap-counts)). The teardown's one finding that changed the project — Strava already rewards pace-agnostic consistency — is settled in [ADR 0013](../decisions/0013-narrowed-thesis-claim.md) and the narrowed wording is now live in the README, the design system page and the design brief.
-- [ ] **Apple Developer Program membership active** — **purchased, awaiting enrolment.** Needed only for the next item, and the only thing gating it
-- [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md)
+- [x] **Apple Developer Program membership active** — approved 2026-08-30. It existed only to unblock the next item
+- [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md). **Unblocked, and now the only thing left in Phase 0.** ~90 min; the runbook is step-by-step
 
 **Moved out of the exit criteria** (see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)):
 
@@ -56,21 +56,28 @@ assumes you are ready to build immediately; the account should arrive just befor
 thing it unblocks.
 
 ```
-Done ────────── Xcode downloaded · GEMINI_API_KEY in .env · cost check measured
+Done ────────── Xcode · GEMINI_API_KEY in .env · cost check measured
                 thesis narrowed (ADR 0013) · harness refuses unpriced models
-                dev account purchased — waiting on Apple to clear enrolment
+                Supabase live (PostHog deferred to Phase 3)
                 Swift ramp-up — 100 Days of SwiftUI, days 1–30
+                design — Matchday, six screens, palette in the tokens
+                dev account APPROVED
 
-Now ─────────── Supabase + PostHog projects (~25 min, runbook: accounts.md)
-                send the clinician pack (docs/safety/clinician-review-pack.md)
+Now ─────────── SPIKE A. The whole of what is left in Phase 0.
+                  1. put real data in Health first — walk a day, add 2–3 weights
+                  2. scripts/verify-toolchain.sh
+                  3. spikes/healthkit/README.md, top to bottom (~90 min)
+                  4. numbers into 07-spike-findings.md → the phase closes
 
-Then ────────── weigh meals as you eat them (slow, passive, no deadline)
-                Swift days 5–20
+Passive ─────── send the clinician pack (a Phase 3 gate, not this one)
+                the accuracy benchmark accumulates during Phase 1's 21 days
 
-Then ────────── design the app in Claude (fully unblocked, do it whenever)
-
-Then ────────── enrolment clears → Spike A (~90 min) → Phase 1
+Then ────────── Phase 1. First design task: fixed type scale vs Dynamic Type
 ```
+
+**Spike A is the last criterion and the one that can still kill the project** — if a
+real device will not hand over weight and steps, no amount of design rescues it.
+Everything else in Phase 0 is closed.
 
 **The two remaining exit criteria are both downstream of Apple**, and nothing else in
 this phase is. Everything under *Now* is work the enrolment wait does not block — which

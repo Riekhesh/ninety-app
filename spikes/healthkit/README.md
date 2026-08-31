@@ -4,13 +4,11 @@
 > rendering on your own iPhone"* (§0.7 exit criteria) plus what you learn. Delete the
 > project afterwards.
 
-**Blocked until the Apple Developer Program clears.** HealthKit is a paid-programme
-entitlement — free provisioning gives you 7-day certificates and no HealthKit at all,
-so you cannot complete this spike without paying. §0.1 moves the purchase to week one
-for exactly this reason, and enrolment can take several days.
+**Unblocked — the Apple Developer Program was approved on 2026-08-30.** HealthKit is a
+paid-programme entitlement, so this could not have been done earlier: free provisioning
+gives 7-day certificates and no HealthKit at all.
 
-Do the design work and Spike B while you wait. This spike is roughly 90 minutes once
-you can actually build.
+This is now the **last open Phase 0 exit criterion**, and roughly 90 minutes of work.
 
 ---
 
