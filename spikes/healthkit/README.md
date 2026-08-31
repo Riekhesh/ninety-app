@@ -32,6 +32,12 @@ what the empty state looks like — which is worth seeing, but second.
 
 ---
 
+> **The spike code compiles as of 2026-08-31.** It was written in Phase 0 with no
+> Apple Developer account, so it had never been through a compiler until the day the
+> membership cleared. Three real errors came out of that first build and are fixed;
+> the fix is commented in `HealthSpike.swift` where it happened. If you hit a fresh
+> compile error, that is a genuine finding — record it rather than working around it.
+
 ## Setup
 
 ### 1 · New project

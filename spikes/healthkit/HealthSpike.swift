@@ -252,33 +252,58 @@ final class HealthSpike {
     /// new anchor to save. **Deletions matter**: a user correcting a mis-typed weight
     /// shows up here as a deleted object, and an app that only handles additions
     /// silently keeps the wrong value forever.
+    ///
+    /// **Why this branches instead of building one predicate.** `HKSamplePredicate`
+    /// is generic over the sample it matches: `.quantitySample(type:)` produces
+    /// `HKSamplePredicate<HKQuantitySample>` and `.workout()` produces
+    /// `HKSamplePredicate<HKWorkout>`. They are different types, so they cannot be
+    /// assigned to one `HKSamplePredicate<HKSample>` variable — and the descriptor
+    /// carries that generic through to its result, which is the point: the compiler
+    /// knows `addedSamples` is `[HKQuantitySample]` on one path and `[HKWorkout]` on
+    /// the other. Erasing that to `HKSample` would throw away the typing that makes
+    /// the modern API worth using.
     private func runAnchoredQuery(for type: SpikeType) async throws -> (added: Int, savedAnchor: Bool) {
-        let predicate: HKSamplePredicate<HKSample> =
-            if let quantityType = type.quantityType {
-                .quantitySample(type: quantityType)
-            } else {
-                .workout()
-            }
+        let saved = anchorStore.load(for: type.rawValue)
 
-        let descriptor = HKAnchoredObjectQueryDescriptor(
-            predicates: [predicate],
-            anchor: anchorStore.load(for: type.rawValue),
-            limit: nil
-        )
+        let added: Int
+        let deleted: Int
+        let newAnchor: HKQueryAnchor
 
-        let result = try await descriptor.result(for: store)
-
-        if let newAnchor = result.newAnchor {
-            anchorStore.save(newAnchor, for: type.rawValue)
+        if let quantityType = type.quantityType {
+            let descriptor = HKAnchoredObjectQueryDescriptor(
+                predicates: [.quantitySample(type: quantityType)],
+                anchor: saved,
+                limit: nil
+            )
+            let result = try await descriptor.result(for: store)
+            added = result.addedSamples.count
+            deleted = result.deletedObjects.count
+            newAnchor = result.newAnchor
+        } else {
+            let descriptor = HKAnchoredObjectQueryDescriptor(
+                predicates: [.workout()],
+                anchor: saved,
+                limit: nil
+            )
+            let result = try await descriptor.result(for: store)
+            added = result.addedSamples.count
+            deleted = result.deletedObjects.count
+            newAnchor = result.newAnchor
         }
+
+        // `newAnchor` is NON-optional on the async descriptor — unlike the older
+        // callback-based HKAnchoredObjectQuery, where it was optional and every
+        // tutorial wraps it in `if let`. A query that ran always yields an anchor,
+        // so there is nothing to unwrap and nothing to compare against nil.
+        anchorStore.save(newAnchor, for: type.rawValue)
 
         log.info("""
             \(type.rawValue, privacy: .public): \
-            +\(result.addedSamples.count) added, \
-            -\(result.deletedObjects.count) deleted
+            +\(added) added, \
+            -\(deleted) deleted
             """)
 
-        return (result.addedSamples.count, result.newAnchor != nil)
+        return (added, true)
     }
 
     /// Daily buckets for display.
