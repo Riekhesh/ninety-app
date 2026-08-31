@@ -1,8 +1,11 @@
 # Notch — repository map
 
 Native iOS health app that ranks on **normalised improvement and consistency**, not
-absolute numbers. Swift 6.3 / SwiftUI / iOS 18+ / Supabase. **Phase 0** (de-risking);
-no app code exists yet, deliberately.
+absolute numbers. Swift 6.3 / SwiftUI / iOS 18+ / Supabase.
+
+**Phase 0 closed 31 Aug 2026** — every exit criterion met, HealthKit proven on a real
+device. **Phase 1 (single-player core) is live**, and is the first phase that builds:
+no `Notch/` or `Packages/` exists yet, and creating them is Phase 1's job.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -14,7 +17,8 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | If the question is… | Read only |
 |---|---|
 | What is this project, what's the pitch | `README.md` |
-| What's left in Phase 0, what's blocked | `docs/phase-0/README.md` |
+| What Phase 0 proved, and the measured numbers | `docs/phase-0/07-spike-findings.md` |
+| What Phase 1 has to do | `docs/phase-0/README.md` (closed tracker) + `PRODUCT.md` |
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |

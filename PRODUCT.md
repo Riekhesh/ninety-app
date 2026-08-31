@@ -38,6 +38,22 @@ normalised so a 120 kg beginner and a 70 kg regular can be compared fairly." (AD
 — deliberately narrowed; Strava Local Legend is cited as prior art, not ignored.)
 Nobody has made normalised improvement the headline ranking itself.
 
+## Phase state
+
+**Phase 0 closed 31 August 2026.** Every exit criterion met. Two findings from it bind
+Phase 1's build and are not negotiable:
+
+- **Never iterate raw HealthKit samples for a daily total.** Measured: ~1,830 step
+  samples and ~3,000 active-energy samples *per day*. Use
+  `HKStatisticsCollectionQuery`, which buckets inside HealthKit.
+- **There is no permission-denied branch to write.** A denied read returns an empty
+  result identical to "no data"; iOS will not distinguish them. Every data surface
+  needs a designed empty state whose wording covers both.
+
+**Phase 1 (single-player core) is in progress.** Its first design decision is the open
+one below; its exit criteria include 21 days of logged food, which is also where the
+photo-accuracy benchmark's data comes from.
+
 ## Operating Context
 
 - Weekly score computed from logged food, weight trend (HealthKit), and consistency.

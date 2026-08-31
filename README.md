@@ -59,20 +59,29 @@ project. Everything else exists to feed it data.
 
 | Phase | What it is | Window | Status |
 |---|---|---|---|
-| **0** | **Foundations & de-risking** | 3–16 Aug 2026 | **in progress** |
-| 1 | Single-player core | 17 Aug – 13 Sep | not started |
+| **0** | Foundations & de-risking | 3–31 Aug 2026 | ✅ **closed** |
+| **1** | **Single-player core** | from 31 Aug | **in progress** |
 | 2 | The ranking engine | 14 Sep – 11 Oct | not started |
 | 3 | TestFlight & real users | 12 Oct – 8 Nov | not started |
 | 4 | Social layer | Nov – Dec | not started |
 | 5 | Public launch & iterate | Jan 2027 → | not started |
 
-Phase 0 exists to kill the risky unknowns in throwaway code, before any real code
-gets written. Photo accuracy turned out to be a **benchmark rather than a gate** —
-the estimate is always a helper with one-tap correction, so a bad number changes the
-UX weighting rather than the feature ([ADR 0010](docs/decisions/0010-anthropic-as-vision-provider.md)).
-Vision cost **is** a gate, and it is measured: **$0.000862/image, $1.55/mo** at §10's
-volumes — 12–35× under the brief's estimate. HealthKit remains a genuine spike: it can
-still kill the project. **Live tracker and exit criteria: [`docs/phase-0/`](docs/phase-0/).**
+Phase 0 existed to kill the risky unknowns in throwaway code, before any real code got
+written. **It closed on 31 August with every exit criterion met**, and what it found:
+
+- **Vision cost — $0.000862/image, $1.55/mo** at §10's volumes. 12–35× under the
+  brief's estimate, so cost is not the constraint it was assumed to be.
+- **HealthKit works**, on a real device, and it was the one unknown that could have
+  ended the project. It also produced the two findings that shape Phase 1: HealthKit
+  stores **~1,830 step samples per day**, so daily totals must be bucketed inside
+  HealthKit rather than iterated; and **a denied read is indistinguishable from no
+  data**, so there is no permission-denied branch to write.
+- **The thesis narrowed.** Strava already rewards pace-agnostic consistency, so the
+  claim is now the sharper one ([ADR 0013](docs/decisions/0013-narrowed-thesis-claim.md)).
+- **Photo accuracy is a benchmark, not a gate** ([ADR 0010](docs/decisions/0010-anthropic-as-vision-provider.md)) —
+  the estimate is always a helper with one-tap correction.
+
+**Numbers: [`07-spike-findings.md`](docs/phase-0/07-spike-findings.md) · closed tracker: [`docs/phase-0/`](docs/phase-0/).**
 
 Phases end on a **testable condition, not a date.** If the exit criteria are not
 met, the phase is not done.
@@ -112,8 +121,8 @@ The brief itself is not in the repo — it is the source PDF. Its locked decisio
 in [`docs/decisions/`](docs/decisions/), and every doc here cites the section it came
 from (`§0.7`, `§2.3`) so a claim can be traced back.
 
-Nothing in `Notch/` or `Packages/` yet, deliberately. **Phase 0 is not a build
-phase.**
+Nothing in `Notch/` or `Packages/` yet — Phase 0 was not a build phase. Phase 1 is,
+and creates them.
 
 ---
 
