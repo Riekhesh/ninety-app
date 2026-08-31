@@ -20,9 +20,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from notchvision import metrics, report  # noqa: E402
-from notchvision.dataset import GroundTruthError, load_run, load_truth  # noqa: E402
-from notchvision.schema import EstimateParseError, parse_estimate  # noqa: E402
+from ninetyvision import metrics, report  # noqa: E402
+from ninetyvision.dataset import GroundTruthError, load_run, load_truth  # noqa: E402
+from ninetyvision.schema import EstimateParseError, parse_estimate  # noqa: E402
 
 
 def newest_run() -> Path | None:

@@ -1,6 +1,6 @@
 {
   "$schema": "https://tr.designtokens.org/format/",
-  "$description": "Notch design tokens. Visual world: MATCHDAY — a lit football pitch. Dark is the default appearance; light is the same world at midday. Generated to Swift and CSS by generate.py, which validates every text/surface pair against WCAG AA and refuses a failing one.",
+  "$description": "Ninety design tokens. Visual world: MATCHDAY — a lit football pitch. Dark is the default appearance; light is the same world at midday. Generated to Swift and CSS by generate.py, which validates every text/surface pair against WCAG AA and refuses a failing one.",
   "_meta": {
     "version": "1.0.0",
     "direction": "Quiet premium, dark-first (ADR 0011)",
@@ -102,7 +102,7 @@
     },
     "light": {
       "$type": "color",
-      "$description": "Full parity, built from day one. Metals are darkened to stay legible on a light ground; the notch count carries tier identity either way (ADR 0012).",
+      "$description": "Full parity, built from day one. Metals are darkened to stay legible on a light ground; the chevron count carries tier identity either way (ADR 0012).",
       "canvas": {
         "$value": "#F1F4EC",
         "$description": "Warm off-white."
@@ -180,45 +180,45 @@
   },
   "tier": {
     "$type": "color",
-    "$description": "The only saturated colour in the product (ADR 0011). Colour is the SECONDARY signal — notch count is primary (ADR 0012), which is what makes Silver/Platinum and Platinum/Diamond distinguishable at all, and what makes the ladder legible without colour vision.",
+    "$description": "The only saturated colour in the product (ADR 0011). Colour is the SECONDARY signal — chevron count is primary (ADR 0012), which is what makes Silver/Platinum and Platinum/Diamond distinguishable at all, and what makes the ladder legible without colour vision.",
     "bronze": {
       "$value": "#C07A44",
       "$description": "1 chevron. Starting out.",
       "$extensions": {
-        "notch.count": 1,
-        "notch.light": "#7E4A1E"
+        "ninety.count": 1,
+        "ninety.light": "#7E4A1E"
       }
     },
     "silver": {
       "$value": "#BFC7C2",
       "$description": "2 chevrons.",
       "$extensions": {
-        "notch.count": 2,
-        "notch.light": "#5C6B62"
+        "ninety.count": 2,
+        "ninety.light": "#5C6B62"
       }
     },
     "gold": {
       "$value": "#E8B54A",
       "$description": "3 chevrons. The division the mockups sit in.",
       "$extensions": {
-        "notch.count": 3,
-        "notch.light": "#8A6410"
+        "ninety.count": 3,
+        "ninety.light": "#8A6410"
       }
     },
     "platinum": {
       "$value": "#DCE6E2",
       "$description": "4 chevrons.",
       "$extensions": {
-        "notch.count": 4,
-        "notch.light": "#5F7168"
+        "ninety.count": 4,
+        "ninety.light": "#5F7168"
       }
     },
     "diamond": {
       "$value": "#8FE0D6",
       "$description": "5 chevrons.",
       "$extensions": {
-        "notch.count": 5,
-        "notch.light": "#1B7A70"
+        "ninety.count": 5,
+        "ninety.light": "#1B7A70"
       }
     }
   },
@@ -233,8 +233,8 @@
         "letterSpacing": "-0.5"
       },
       "$extensions": {
-        "notch.iosTextStyle": "largeTitle",
-        "notch.usage": "Onboarding step headings, rank tier name."
+        "ninety.iosTextStyle": "largeTitle",
+        "ninety.usage": "Onboarding step headings, rank tier name."
       }
     },
     "title1": {
@@ -246,7 +246,7 @@
         "letterSpacing": "-0.3"
       },
       "$extensions": {
-        "notch.iosTextStyle": "title"
+        "ninety.iosTextStyle": "title"
       }
     },
     "title2": {
@@ -258,7 +258,7 @@
         "letterSpacing": "-0.2"
       },
       "$extensions": {
-        "notch.iosTextStyle": "title2"
+        "ninety.iosTextStyle": "title2"
       }
     },
     "title3": {
@@ -270,7 +270,7 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "title3"
+        "ninety.iosTextStyle": "title3"
       }
     },
     "headline": {
@@ -282,8 +282,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "headline",
-        "notch.usage": "Food name in a row, card titles."
+        "ninety.iosTextStyle": "headline",
+        "ninety.usage": "Food name in a row, card titles."
       }
     },
     "body": {
@@ -295,7 +295,7 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "body"
+        "ninety.iosTextStyle": "body"
       }
     },
     "callout": {
@@ -307,7 +307,7 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "callout"
+        "ninety.iosTextStyle": "callout"
       }
     },
     "subhead": {
@@ -319,8 +319,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "subheadline",
-        "notch.usage": "Brand and portion under a food name."
+        "ninety.iosTextStyle": "subheadline",
+        "ninety.usage": "Brand and portion under a food name."
       }
     },
     "footnote": {
@@ -332,7 +332,7 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "footnote"
+        "ninety.iosTextStyle": "footnote"
       }
     },
     "caption": {
@@ -344,7 +344,7 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "caption"
+        "ninety.iosTextStyle": "caption"
       }
     },
     "label": {
@@ -356,9 +356,9 @@
         "letterSpacing": "0.6"
       },
       "$extensions": {
-        "notch.iosTextStyle": "caption2",
-        "notch.transform": "uppercase",
-        "notch.usage": "Section eyebrows, stat card labels."
+        "ninety.iosTextStyle": "caption2",
+        "ninety.transform": "uppercase",
+        "ninety.usage": "Section eyebrows, stat card labels."
       }
     },
     "metricXL": {
@@ -370,9 +370,9 @@
         "letterSpacing": "-1.5"
       },
       "$extensions": {
-        "notch.iosTextStyle": "largeTitle",
-        "notch.tabularFigures": true,
-        "notch.usage": "The composite score on the rank screen. One per screen, maximum."
+        "ninety.iosTextStyle": "largeTitle",
+        "ninety.tabularFigures": true,
+        "ninety.usage": "The composite score on the rank screen. One per screen, maximum."
       }
     },
     "metricL": {
@@ -384,9 +384,9 @@
         "letterSpacing": "-0.8"
       },
       "$extensions": {
-        "notch.iosTextStyle": "title",
-        "notch.tabularFigures": true,
-        "notch.usage": "Calories remaining."
+        "ninety.iosTextStyle": "title",
+        "ninety.tabularFigures": true,
+        "ninety.usage": "Calories remaining."
       }
     },
     "metricM": {
@@ -398,8 +398,8 @@
         "letterSpacing": "-0.3"
       },
       "$extensions": {
-        "notch.iosTextStyle": "title2",
-        "notch.tabularFigures": true
+        "ninety.iosTextStyle": "title2",
+        "ninety.tabularFigures": true
       }
     },
     "metricS": {
@@ -411,9 +411,9 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "notch.iosTextStyle": "headline",
-        "notch.tabularFigures": true,
-        "notch.usage": "kcal on a food row."
+        "ninety.iosTextStyle": "headline",
+        "ninety.tabularFigures": true,
+        "ninety.usage": "kcal on a food row."
       }
     }
   },
@@ -521,7 +521,7 @@
           1
         ],
         "$extensions": {
-          "notch.swiftUI": "spring(response: 0.35, dampingFraction: 0.86)"
+          "ninety.swiftUI": "spring(response: 0.35, dampingFraction: 0.86)"
         }
       },
       "reveal": {
@@ -532,8 +532,8 @@
           1
         ],
         "$extensions": {
-          "notch.swiftUI": "spring(response: 0.62, dampingFraction: 0.70)",
-          "notch.note": "Slight overshoot. Deliberate — this is the one place a bounce is earned."
+          "ninety.swiftUI": "spring(response: 0.62, dampingFraction: 0.70)",
+          "ninety.note": "Slight overshoot. Deliberate — this is the one place a bounce is earned."
         }
       }
     }
@@ -550,7 +550,7 @@
         "spread": "0"
       },
       "$extensions": {
-        "notch.darkTreatment": "surface + stroke hairline, no shadow"
+        "ninety.darkTreatment": "surface + stroke hairline, no shadow"
       }
     },
     "sheet": {
@@ -563,7 +563,7 @@
         "spread": "0"
       },
       "$extensions": {
-        "notch.darkTreatment": "surfaceRaised + stroke hairline, no shadow"
+        "ninety.darkTreatment": "surfaceRaised + stroke hairline, no shadow"
       }
     }
   },

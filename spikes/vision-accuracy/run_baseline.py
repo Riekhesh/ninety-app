@@ -32,11 +32,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from notchvision import imaging, providers  # noqa: E402
-from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
-from notchvision.env import load_dotenv  # noqa: E402
-from notchvision.prompts import PROMPT_VERSION, prompt_hash  # noqa: E402
-from notchvision.providers import VisionRefusal  # noqa: E402
+from ninetyvision import imaging, providers  # noqa: E402
+from ninetyvision.dataset import GroundTruthError, load_truth  # noqa: E402
+from ninetyvision.env import load_dotenv  # noqa: E402
+from ninetyvision.prompts import PROMPT_VERSION, prompt_hash  # noqa: E402
+from ninetyvision.providers import VisionRefusal  # noqa: E402
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -136,7 +136,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  indistinguishable from a genuinely free model.\n", file=sys.stderr)
         print("  Fix it: add the input/output rates in USD per million tokens to",
               file=sys.stderr)
-        print("  PRICING in notchvision/providers.py, from the provider's pricing page:",
+        print("  PRICING in ninetyvision/providers.py, from the provider's pricing page:",
               file=sys.stderr)
         print(f'      "{resolved_model}": (<in>, <out>),\n', file=sys.stderr)
         print("  Or, to collect responses now and price them later:", file=sys.stderr)

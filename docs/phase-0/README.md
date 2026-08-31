@@ -110,7 +110,7 @@ you do not need to read it to make progress.
 | Google Gemini API | pay-as-you-go | **done** | Spike B, using existing credit ([ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)). Measured at $0.000862/image, so the 20-meal baseline is ~$0.02. Anthropic/OpenAI remain optional comparison arms. |
 | Supabase | free → ~$25/mo | week 2 | Not needed until Phase 1, but create the project so it exists. Click-path: [accounts.md](accounts.md) |
 | PostHog | free | now | Not needed until Phase 3. Create it now so you're not doing admin later (§0.2). Click-path: [accounts.md](accounts.md) |
-| Figma | free | optional | Only if you want to mirror the tokens. `notch.tokens.json` imports via Tokens Studio. |
+| Figma | free | optional | Only if you want to mirror the tokens. `ninety.tokens.json` imports via Tokens Studio. |
 
 Keys go in `.env` (gitignored) or Supabase Edge Function env vars. Never the app
 bundle — see [secrets.md](../security/secrets.md).
@@ -183,7 +183,7 @@ Committed in this phase, so you don't have to redo it:
 |---|---|
 | `.swiftlint.yml` | Standard rules **plus custom rules that enforce brief decisions**: RankingEngine purity (no UI imports, no ambient clock, no randomness — [ADR 0006](../decisions/0006-ranking-engine-client-side-first.md)), no hardcoded colours, no punishment framing in strings (§10), no embedded secrets |
 | `.githooks/` | Secret + health-data tripwires, token-sync check, conventional-commit enforcement. Enable with `git config core.hooksPath .githooks` |
-| `design/tokens/` | `notch.tokens.json` is the single source of truth; `generate.py` emits Swift + CSS and **validates every text/surface pair against WCAG AA**, failing the build on a regression. It caught three real failures in the first draft. |
+| `design/tokens/` | `ninety.tokens.json` is the single source of truth; `generate.py` emits Swift + CSS and **validates every text/surface pair against WCAG AA**, failing the build on a regression. It caught three real failures in the first draft. |
 | `docs/decisions/` | 12 ADRs — the seven locked decisions from §02 plus three new Phase 0 ones |
 | `design/spec/` | Principles, component specs, and a full copy deck reviewed against §10 |
 | `docs/safety/` | §10 as numbered rules with concrete thresholds and test names. **The numbers need a clinician before Phase 3** — [clinician-review-pack.md](../safety/clinician-review-pack.md) is the self-contained ~30-minute document to send them, and [who to ask](../safety/safety-requirements.md#the-pack-to-send-them) is written down. |

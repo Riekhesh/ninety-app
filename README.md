@@ -1,6 +1,6 @@
 <div align="center">
 
-# NOTCH
+# NINETY
 
 **A native iOS health app that ranks you on improvement and consistency — not on absolute numbers.**
 
@@ -32,7 +32,7 @@ whoever runs a segment **most often over 90 days, regardless of pace** — a ran
 beginner can genuinely top. The Phase 0 teardown went looking for that counter-example
 and found it, so the claim is stated narrowly on purpose ([ADR 0013](docs/decisions/0013-narrowed-thesis-claim.md)):
 
-| | Strava Local Legend | Notch |
+| | Strava Local Legend | Ninety |
 |---|---|---|
 | Rewards | raw **frequency** on one segment | **improvement rate + consistency** |
 | Normalised for starting point? | **No** | **Yes** — DOTS/Wilks-style coefficient (§2.2) |
@@ -101,7 +101,7 @@ docs/
   security/secrets.md           where every secret lives, and why none is in the app
 
 design/                         ONE design tree — values, specs and preview together
-  tokens/notch.tokens.json      single source of truth for the design system
+  tokens/ninety.tokens.json      single source of truth for the design system
   tokens/generate.py            → Swift + CSS + the chat brief; validates WCAG AA
   generated/                    DO NOT EDIT — regenerate from the tokens
   spec/                         principles, components, and the copy deck
@@ -121,7 +121,7 @@ The brief itself is not in the repo — it is the source PDF. Its locked decisio
 in [`docs/decisions/`](docs/decisions/), and every doc here cites the section it came
 from (`§0.7`, `§2.3`) so a claim can be traced back.
 
-Nothing in `Notch/` or `Packages/` yet — Phase 0 was not a build phase. Phase 1 is,
+Nothing in `Ninety/` or `Packages/` yet — Phase 0 was not a build phase. Phase 1 is,
 and creates them.
 
 ---
@@ -161,8 +161,8 @@ than a rewrite. It is the hard gate on Phase 4.
 ## Getting set up
 
 ```bash
-git clone git@github.com:Riekhesh/Notch-App.git
-cd Notch-App
+git clone git@github.com:Riekhesh/Ninety-App.git
+cd Ninety-App
 
 git config core.hooksPath .githooks   # secret + lint + commit-message hooks
 cp .env.example .env                  # then fill it in; .env is gitignored
@@ -180,7 +180,7 @@ thing protecting user health data — not a defence-in-depth nicety.
 
 ## Working on the design
 
-The token system is real code: `design/tokens/notch.tokens.json` is the single source
+The token system is real code: `design/tokens/ninety.tokens.json` is the single source
 of truth, and `python3 design/tokens/generate.py` emits the Swift and CSS **and fails
 the build if any text-on-surface pair drops below WCAG AA**. It caught three genuine
 contrast failures in its first run.
@@ -225,7 +225,7 @@ Conventional commits, enforced by a hook. See
 <div align="center">
 <sub>
 
-Not a medical device. Notch makes no medical claims and is not a substitute for
+Not a medical device. Ninety makes no medical claims and is not a substitute for
 professional advice.
 
 </sub>

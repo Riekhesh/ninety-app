@@ -1,4 +1,4 @@
-# Clinician review pack — Notch safety thresholds
+# Clinician review pack — Ninety safety thresholds
 
 <details>
 <summary><strong>The email to send with this — click to expand, edit, paste</strong></summary>
@@ -48,7 +48,7 @@ qualified to set. I am asking you to tell me where they are wrong.
 
 ## What the app is, in four sentences
 
-Notch is an iOS calorie and weight tracker whose distinguishing feature is that it
+Ninety is an iOS calorie and weight tracker whose distinguishing feature is that it
 **ranks the user on their rate of improvement and their consistency**, rather than on
 absolute numbers — the intent being that a beginner can rank well where they cannot on
 a conventional leaderboard. It computes a daily calorie target from Mifflin-St Jeor,

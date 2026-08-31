@@ -40,7 +40,7 @@ project**.
 | Setting | Value | Why this one |
 |---|---|---|
 | Organisation | new, free tier | — |
-| Name | `notch` | matches the repo |
+| Name | `ninety` | matches the repo |
 | **Region** | **London / `eu-west-2`** (any EU region if London is unavailable) | **The decision that is expensive to change.** This is special category health data under UK GDPR Article 9. Region is fixed at creation — moving it later means a dump, a new project, and reissuing every key. |
 | Database password | generate a long random one | goes straight into `.env` as `SUPABASE_DB_PASSWORD`; you will need it for migrations, and it is not retrievable afterwards |
 | Plan | Free | comfortably covers Phases 0–3 ([ADR 0003](../decisions/0003-supabase-backend.md)) |
@@ -77,7 +77,7 @@ as the Supabase region, and `.env.example` already points `POSTHOG_HOST` at
 `https://eu.i.posthog.com`. Signing up on the US cloud puts UK health-app telemetry in
 the wrong jurisdiction and, like the Supabase region, is not movable afterwards.
 
-Create a project named `notch`. **Project Settings**, and copy:
+Create a project named `ninety`. **Project Settings**, and copy:
 
 ```
 POSTHOG_PROJECT_API_KEY=phc_...    # write-only ingest key; safe in the app bundle

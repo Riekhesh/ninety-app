@@ -39,7 +39,7 @@ fact. "Over budget" is a judgement, and it frames food as money you have spent.
 ## 1. Onboarding
 
 **Sign in**
-- Title: `Notch`
+- Title: `Ninety`
 - Sub: `Ranked on how much you improve — not on how you compare to anyone else.`
 - Button: `Continue with Apple`
 - Footnote: `We ask for your date of birth, height and sex because the scoring engine needs them. Nothing else.`
@@ -50,8 +50,8 @@ fact. "Over budget" is a judgement, and it frames food as money you have spent.
 - Footnote: `Used to work out a realistic starting point for you. Not shared with anyone.`
 
 **Age gate** (under 18 — §10)
-- Title: `Notch is 18+`
-- Body: `Notch isn't built for under-18s yet. Body-image and nutrition content for younger users needs safeguards we haven't built, and we'd rather say so than get it wrong.`
+- Title: `Ninety is 18+`
+- Body: `Ninety isn't built for under-18s yet. Body-image and nutrition content for younger users needs safeguards we haven't built, and we'd rather say so than get it wrong.`
 - Body 2: `If you're looking for support with eating or body image, Beat has a youth helpline: beateatingdisorders.org.uk`
 - Button: `Close`
 - **This is a hard stop with no bypass.** No "continue anyway."
@@ -61,7 +61,7 @@ fact. "Over budget" is a judgement, and it frames food as money you have spent.
 - Options: `Lose weight` · `Maintain` · `Gain weight`
 - Rate label: `How fast?`
 - Rate options: `Steady · 0.25 kg/week` · `Moderate · 0.5 kg/week` · `Faster · 0.75 kg/week`
-- Footnote: `Notch scores the appropriate rate highest, not the fastest one. Losing weight faster than about 1% of your body weight a week doesn't score better here.`
+- Footnote: `Ninety scores the appropriate rate highest, not the fastest one. Losing weight faster than about 1% of your body weight a week doesn't score better here.`
 
 That footnote is doing real work: it tells the user up front that the rate ceiling exists, so it
 does not read as the app being broken when a faster rate does not score higher.
@@ -70,11 +70,11 @@ does not read as the app being broken when a faster rate does not score higher.
 - Title: `Your daily band`
 - Value: `1,750–1,950 kcal`
 - Body: `A band, not a number. Hitting exactly 1,847 isn't a real goal — landing in this range is.`
-- Footnote: `Worked out from your height, weight, age and activity using the Mifflin-St Jeor equation. It's an estimate, and Notch adjusts as it sees your real data.`
+- Footnote: `Worked out from your height, weight, age and activity using the Mifflin-St Jeor equation. It's an estimate, and Ninety adjusts as it sees your real data.`
 
 **Calibration explainer**
 - Title: `The first two weeks are calibration`
-- Body: `Notch watches your first 14 days to learn your baseline. You won't get a tier until it closes — a rank based on two days of data would be meaningless.`
+- Body: `Ninety watches your first 14 days to learn your baseline. You won't get a tier until it closes — a rank based on two days of data would be meaningless.`
 - Body 2: `Log as normally as you can. An unusually light fortnight makes every week after it look worse by comparison.`
 - Button: `Got it`
 
@@ -94,26 +94,26 @@ them blames the user** — they describe a limit the app holds.
 > before Phase 3 external testers.**
 
 **Calorie floor** — target would fall below 1,200 kcal (female) / 1,500 kcal (male)
-- `Notch won't set a target below 1,200 kcal a day. Below that it's hard to get enough nutrients, and it usually needs medical supervision.`
+- `Ninety won't set a target below 1,200 kcal a day. Below that it's hard to get enough nutrients, and it usually needs medical supervision.`
 - `Your band is set to 1,200–1,400 instead. You can pick a slower rate of loss to widen it.`
 
 **Goal weight below healthy BMI** — target BMI < 18.5
 - `That goal weight is below the healthy range for your height (which starts at 58 kg).`
-- `Notch can't set that as a target. You can set 58 kg or above, or switch to maintaining.`
+- `Ninety can't set that as a target. You can set 58 kg or above, or switch to maintaining.`
 
 **Rate of loss above ceiling** — > 1% bodyweight/week or > 1.0 kg/week
 - `That's faster than about 1% of your body weight a week.`
-- `Notch scores the appropriate rate highest rather than the fastest, so a faster target won't raise your rank — and it's harder to sustain. The fastest option here is 0.75 kg/week.`
+- `Ninety scores the appropriate rate highest rather than the fastest, so a faster target won't raise your rank — and it's harder to sustain. The fastest option here is 0.75 kg/week.`
 
 **Rapid unexplained loss detected** — sustained rate above ceiling in the data
 - `Your weight has been dropping faster than about 1% a week for three weeks.`
-- `That's worth mentioning to a GP, especially if it wasn't intentional. Notch isn't reducing your score for it — it just isn't scoring it higher either.`
+- `That's worth mentioning to a GP, especially if it wasn't intentional. Ninety isn't reducing your score for it — it just isn't scoring it higher either.`
 
 **Signposting** — patterns suggest it may help
 - `If your relationship with food or your body is feeling difficult, these people help:`
 - `Beat — 0808 801 0677 · beateatingdisorders.org.uk`
 - `National Alliance for Eating Disorders — eatingdisorderinfo.org`
-- `Notch isn't a substitute for either of them.`
+- `Ninety isn't a substitute for either of them.`
 
 **Competitive opt-out** — must be always available (§10)
 - Setting: `Competitive features`
@@ -143,7 +143,7 @@ the app genuinely cannot tell them apart):
 - Food: `Nothing logged yet today` + `Log a meal`
 - Weight: `No weight yet` + `Add today's weight`
 - Steps: `No step data` + `Connect Apple Health`
-- Steps after connecting, still empty: `No step data` + `Notch reads steps from Apple Health when they're there.`
+- Steps after connecting, still empty: `No step data` + `Ninety reads steps from Apple Health when they're there.`
 
 ---
 
@@ -167,12 +167,12 @@ control. Users accept a rule they can see the point of.
 - Prompt: `Photograph your meal`
 - Working: `Estimating…`
 - Header: `Estimates, not measurements`
-- Body: `Notch is guessing from a photo. It misses cooking oil, hidden sugar and portion size — trained dietitians are 20–30% out and models do worse.`
+- Body: `Ninety is guessing from a photo. It misses cooking oil, hidden sugar and portion size — trained dietitians are 20–30% out and models do worse.`
 - Body 2: `That's fine for tracking a trend: a consistent error still shows the direction correctly. Correct anything that looks wrong.`
 - Per item: `Porridge with milk` · `200–280 g` · `290–390 kcal` · confidence chip `HIGH` / `MEDIUM` / `LOW`
 - Actions: `Adjust portion` · `Remove` · `Add a missed item`
 - Confirm: `Log 3 items`
-- Low confidence: `Notch isn't confident about this one — worth a look.`
+- Low confidence: `Ninety isn't confident about this one — worth a look.`
 
 §1.3 calls owning this limitation loudly "better product design and a far better interview
 answer than claiming you solved computer vision." The copy above is that, in the product rather
@@ -186,7 +186,7 @@ than in a write-up.
 - Value: `78.4 kg` · `7-day average`
 - Delta: `−1.2 kg vs 4 weeks ago`
 - Toggle: `Show daily readings`
-- Explainer: `Notch shows a 7-day average because daily weight is mostly water, glycogen and gut content. The raw line jumps around enough to make a good week look like a bad one.`
+- Explainer: `Ninety shows a 7-day average because daily weight is mostly water, glycogen and gut content. The raw line jumps around enough to make a good week look like a bad one.`
 - Flat: `Steady over 4 weeks` — flat is a legitimate outcome, not a failure
 - Up: `+0.4 kg vs 4 weeks ago` + `Four weeks is a short window. It moves around.`
 - Fewer than 7 readings: `Trend needs a week of readings` + `Add today's weight`
@@ -218,10 +218,10 @@ next* (principle 7).
 - Best tier: `Diamond is the top tier. Holding it is the whole game now.`
 
 **Progress explainer** — needed because ADR 0008 accepts progress will feel unresponsive
-- `Progress is scored against what someone your size would expect to lose, not against a fixed number. Someone at 120 kg loses faster than someone at 70 kg on the same effort — that's physiology, not effort, so Notch doesn't reward it.`
+- `Progress is scored against what someone your size would expect to lose, not against a fixed number. Someone at 120 kg loses faster than someone at 70 kg on the same effort — that's physiology, not effort, so Ninety doesn't reward it.`
 
 **Plausibility flag** (§2.3 — flag, don't reject)
-- `This week's numbers look unusual, so progress is held at last week's value while Notch double-checks.`
+- `This week's numbers look unusual, so progress is held at last week's value while Ninety double-checks.`
 - `Nothing to do. If it's correct it'll settle on its own.`
 
 Neutral on purpose. §2.3: *"Over-aggressive rejection destroys trust with honest users who
@@ -230,14 +230,14 @@ should not be made to feel accused.
 
 **Calibrating**
 - `CALIBRATING · 6 days to go`
-- `Notch is learning your baseline. Your first tier arrives on 17 August.`
+- `Ninety is learning your baseline. Your first tier arrives on 17 August.`
 
 ---
 
 ## 7. Data rights (§10 · UK GDPR Article 9)
 
 - Export title: `Export your data`
-- Body: `Everything Notch holds about you, as JSON: profile, food logs, weights, health samples and weekly scores.`
+- Body: `Everything Ninety holds about you, as JSON: profile, food logs, weights, health samples and weekly scores.`
 - Delete title: `Delete your account`
 - Body: `Deletes your account and everything in it — logs, weights, photos, scores. Permanently, not hidden. This can't be undone.`
 - Confirm: `Type DELETE to confirm`

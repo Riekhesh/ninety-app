@@ -1,5 +1,5 @@
 ## ─────────────────────────────────────────────────────────────
-## Notch — .gitignore
+## Ninety — .gitignore
 ## Based on github/gitignore Swift.gitignore + Xcode additions.
 ## Xcode generates a lot of noise; this keeps the history readable.
 ## ─────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ playground.xcworkspace
 ## Swift Package Manager
 ## Package.resolved IS committed for apps (it pins exact dependency versions
 ## so CI and your machine build the same thing). It is NOT committed for
-## libraries. Notch is an app, so it stays tracked — hence no ignore line.
+## libraries. Ninety is an app, so it stays tracked — hence no ignore line.
 .build/
 .swiftpm/
 Packages/

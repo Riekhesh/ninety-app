@@ -44,7 +44,8 @@ Re-litigating settled decisions is the most expensive habit in solo projects.
 | [0009](0009-no-workout-logging-in-v1.md) | No workout logging in v1 | Locked | 0 |
 | [0010](0010-anthropic-as-vision-provider.md) | Anthropic as the vision provider, behind an interface | Locked | 0 |
 | [0011](0011-dark-first-visual-direction.md) | Dark-first visual direction | **Reversed in part** — world is now Matchday | 0 |
-| [0012](0012-tier-encoded-as-notch-count.md) | Tier encoded as notch count, not colour alone | Locked | 0 |
+| [0012](0012-tier-carried-by-count-not-colour.md) | Tier carried by a count, not colour alone | Locked · amended (chevrons) | 0 |
 | [0013](0013-narrowed-thesis-claim.md) | Thesis narrowed: consistency is the rank, not absent elsewhere | Locked | 0 |
+| [0014](0014-rename-to-ninety.md) | Renamed from Notch to Ninety | Locked | 0→1 |
 
 New decisions get the next number. Do not renumber; a stale link is worse than a gap.

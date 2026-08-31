@@ -75,3 +75,32 @@ badge change.
 Phase 3 user testing showing people misread the count, or cannot tell 4 notches from 5 at tab-bar
 size. Test this explicitly in the Phase 3 one-to-one sessions (§3.4) — show the badge and ask
 *"what tier is that, and how do you know?"*
+
+---
+
+## Amended — 2026-08-31: the count is chevrons, and the file is renamed
+
+**What new information changed it.** The Matchday redesign replaced the visual world,
+and with it the badge: a shield with notches cut into it became **N stacked chevrons**.
+
+**What is unchanged, and is the entire decision:** tier is carried by a **count**, never
+by colour alone. The measurement that forced it is if anything worse in the new palette
+— silver and gold now differ by **1.09:1**, platinum and diamond by 1.19:1, both far
+under any threshold at which colour could be read as the signal. `generate.py` still
+prints those ratios on every run as a note rather than a failure, because the count is
+what carries the meaning and the colours are decoration.
+
+**Why chevrons are a better execution of the same decision.** Chevrons are rank
+insignia in the military, in sport and in scouting, so "more chevrons is higher" needs
+no teaching. A notch cut into a shield had to be explained. The decision got easier to
+read without changing.
+
+**One thing this amendment removes.** The original recorded that notches were also what
+the app was *named* after — a notch being a tally mark, "one more than before". That
+tie is gone: the app is now **Ninety** ([ADR 0014](0014-rename-to-ninety.md)). The
+naming rationale was always a bonus argument rather than the reason, and the reason —
+colour cannot carry this signal — is untouched.
+
+**File renamed** from `0012-tier-encoded-as-notch-count.md` so the name does not
+describe an execution the project no longer uses. The number is unchanged; the ADR
+index is the stable reference.

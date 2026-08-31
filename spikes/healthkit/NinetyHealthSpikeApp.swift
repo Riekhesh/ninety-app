@@ -1,5 +1,5 @@
 //
-//  NotchHealthSpikeApp.swift
+//  NinetyHealthSpikeApp.swift
 //  Spike A — app entry point and a minimal UI (§0.7)
 //
 //  THROWAWAY. The UI exists only so the spike can be driven on a device without a
@@ -12,7 +12,7 @@ import HealthKit
 import SwiftUI
 
 @main
-struct NotchHealthSpikeApp: App {
+struct NinetyHealthSpikeApp: App {
     var body: some Scene {
         WindowGroup {
             SpikeView()

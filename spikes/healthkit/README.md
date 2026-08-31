@@ -46,7 +46,7 @@ Xcode → **File → New → Project → iOS → App**.
 
 | Field | Value |
 |---|---|
-| Product Name | `NotchHealthSpike` |
+| Product Name | `NinetyHealthSpike` |
 | Interface | SwiftUI |
 | Language | Swift |
 | Storage | None |
@@ -57,7 +57,7 @@ project noise in the history.
 
 ### 2 · Set the deployment target
 
-Select the project (top of the file list) → target `NotchHealthSpike` → **General** →
+Select the project (top of the file list) → target `NinetyHealthSpike` → **General** →
 **Minimum Deployments** → iOS **18.0**. Matches ADR 0002 so the spike proves the
 right thing.
 
@@ -80,7 +80,7 @@ Target → **Info** tab → hover any row → **+**:
 
 | Key | Value |
 |---|---|
-| `Privacy - Health Share Usage Description` | `Notch reads your weight, steps and workouts so it can score your consistency and progress against your own baseline.` |
+| `Privacy - Health Share Usage Description` | `Ninety reads your weight, steps and workouts so it can score your consistency and progress against your own baseline.` |
 
 The raw key is `NSHealthShareUsageDescription`. **Without it the app crashes the
 moment you request authorisation** — not a graceful error, an immediate termination
@@ -99,7 +99,7 @@ Replace the generated files with these two:
 
 | Xcode file | Replace with |
 |---|---|
-| `NotchHealthSpikeApp.swift` | [`NotchHealthSpikeApp.swift`](NotchHealthSpikeApp.swift) |
+| `NinetyHealthSpikeApp.swift` | [`NinetyHealthSpikeApp.swift`](NinetyHealthSpikeApp.swift) |
 | `ContentView.swift` | **delete it** — `SpikeView` lives in the app file |
 | *(new file)* | [`HealthSpike.swift`](HealthSpike.swift) |
 
@@ -124,7 +124,7 @@ General → VPN & Device Management → your Apple ID → Trust.
    anchor survived the launch, which is what makes it useful.
 5. **Reset anchors, then read again.** Back to many samples. You have just watched
    the difference between an incremental sync and a full re-read.
-6. **Now test denial.** Settings → Health → Data Access & Devices → NotchHealthSpike
+6. **Now test denial.** Settings → Health → Data Access & Devices → NinetyHealthSpike
    → turn Steps off. Read again. **Note what you get: an empty result, with no error
    and no indication that anything was denied.** Sit with that for a moment — it is
    the finding.

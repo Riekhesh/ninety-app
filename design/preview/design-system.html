@@ -1,4 +1,4 @@
-<title>Notch — Design System</title>
+<title>Ninety — Design System</title>
 
 <!-- Palette comes from the generated file, never copied into this page: a second
      copy of a hex value is a second source of truth, and this is the file that
@@ -8,7 +8,7 @@
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
    TOKENS — mirrored from design/generated/tokens.generated.css
-   Source of truth is design/tokens/notch.tokens.json. If you edit tokens, run
+   Source of truth is design/tokens/ninety.tokens.json. If you edit tokens, run
    `python3 design/tokens/generate.py` and re-sync the block between the
    BEGIN/END markers below.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -86,13 +86,13 @@ code,.mono{font-family:var(--doc-mono);font-size:0.86em}
   box-shadow:0 1px 2px rgb(0 0 0 / .12)}
 .toggle button:focus-visible{outline:var(--bor-focus) solid var(--c-accent);outline-offset:2px}
 
-/* ── Section rhythm. The structural device is the notch: a section's rule is
-      notched, echoing the tier badge. Not decoration — it's the product's own
+/* ── Section rhythm. The structural device is the rank mark: a section's rule
+      carries a count, echoing the division badge. Not decoration — the product's own
       primitive doing the document's typography. ── */
 section{padding:var(--spa-vast) 0;border-bottom:1px solid var(--c-stroke)}
 .sec-head{display:flex;align-items:baseline;gap:var(--spa-lg);margin-bottom:var(--spa-sm)}
-.notch-mark{display:inline-flex;gap:3px;flex:0 0 auto;padding-bottom:5px}
-.notch-mark i{display:block;width:3px;height:15px;background:var(--c-text-primary);border-radius:1px}
+.rank-mark{display:inline-flex;gap:3px;flex:0 0 auto;padding-bottom:5px}
+.rank-mark i{display:block;width:3px;height:15px;background:var(--c-text-primary);border-radius:1px}
 section h2{font-size:clamp(24px,3vw,34px);letter-spacing:-0.015em}
 .sec-lede{color:var(--c-text-secondary);max-width:var(--measure);margin-bottom:var(--spa-xxxl)}
 .sec-lede em{font-family:var(--doc-serif);color:var(--c-text-primary)}
@@ -295,9 +295,9 @@ section h2{font-size:clamp(24px,3vw,34px);letter-spacing:-0.015em}
   60%{opacity:1}
   100%{transform:scale(1);opacity:1}
 }
-@keyframes notchIn{from{opacity:0}to{opacity:1}}
+@keyframes markIn{from{opacity:0}to{opacity:1}}
 .playing .hero-badge{animation:badgePop var(--dur-reveal) var(--ease-reveal) both}
-.playing .nslot{animation:notchIn var(--dur-fast) linear both}
+.playing .nslot{animation:markIn var(--dur-fast) linear both}
 @media (prefers-reduced-motion:reduce){
   .playing .hero-badge,.playing .nslot{animation:none}
   *{transition-duration:1ms!important}
@@ -341,7 +341,7 @@ footer p{max-width:var(--measure);line-height:1.6}
         <path d="M8 6h84a4 4 0 0 1 4 4v58L50 114 4 68V10a4 4 0 0 1 4-4Z"
               fill="currentColor" mask="url(#wm)"/>
       </svg>
-      Notch
+      Ninety
     </div>
     <div class="toggle" role="group" aria-label="Preview theme">
       <button type="button" data-theme-set="dark" aria-pressed="true">Dark</button>
@@ -357,7 +357,7 @@ footer p{max-width:var(--measure);line-height:1.6}
   <div class="mast-meta">
     <div><span class="eyebrow">Phase</span><strong>0 · Foundations</strong></div>
     <div><span class="eyebrow">Direction</span><strong>Matchday · dark-first</strong></div>
-    <div><span class="eyebrow">Source of truth</span><strong class="mono">notch.tokens.json</strong></div>
+    <div><span class="eyebrow">Source of truth</span><strong class="mono">ninety.tokens.json</strong></div>
     <div><span class="eyebrow">Screens</span><strong>6 wireframes · 1 hero</strong></div>
   </div>
 </header>
@@ -365,7 +365,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ PRINCIPLES ═══ -->
 <section id="principles">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i></span>
     <h2>Seven rules</h2>
   </div>
   <p class="sec-lede">Each one traces to the cover thesis or to §10, and each is
@@ -443,7 +443,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ COLOUR ═══ -->
 <section id="colour">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i><i></i></span>
     <h2>Colour, with a budget</h2>
   </div>
   <p class="sec-lede">The contrast ratios below are <em>computed on this page</em>, live, against
@@ -470,30 +470,35 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ TIERS ═══ -->
 <section id="tiers">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i><i></i><i></i></span>
     <h2>The ladder is a count, not a colour</h2>
   </div>
   <p class="sec-lede">Any honest rendering of "silver" and "platinum" as metals gives you two
   light cool greys. And roughly <em>1 in 12 men</em> have some colour vision deficiency, which
-  makes a hue-only ladder unreadable for them. So tier is encoded in the number of notches cut
-  into the badge, with metal colour as the redundant second signal. Both derive from one
+  makes a hue-only ladder unreadable for them. So division is encoded in the number of
+  <em>chevrons</em>, with metal colour as the redundant second signal. Both derive from one
   <code>Tier</code> enum, so they can never disagree.</p>
 
   <div class="tier-rail" id="tier-rail"></div>
 
   <div class="note" style="margin-top:var(--spa-xxxl)">
-    <b>The name earns its keep.</b> A notch is a mark you cut to record progress — a tally.
-    It's physical, humble and pre-digital, and it means <em>one more than before</em> rather
-    than <em>a score</em>. That's the thesis in a single image: you're not being measured
-    against a scale, you're accumulating marks against your own past. The same primitive
-    carries the consistency ring below — seven notches, one per day.
+    <b>Chevrons need no teaching.</b> They are rank insignia in the military, in sport and
+    in scouting, so <em>more means higher</em> arrives before any copy does. And they say
+    <em>one more than before</em> rather than <em>a score</em> — the thesis in a single
+    image: you are not being measured against a scale, you are accumulating marks against
+    your own past. The same primitive carries the form guide below, one mark per day.
+
+    <br><br><small>This paragraph used to argue that the product's name — Notch — earned its
+    keep, because a notch is a tally mark. The badge is chevrons now and the app is
+    <b>Ninety</b>, so that argument is gone rather than quietly reworded. The reason the
+    encoding exists never depended on it: colour cannot carry this signal (ADR 0012).</small>
   </div>
 </section>
 
 <!-- ═══ TYPE ═══ -->
 <section id="type">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
     <h2>Type scale</h2>
   </div>
   <p class="sec-lede">Every style binds to an iOS text style so Dynamic Type works without extra
@@ -506,7 +511,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ SCALES ═══ -->
 <section id="scales">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
     <h2>Space, radius, motion</h2>
   </div>
   <p class="sec-lede">A 4-point grid, six radii, and a motion budget with exactly one
@@ -543,11 +548,11 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ COMPONENTS ═══ -->
 <section id="components">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <h2>Six components, plus one</h2>
   </div>
   <p class="sec-lede">The brief caps the set at six and says <em>"That's it."</em> The seventh —
-  the notch ring — is justified: consistency is seven discrete days, and a continuous ring at
+  the form guide — is justified: consistency is seven discrete days, and a continuous ring at
   71% invites the question "which day was the 0.71?"</p>
 
   <div class="grid g2">
@@ -570,7 +575,7 @@ footer p{max-width:var(--measure);line-height:1.6}
         <label>Goal weight</label>
         <div class="inp"><span>54</span><span class="unit">kg</span></div>
         <p class="msg">That's below the healthy range for your height, which starts at 58 kg.
-        Notch can't set it as a target.</p>
+        Ninety can't set it as a target.</p>
       </div>
     </div>
 
@@ -615,7 +620,7 @@ footer p{max-width:var(--measure);line-height:1.6}
     </div>
 
     <div class="demo" style="grid-column:1/-1">
-      <p class="demo-label">Notch ring · seven segments, because consistency is seven days</p>
+      <p class="demo-label">Ninety ring · seven segments, because consistency is seven days</p>
       <div class="ringwrap">
         <div id="ring-host"></div>
         <label class="ringctl">Days logged
@@ -633,7 +638,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ WIREFRAMES ═══ -->
 <section id="screens">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <span class="rank-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <h2>Six screens, deliberately unfinished</h2>
   </div>
   <p class="sec-lede">These are wireframes, and they look like wireframes on purpose. The brief
@@ -657,7 +662,7 @@ footer p{max-width:var(--measure);line-height:1.6}
           <div class="box">○ Maintain &nbsp; ○ Gain weight</div>
           <div class="box"><b>How fast?</b>Steady 0.25 · Moderate 0.5 · Faster 0.75 kg/wk</div>
           <div class="box solid" style="border-color:var(--c-safety);color:var(--c-safety)">
-            <b>Rate ceiling · safety token</b>"Notch scores the appropriate rate highest, not
+            <b>Rate ceiling · safety token</b>"Ninety scores the appropriate rate highest, not
             the fastest one."</div>
           <div class="box"><b>Your band</b>1,750–1,950 kcal — a band, not a number</div>
           <div class="cta">Continue</div>
@@ -729,7 +734,7 @@ footer p{max-width:var(--measure);line-height:1.6}
           <div class="box fill"><b>Porridge with milk</b>200–280 g · 290–390 kcal ·
             <span class="chip pos">high</span></div>
           <div class="box fill"><b>Banana</b>90–140 g · 80–125 kcal ·
-            <span class="chip warn">low</span><br>"Notch isn't confident — worth a look."</div>
+            <span class="chip warn">low</span><br>"Ninety isn't confident — worth a look."</div>
           <div class="box">＋ Add a missed item</div>
           <div class="cta">Log 2 items</div>
           <p class="taps">correction → photo_estimates.was_corrected</p>
@@ -769,7 +774,7 @@ footer p{max-width:var(--measure);line-height:1.6}
         <div class="island"><i></i></div>
         <div class="vp">
           <div class="box">WEEK OF 3 AUGUST</div>
-          <div class="ph" style="min-height:104px">tier badge · 3 notches · hero size 240pt</div>
+          <div class="ph" style="min-height:104px">division badge · 3 chevrons · hero size 240pt</div>
           <div class="box solid"><b>Gold</b>Up from Silver</div>
           <div class="box fill"><b>0.71</b>composite · metricXL, once per app</div>
           <div class="box"><b>CONSISTENCY · 0.50</b>6 of 7 days → 0.86</div>
@@ -788,7 +793,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ HERO ═══ -->
 <section id="hero">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true">
+    <span class="rank-mark" aria-hidden="true">
       <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <h2>The hero: rank week</h2>
   </div>
@@ -851,7 +856,7 @@ footer p{max-width:var(--measure);line-height:1.6}
         <span class="n">1</span>
         <div>
           <h4>The badge carries the count, not just the metal</h4>
-          <p>Three notches for Gold. At tab-bar size the silhouette still reads as three,
+          <p>Three chevrons for Gold. At tab-bar size the silhouette still reads as three,
           which is what makes the ladder legible to someone who can't separate gold from
           silver by hue. VoiceOver hears <em>"Gold. Tier 3 of 5."</em></p>
         </div>
@@ -899,7 +904,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 <!-- ═══ COPY ═══ -->
 <section id="copy">
   <div class="sec-head">
-    <span class="notch-mark" aria-hidden="true">
+    <span class="rank-mark" aria-hidden="true">
       <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <h2>The rewrite rule</h2>
   </div>
@@ -934,9 +939,9 @@ footer p{max-width:var(--measure);line-height:1.6}
 
 <footer>
   <p><b style="color:var(--c-text-secondary)">Phase 0 · Foundations.</b> Tokens, components and
-  screens generated from <code>design/tokens/notch.tokens.json</code>. Contrast ratios on this
+  screens generated from <code>design/tokens/ninety.tokens.json</code>. Contrast ratios on this
   page are computed live and match the CI check in <code>design/tokens/generate.py</code>.</p>
-  <p style="margin-top:var(--spa-md)">Not a medical device. Notch makes no medical claims and is
+  <p style="margin-top:var(--spa-md)">Not a medical device. Ninety makes no medical claims and is
   not a substitute for professional advice.</p>
 </footer>
 
@@ -1040,10 +1045,9 @@ footer p{max-width:var(--measure);line-height:1.6}
   }
 
   /* ── Tier badge ─────────────────────────────────────────────────────────
-     Generated from one source, so notch count and metal can never disagree —
-     the same property the Swift `Tier` enum has. Notches are cut from the top
-     edge via a mask, so the COUNT is a silhouette change and survives being
-     shrunk to tab-bar size. */
+     Generated from one source, so chevron count and metal can never disagree —
+     the same property the Swift `Tier` enum has. The COUNT is a silhouette
+     change, so it survives being shrunk to tab-bar size. */
   const TIERS = [
     ["Bronze", 1, "tier-bronze", "Starting out"],
     ["Silver", 2, "tier-silver", "Building habit"],
@@ -1052,39 +1056,32 @@ footer p{max-width:var(--measure);line-height:1.6}
     ["Diamond", 5, "tier-diamond", "Exceptional"],
   ];
 
-  function badgeSVG(name, notches, colourVar, size, idSuffix) {
-    // Notches are a FIXED width with FIXED gaps, centred as a group — not
-    // stretched to fill a span. Stretching makes a single notch read as a bite
-    // out of the badge rather than as a tally mark, and it stops the widths
-    // being comparable between tiers, which is the whole point of a count.
-    const W = 100, H = 120, NW = 9, GAP = 6, depth = 30;
-    const groupW = notches * NW + (notches - 1) * GAP;
-    const x0 = (W - groupW) / 2;
-    let cuts = "";
-    for (let i = 0; i < notches; i++) {
-      const x = x0 + i * (NW + GAP);
-      cuts += `<rect class="nslot" x="${x.toFixed(2)}" y="-4"
-        width="${NW}" height="${depth}" rx="3"
-        fill="#000" style="animation-delay:${180 + i * 110}ms"/>`;
+  function badgeSVG(name, chevrons, colourVar, size, idSuffix) {
+    // Chevrons stack upward at a FIXED pitch, drawn bottom-first so a higher
+    // division reads as "the same thing, more of it" rather than a different
+    // shape. Square caps, not round: this is insignia, not a logo swoosh.
+    // The group is bottom-anchored so the baseline never moves between
+    // divisions — the count is the only thing that changes.
+    const W = 34, PITCH = 9, BASE = 26, SW = 3.2;
+    const H = BASE + 4 + (chevrons - 1) * PITCH;
+    let marks = "";
+    for (let i = 0; i < chevrons; i++) {
+      const y = H - 4 - i * PITCH;
+      marks += `<path class="nslot" d="M4 ${y}l13-8 13 8"
+        stroke="var(--${colourVar})" stroke-width="${SW}" stroke-linecap="square"
+        fill="none" style="animation-delay:${180 + i * 110}ms"/>`;
     }
-    const mid = `m-${idSuffix}`;
     return `<svg width="${size}" height="${(size * H / W).toFixed(0)}"
-        viewBox="0 0 ${W} ${H}" role="img"
-        aria-label="${name}. Tier ${notches} of 5.">
-      <mask id="${mid}">
-        <rect width="${W}" height="${H}" fill="#fff"/>${cuts}
-      </mask>
-      <path d="M8 4h84a5 5 0 0 1 5 5v60L50 116 3 69V9a5 5 0 0 1 5-5Z"
-            fill="var(--${colourVar})" mask="url(#${mid})"/>
-    </svg>`;
+        viewBox="0 0 ${W} ${H}" fill="none" role="img"
+        aria-label="${name}. Division ${chevrons} of 5.">${marks}</svg>`;
   }
 
   function paintTiers() {
     document.getElementById("tier-rail").innerHTML = TIERS.map(
       ([name, n, v, desc]) => `<div class="tier-item">
-        ${badgeSVG(name, n, v, 86, "rail" + n)}
+        ${badgeSVG(name, n, v, 44, "rail" + n)}
         <div class="tname">${name}</div>
-        <div class="tcount">${n} notch${n > 1 ? "es" : ""}</div>
+        <div class="tcount">${n} chevron${n > 1 ? "s" : ""}</div>
         <div class="tdesc">${desc}</div>
       </div>`).join("");
   }
@@ -1101,7 +1098,7 @@ footer p{max-width:var(--measure);line-height:1.6}
     ["title2", 22, 28, 600, "title2", "Photo confirm", 0],
     ["title3", 20, 25, 600, "title3", "Weight & trend", 0],
     ["headline", 17, 22, 600, "headline", "Porridge with milk", 0],
-    ["body", 17, 22, 400, "body", "Notch shows a 7-day average because daily weight is mostly water.", 0],
+    ["body", 17, 22, 400, "body", "Ninety shows a 7-day average because daily weight is mostly water.", 0],
     ["callout", 16, 21, 400, "callout", "Estimates, not measurements", 0],
     ["subhead", 15, 20, 400, "subheadline", "Tesco · 250 g", 0],
     ["footnote", 13, 18, 400, "footnote", "of 1,750–1,950 band", 0],
@@ -1137,7 +1134,7 @@ footer p{max-width:var(--measure);line-height:1.6}
         <span class="bar" style="width:${v * 2.4}px"></span>
       </div>`).join("");
 
-  /* ── Notch ring ────────────────────────────────────────────────────────
+  /* ── Ninety ring ────────────────────────────────────────────────────────
      Seven segments because consistency IS seven discrete days. A continuous
      ring at 71% invites "which day was the 0.71?" */
   function ringSVG(filled) {

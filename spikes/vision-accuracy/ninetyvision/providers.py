@@ -94,7 +94,7 @@ class Usage:
         except KeyError:
             raise UnpricedModelError(
                 f"no pricing entry for {model!r}. Add its input/output rates in "
-                f"USD per million tokens to PRICING in notchvision/providers.py, "
+                f"USD per million tokens to PRICING in ninetyvision/providers.py, "
                 f"taken from the provider's own pricing page."
             ) from None
         per_token_in = rate_in / 1_000_000

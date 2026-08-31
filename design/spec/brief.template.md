@@ -1,11 +1,11 @@
 # Paste-into-Claude design brief
 
-**What this is for.** Everything Claude needs to design Notch screens with you in a
+**What this is for.** Everything Claude needs to design Ninety screens with you in a
 chat, in one self-contained block. Paste the section between the two `═══` rules into
 a fresh Claude conversation, then ask for whatever screen you want.
 
 It's deliberately compact — the full versions live in `design/spec/` and
-`design/tokens/notch.tokens.json`, but you can't paste a 1,400-line HTML file into a
+`design/tokens/ninety.tokens.json`, but you can't paste a 1,400-line HTML file into a
 chat window and you shouldn't have to.
 
 **This file is a TEMPLATE. Do not paste from it — the tables are placeholders.**
@@ -19,11 +19,11 @@ and a second source of truth is just a bug with a delay on it.
 
 ═══════════════════════════ PASTE FROM HERE ═══════════════════════════
 
-I'm designing **Notch**, a native iOS health app (Swift 6.3 / SwiftUI, iOS 18+).
+I'm designing **Ninety**, a native iOS health app (Swift 6.3 / SwiftUI, iOS 18+).
 
 **Thesis:** fitness apps rank you on absolute performance, and where consistency is
 rewarded at all it is a side badge next to that leaderboard (Strava's Local Legend is
-the closest prior art). Notch makes **normalised** improvement and consistency the rank
+the closest prior art). Ninety makes **normalised** improvement and consistency the rank
 itself, so a beginner is compared fairly against their own starting point rather than
 buried under people who started years earlier.
 
@@ -71,7 +71,7 @@ SF Pro (`system-ui`). Numbers that update in place use **tabular figures**.
 3. **Ranges, not points.** Calorie targets are bands (`1,750–1,950`, never `1,847`).
    Photo estimates are ranges + confidence. Weight is a 7-day average; raw dailies are
    off by default because daily weight is mostly water and glycogen.
-4. **Regression is a reset, never a failure.** A missed day is an *empty* notch, never
+4. **Regression is a reset, never a failure.** A missed day is an *empty* mark, never
    crossed out or red. Losing a tier says "Reset to Silver. Gold is four consistent
    days away." No streak-break animation. Ever.
 5. **"No data" is a designed state.** iOS won't tell you if HealthKit read access was
@@ -86,36 +86,32 @@ SF Pro (`system-ui`). Numbers that update in place use **tabular figures**.
 
 ## The tier badge — the one distinctive idea
 
-Tier is encoded as **notch count**, not colour. A shield/chevron with N notches cut
-down from its top edge: Bronze 1 → Diamond 5.
+Division is encoded as **chevron count**, not colour. N stacked chevrons:
+Bronze 1 → Diamond 5.
 
-Two reasons: silver and platinum are near-identical metals (1.14:1 luminance apart, so
+Two reasons: silver and platinum are near-identical metals (1.09:1 luminance apart, so
 colour alone can't separate them), and ~1 in 12 men have some colour vision deficiency.
 Count is colourblind-safe and reads as a silhouette at tab-bar size.
 
-It's also what the app is *named* after — a notch is a tally mark, "one more than
-before", which is the thesis in a single image.
+Chevrons are also rank insignia everywhere they appear — military, sport, scouting —
+so the "one more than before" reading needs no explaining.
 
-SVG (100×120 viewBox), notches fixed 9 wide with 6 gaps, centred, 30 deep:
+SVG (34×30 viewBox), three chevrons, 9px apart, square caps:
 
 ```html
-<svg viewBox="0 0 100 120" width="120">
-  <mask id="n3">
-    <rect width="100" height="120" fill="#fff"/>
-    <rect x="35.5" y="-4" width="9" height="30" rx="3" fill="#000"/>
-    <rect x="50.5" y="-4" width="9" height="30" rx="3" fill="#000"/>
-    <rect x="65.5" y="-4" width="9" height="30" rx="3" fill="#000"/>
-  </mask>
-  <path d="M8 4h84a5 5 0 0 1 5 5v60L50 116 3 69V9a5 5 0 0 1 5-5Z"
-        fill="#E7B23C" mask="url(#n3)"/>
+<svg viewBox="0 0 34 30" width="34" height="30" fill="none">
+  <path d="M4 26l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"/>
+  <path d="M4 17l13-8 13 8" stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"/>
+  <path d="M4 8l13-8 13 8"  stroke="#E8B54A" stroke-width="3.2" stroke-linecap="square"/>
 </svg>
 ```
 
-For N notches, group width = `N*9 + (N-1)*6`, first x = `(100 - groupWidth)/2`.
+For N chevrons, draw N paths at `y = 26 - 9k` for k in 0..N-1.
 
-The **consistency ring** reuses the same idea: 7 discrete segments, one per day, not a
+The **form guide** reuses the same idea: 7 discrete marks, one per day, not a
 continuous ring — because consistency *is* whole days, and a continuous ring at 71%
-invites "which day was the 0.71?" Filled = positive, empty = stroke. Never red.
+invites "which day was the 0.71?" Filled = played, empty outline = didn't. Never red,
+never crossed out.
 
 ## Copy rules
 
@@ -175,11 +171,11 @@ scrolling. My first pass overflowed by 22px and clipped the next-step card. Chec
   currently reads flat. Show me three directions before you build."*
 - *"Design screen 2 (Today) in both light and dark. Verify nothing overflows 393×852."*
 - *"The tier badge silhouette — try three alternatives to the shield shape, keeping
-  the notch count as the primary signal."*
+  the chevron count as the primary signal."*
 
 ## When you land something
 
-Bring the hex values or geometry back into `design/tokens/notch.tokens.json`, run
+Bring the hex values or geometry back into `design/tokens/ninety.tokens.json`, run
 `python3 design/tokens/generate.py`, and the Swift and CSS regenerate. The generator
 fails the build if any text/surface pair drops below WCAG AA — so a colour change
 that breaks contrast gets caught rather than shipped.

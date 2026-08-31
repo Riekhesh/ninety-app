@@ -33,7 +33,7 @@ normalised for starting point.** Cite Strava as prior art rather than as an abse
 The wording that replaces the strong form:
 
 > Every fitness app ranks you on absolute performance. Consistency, where it is
-> rewarded at all, is a side badge next to that leaderboard. Notch makes normalised
+> rewarded at all, is a side badge next to that leaderboard. Ninety makes normalised
 > improvement the rank itself, so a 120 kg beginner and a 70 kg regular can be
 > compared fairly.
 
@@ -42,7 +42,7 @@ The wording that replaces the strong form:
 **What survives the finding is still the whole project.** Local Legend counts raw
 frequency on one segment the user chose, is not normalised for starting point, needs no
 anti-gaming defences because there is nothing to fake, and sits *next to* a leaderboard
-still headlined by absolute speed. Notch ranks improvement rate and consistency across
+still headlined by absolute speed. Ninety ranks improvement rate and consistency across
 all logged behaviour, normalised by a DOTS/Wilks-style coefficient (§2.2), with a
 calibration window, edit lock, delta cap and z-score flags behind it (§2.3) — and that
 score **is** the headline, not a badge beside one.

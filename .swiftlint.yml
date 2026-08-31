@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Notch — SwiftLint configuration
+# Ninety — SwiftLint configuration
 #
 # Configured in Phase 0, while there are zero violations to fix (§0.6).
 #
@@ -19,9 +19,9 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 included:
-  - Notch
+  - Ninety
   - Packages
-  - NotchTests
+  - NinetyTests
 
 excluded:
   - .build
@@ -212,14 +212,14 @@ custom_rules:
   no_hardcoded_colour:
     name: "Use design tokens, not literal colours"
     regex: '(Color\(\s*(red|white|hue):|UIColor\(\s*(red|white|hue):|Color\(hex:|#[0-9A-Fa-f]{6}")'
-    message: "Colours come from Notch.Colour (generated from design/tokens/notch.tokens.json). Add a token rather than a literal."
+    message: "Colours come from Ninety.Colour (generated from design/tokens/ninety.tokens.json). Add a token rather than a literal."
     severity: warning
     excluded: ".*DesignTokens\\.generated\\.swift"
 
   no_magic_corner_radius:
     name: "Use the radius scale"
-    regex: 'cornerRadius:\s*(?!Notch)[0-9]+'
-    message: "Corner radii come from Notch.Radius (§0.5 token scale). iOS also wants style: .continuous — the token helpers apply it for you."
+    regex: 'cornerRadius:\s*(?!Ninety)[0-9]+'
+    message: "Corner radii come from Ninety.Radius (§0.5 token scale). iOS also wants style: .continuous — the token helpers apply it for you."
     severity: warning
     excluded: ".*DesignTokens\\.generated\\.swift"
 

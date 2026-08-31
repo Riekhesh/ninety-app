@@ -1,20 +1,20 @@
 // GENERATED FILE — DO NOT EDIT.
-// Source: design/tokens/notch.tokens.json
+// Source: design/tokens/ninety.tokens.json
 // Regenerate: python3 design/tokens/generate.py
 
 
 import SwiftUI
 import UIKit
 
-/// Notch design system tokens.
+/// Ninety design system tokens.
 ///
 /// Every colour, size, radius and duration in the app comes from here.
 /// SwiftLint enforces it (`no_hardcoded_colour`, `no_magic_corner_radius`).
-public enum Notch {}
+public enum Ninety {}
 
 // MARK: - Colour
 
-public extension Notch {
+public extension Ninety {
     /// Semantic colours. Each resolves per colour scheme automatically.
     enum Colour {
         /// The pitch under floodlight. Deep, warm-shifted green — never neutral black.
@@ -68,7 +68,7 @@ public extension Notch {
 
 /// The five-rung ladder.
 ///
-/// `notches` is the PRIMARY signal and `colour` is secondary (ADR 0012):
+/// `chevrons` is the PRIMARY signal and `colour` is secondary (ADR 0012):
 /// Silver and Platinum are near-identical metals, and roughly 1 in 12 men
 /// have some colour vision deficiency. Both are derived from this single
 /// enum so they can never disagree.
@@ -84,8 +84,8 @@ public enum Tier: Int, CaseIterable, Comparable, Sendable {
     /// 5 chevrons.
     case diamond = 5
 
-    /// Number of notches cut into the badge. The primary tier signal.
-    public var notches: Int { rawValue }
+    /// Number of chevrons in the badge. The primary tier signal.
+    public var chevrons: Int { rawValue }
 
     public var colour: Color {
         switch self {
@@ -118,7 +118,7 @@ public enum Tier: Int, CaseIterable, Comparable, Sendable {
 
 // MARK: - Typography
 
-public extension Notch {
+public extension Ninety {
     /// Type scale. Every style is bound to an iOS text style so Dynamic
     /// Type works for free — required, not optional, in a health app.
     enum TypeStyle: Sendable {
@@ -263,15 +263,15 @@ public extension Notch {
 }
 
 public extension View {
-    /// Apply a Notch type style, including tracking and casing.
-    func notchType(_ style: Notch.TypeStyle) -> some View {
+    /// Apply a Ninety type style, including tracking and casing.
+    func ninetyType(_ style: Ninety.TypeStyle) -> some View {
         font(style.font).tracking(style.tracking)
     }
 }
 
 // MARK: - Space
 
-public extension Notch {
+public extension Ninety {
     /// Spacing scale. 4-point grid.
     enum Space {
 
@@ -299,7 +299,7 @@ public extension Notch {
 
 // MARK: - Radius
 
-public extension Notch {
+public extension Ninety {
     /// Corner radii. Always paired with the continuous curve.
     enum Radius {
 
@@ -319,7 +319,7 @@ public extension Notch {
 
 // MARK: - Border
 
-public extension Notch {
+public extension Ninety {
     /// Stroke widths.
     enum Border {
 
@@ -331,9 +331,9 @@ public extension Notch {
 
 // MARK: - Motion
 
-public extension Notch {
+public extension Ninety {
     /// MOTION BUDGET: nothing but `.reveal` may exceed 0.3s.
-    /// Always respect Reduce Motion — use `Notch.Motion.animation(_:reduceMotion:)`.
+    /// Always respect Reduce Motion — use `Ninety.Motion.animation(_:reduceMotion:)`.
     enum Motion {
         /// Press feedback, chip toggle.
         public static let instant: Double = 0.12
@@ -363,31 +363,31 @@ public extension Notch {
 public extension View {
     /// Rounded rect with the iOS continuous curve. Using this instead of
     /// `.cornerRadius(_:)` is why `no_magic_corner_radius` can be a lint rule.
-    func notchCorners(_ radius: CGFloat) -> some View {
+    func ninetyCorners(_ radius: CGFloat) -> some View {
         clipShape(.rect(cornerRadius: radius, style: .continuous))
     }
 
     /// Card surface. Dark mode gets a lightness step plus a hairline;
     /// light mode gets a shadow. Shadows do not read on near-black, so the
     /// two schemes need genuinely different treatments — this picks for you.
-    func notchCard(radius: CGFloat = Notch.Radius.lg) -> some View {
-        modifier(NotchCardStyle(radius: radius))
+    func ninetyCard(radius: CGFloat = Ninety.Radius.lg) -> some View {
+        modifier(NinetyCardStyle(radius: radius))
     }
 }
 
-public struct NotchCardStyle: ViewModifier {
+public struct NinetyCardStyle: ViewModifier {
     @Environment(\.colorScheme) private var scheme
     let radius: CGFloat
 
     public func body(content: Content) -> some View {
         content
-            .background(Notch.Colour.surface)
-            .notchCorners(radius)
+            .background(Ninety.Colour.surface)
+            .ninetyCorners(radius)
             .overlay(
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
                     .strokeBorder(
-                        Notch.Colour.stroke,
-                        lineWidth: scheme == .dark ? Notch.Border.hairline : 0
+                        Ninety.Colour.stroke,
+                        lineWidth: scheme == .dark ? Ninety.Border.hairline : 0
                     )
             )
             .shadow(

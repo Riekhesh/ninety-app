@@ -37,9 +37,9 @@ from PIL import Image, ImageDraw
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from notchvision import imaging  # noqa: E402
-from notchvision.providers import MockProvider  # noqa: E402
-from notchvision.schema import parse_estimate  # noqa: E402
+from ninetyvision import imaging  # noqa: E402
+from ninetyvision.providers import MockProvider  # noqa: E402
+from ninetyvision.schema import parse_estimate  # noqa: E402
 
 FIXTURES = HERE / "fixtures"
 PHOTOS = FIXTURES / "synthetic"

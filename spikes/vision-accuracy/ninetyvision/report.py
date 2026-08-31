@@ -297,7 +297,7 @@ def render(
             f"{calls} call(s) used a model with no entry in `PRICING`, so the run "
             f"cannot be costed — which is a different statement from costing "
             f"nothing. Add the model's input/output rates in USD per million tokens "
-            f"to `PRICING` in `notchvision/providers.py` and re-run `analyse.py`; "
+            f"to `PRICING` in `ninetyvision/providers.py` and re-run `analyse.py`; "
             f"the token counts above are real and the cost recomputes from them."
         )
         L.append("")

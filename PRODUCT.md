@@ -11,7 +11,7 @@ ios
 Native Swift 6.3 / SwiftUI, iOS 18+ deployment target (ADR 0001, 0002). Backend is
 Supabase (ADR 0003). **Design deliverables in Phase 0 are HTML artboards at 393×852**
 (iPhone-frame mockups); the build target is SwiftUI, bridged through
-`design/tokens/notch.tokens.json` → `generate.py` → `DesignTokens.generated.swift`.
+`design/tokens/ninety.tokens.json` → `generate.py` → `DesignTokens.generated.swift`.
 SwiftLint bans hardcoded colours in Swift at error severity, so a palette that is not
 in the tokens file cannot ship.
 
@@ -79,8 +79,8 @@ photo-accuracy benchmark's data comes from.
 - **No confetti / rate-rewarding celebration** — the engine caps rate of loss for
   safety (S3); celebration of speed would fight it.
 - Tier must be readable **without colour alone** (ADR 0012 — silver/gold differ by
-  1.14:1). Currently carried by notch count; any replacement must carry an equally
-  colour-independent channel.
+  1.09:1 in the current palette). Carried by **chevron count**; any replacement must
+  carry an equally colour-independent channel.
 - Rank breakdown shows its **weights visibly** (CONSISTENCY 0.50 / ADHERENCE 0.25 /
   PROGRESS 0.25). No other user's name or number anywhere in v1; no percentile.
 - Calorie target is always a **band, not a single number** ("1,750–1,950").
@@ -98,10 +98,9 @@ photo-accuracy benchmark's data comes from.
 
 ## Brand Commitments
 
-- Name: **Notch**. The notch-count tier encoding is a *cool concept* the user is open
-  to keeping, but the current literal execution (badge = rounded rect with notches)
-  is judged too basic; the logo/badge may be reinvented as long as the
-  colour-independent tier channel survives.
+- Name: **Ninety** (renamed from Notch, 2026-08-31 — [ADR 0014](docs/decisions/0014-rename-to-ninety.md)).
+  Ninety minutes: a quiet football reference that reads as a clean number to anyone who
+  does not follow it. The football world lives *inside* the app, not in the name.
 - Dark-first, light parity later (ADR 0011 — direction locked, palette values not).
 - Voice: calm, factual, never punitive. Copy deck at design/spec/04-copy-deck.md.
 - **Visual world chosen 2026-08-30: MATCHDAY** — a lit football pitch, not a dark app

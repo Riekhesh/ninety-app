@@ -163,9 +163,9 @@ peer-reviewed paper.** Cite it as such.
 | Cal AI | not measured | | | |
 | Yazio / Zero | not measured | | | |
 | Hevy | n/a | n/a | n/a | no food logging |
-| **Notch (target)** | **2** | ~8 | ~3 | see below |
+| **Ninety (target)** | **2** | ~8 | ~3 | see below |
 
-**Where Notch's target comes from.** Cold open lands on Today. Tap `Log` (1). Tap a
+**Where Ninety's target comes from.** Cold open lands on Today. Tap `Log` (1). Tap a
 frequent food (2) — which logs immediately at its last-used portion, with an undo
 toast. That is the whole interaction.
 
@@ -221,7 +221,7 @@ far worse than having narrowed the claim ourselves.
 
 **What survives, and it is still the whole project:**
 
-| | Strava Local Legend | Notch |
+| | Strava Local Legend | Ninety |
 |---|---|---|
 | Rewards | raw **frequency** on one segment | **improvement rate + consistency** |
 | Normalised for starting point? | **No** | **Yes** — the DOTS/Wilks-style coefficient in §2.2 |

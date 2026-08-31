@@ -15,7 +15,7 @@ Delete sections that genuinely do not apply.
 ## Scope check
 
 > Does this trace back to the cover thesis?
-> *Notch ranks users on rate of improvement and consistency relative to their own
+> *Ninety ranks users on rate of improvement and consistency relative to their own
 > baseline — not absolute performance.*
 
 - [ ] Yes, directly

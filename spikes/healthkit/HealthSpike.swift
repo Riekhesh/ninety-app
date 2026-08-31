@@ -125,7 +125,7 @@ struct TypeReadResult: Identifiable {
 final class HealthSpike {
 
     private let store = HKHealthStore()
-    private let log = Logger(subsystem: "com.notch.spike.healthkit", category: "read")
+    private let log = Logger(subsystem: "com.ninety.spike.healthkit", category: "read")
 
     var isAvailable = HKHealthStore.isHealthDataAvailable()
     var didRequestAuthorisation = false

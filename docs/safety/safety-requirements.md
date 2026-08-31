@@ -204,7 +204,7 @@ test_age_gate_screen_includes_support_signposting
 
 - **No error colour exists for logged intake.** Absent from the token set on purpose.
   A designer reaching for "the red one" for over-budget will not find one.
-- A missed day is an **empty** notch, never crossed out.
+- A missed day is an **empty** mark, never crossed out.
 - No streak-loss animation.
 - Losing a tier always states the way back: *"Gold is four consistent days away."*
 
@@ -326,7 +326,7 @@ sense.
 **Allowed:** describing what the app does — *"tracks what you log"*, *"scores your
 consistency"*, *"shows your weight trend"*.
 
-Footer, everywhere it fits: *"Not a medical device. Notch makes no medical claims and
+Footer, everywhere it fits: *"Not a medical device. Ninety makes no medical claims and
 is not a substitute for professional advice."*
 
 ---

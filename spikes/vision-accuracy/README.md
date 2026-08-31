@@ -151,7 +151,7 @@ python3 analyse.py --compare runs/*.jsonl
 
 ### If a model id is newer than this harness
 
-Model ids move faster than `PRICING` in `notchvision/providers.py` does, so a sweep
+Model ids move faster than `PRICING` in `ninetyvision/providers.py` does, so a sweep
 across a just-released model is the normal way to hit this:
 
 ```
@@ -193,7 +193,7 @@ run_baseline.py       collect responses → runs/*.jsonl (manifest + one line pe
 analyse.py            score a run → markdown report; --compare for a sweep table
 make_fixtures.py      synthetic photos + derived truth, for the no-key demo
 groundtruth.example.csv   copy to groundtruth.csv; rules are in the comments
-notchvision/
+ninetyvision/
   schema.py           the structured-output contract Phase 1's Edge Function inherits
   prompts.py          the prompt, versioned + hashed (bump the version when you edit)
   providers.py        gemini | anthropic | openai | mock, one interface (ADR 0010)

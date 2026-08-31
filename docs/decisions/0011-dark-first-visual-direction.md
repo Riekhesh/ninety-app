@@ -46,7 +46,7 @@ warmth comes from the neutrals rather than from adding a second saturated colour
 compete with the tier metals.
 
 This is one token-file edit to reverse. The cool ramp is preserved as a commented variant in
-`design/tokens/notch.tokens.json` if the warmth turns out to be wrong on a real device.
+`design/tokens/ninety.tokens.json` if the warmth turns out to be wrong on a real device.
 
 ## Trade-off accepted
 
@@ -89,7 +89,7 @@ a **rank**, where the weekly result has to feel like a result.
 - **The colour budget.** One accent, reserved. Matchday spends it harder than the
   original palette did, but on one thing — the division — and nothing else.
 - **No error colour for logged intake.** Still absent from the token set by design.
-- **Tier never carried by colour alone** ([ADR 0012](0012-tier-encoded-as-notch-count.md))
+- **Tier never carried by colour alone** ([ADR 0012](0012-tier-carried-by-count-not-colour.md))
   — the notch count became a chevron count; the constraint is untouched.
 - The WCAG AA validator in `generate.py` still gates every pair, and passed the whole
   Matchday palette without a threshold being lowered.

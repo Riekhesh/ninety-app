@@ -21,12 +21,12 @@ from PIL import Image
 SPIKE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SPIKE))
 
-from notchvision import imaging, metrics  # noqa: E402
-from notchvision.dataset import GroundTruthError, load_truth  # noqa: E402
-from notchvision.env import find_dotenv, load_dotenv, parse_dotenv  # noqa: E402
-from notchvision.providers import MockProvider, UnpricedModelError, Usage  # noqa: E402
-from notchvision.report import render  # noqa: E402
-from notchvision.schema import EstimateParseError, parse_estimate  # noqa: E402
+from ninetyvision import imaging, metrics  # noqa: E402
+from ninetyvision.dataset import GroundTruthError, load_truth  # noqa: E402
+from ninetyvision.env import find_dotenv, load_dotenv, parse_dotenv  # noqa: E402
+from ninetyvision.providers import MockProvider, UnpricedModelError, Usage  # noqa: E402
+from ninetyvision.report import render  # noqa: E402
+from ninetyvision.schema import EstimateParseError, parse_estimate  # noqa: E402
 
 
 # ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -315,13 +315,13 @@ def test_cost_prices_cache_reads_cheaper_than_fresh_input():
 
 
 def test_every_provider_has_a_default_model():
-    from notchvision.providers import DEFAULT_MODELS, PROVIDERS
+    from ninetyvision.providers import DEFAULT_MODELS, PROVIDERS
 
     assert set(DEFAULT_MODELS) == set(PROVIDERS)
 
 
 def test_unknown_provider_names_the_valid_ones():
-    from notchvision import providers
+    from ninetyvision import providers
 
     with pytest.raises(ValueError, match="gemini"):
         providers.build("bard", None)
@@ -331,7 +331,7 @@ def test_every_default_model_is_priced():
     """A model with no price used to silently report $0.0000/image, which is worse
     than an error — it looks like the feature is free. The mock is in the table too,
     at a declared zero: "free" and "unknown" must not share a representation."""
-    from notchvision.providers import DEFAULT_MODELS, PRICING
+    from ninetyvision.providers import DEFAULT_MODELS, PRICING
 
     for model in DEFAULT_MODELS.values():
         assert model in PRICING, f"{model} has no pricing entry"
@@ -433,8 +433,8 @@ def test_a_partly_unpriced_run_has_no_total(photo_dir: Path, truth_csv: Path):
 
 
 def test_gemini_schema_strips_unsupported_keys():
-    from notchvision.providers import _to_gemini_schema
-    from notchvision.schema import ESTIMATE_SCHEMA
+    from ninetyvision.providers import _to_gemini_schema
+    from ninetyvision.schema import ESTIMATE_SCHEMA
 
     adapted = json.dumps(_to_gemini_schema(ESTIMATE_SCHEMA))
     assert "additionalProperties" not in adapted
@@ -442,8 +442,8 @@ def test_gemini_schema_strips_unsupported_keys():
 
 
 def test_gemini_schema_keeps_the_parts_that_matter():
-    from notchvision.providers import _to_gemini_schema
-    from notchvision.schema import ESTIMATE_SCHEMA
+    from ninetyvision.providers import _to_gemini_schema
+    from ninetyvision.schema import ESTIMATE_SCHEMA
 
     adapted = _to_gemini_schema(ESTIMATE_SCHEMA)
     item = adapted["properties"]["items"]["items"]
@@ -458,8 +458,8 @@ def test_gemini_schema_keeps_the_parts_that_matter():
 
 
 def test_gemini_schema_adds_stable_property_ordering():
-    from notchvision.providers import _to_gemini_schema
-    from notchvision.schema import ESTIMATE_SCHEMA
+    from ninetyvision.providers import _to_gemini_schema
+    from ninetyvision.schema import ESTIMATE_SCHEMA
 
     adapted = _to_gemini_schema(ESTIMATE_SCHEMA)
     assert adapted["propertyOrdering"] == ["items", "notes"]
@@ -510,7 +510,7 @@ def test_dotenv_survives_the_real_env_example(tmp_path: Path):
     example = SPIKE.parents[1] / ".env.example"
     parsed = parse_dotenv(example.read_text(encoding="utf-8"))
     assert "GEMINI_API_KEY" in parsed
-    assert parsed["NOTCH_VISION_MODEL"] == "gemini-3.5-flash-lite"
+    assert parsed["NINETY_VISION_MODEL"] == "gemini-3.5-flash-lite"
     assert all(k.replace("_", "").isalnum() for k in parsed)
 
 

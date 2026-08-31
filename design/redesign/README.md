@@ -3,7 +3,7 @@
 The visual world the app is built in, as six screens. Decided 2026-08-30 after three
 directions were built at full fidelity and two were cut.
 
-**The palette is not here.** It lives in `design/tokens/notch.tokens.json` and reaches
+**The palette is not here.** It lives in `design/tokens/ninety.tokens.json` and reaches
 SwiftUI through `generate.py`. Change a colour there, never in these files.
 
 ---
@@ -59,13 +59,13 @@ step. Open one in a browser to see it, or edit and re-seed the canvas:
 
 ```bash
 node "<design-skill>/seed-canvas.mjs" --template "<design-skill>/payload.template.html" \
-  --out notch-redesign.html --title "Notch Redesign" \
+  --out ninety-redesign.html --title "Ninety Redesign" \
   --artboard Main.dc.html --artboard SubOn.dc.html --artboard Table.dc.html \
   --artboard Signing.dc.html --artboard Var.dc.html --artboard Season.dc.html \
   --canvas canvas.json
 ```
 
-`notch-redesign.html` is the seeded canvas — **gitignored**, because it is 2.5 MB of
+`ninety-redesign.html` is the seeded canvas — **gitignored**, because it is 2.5 MB of
 generated editor payload rebuilt from these files on demand.
 
 ---

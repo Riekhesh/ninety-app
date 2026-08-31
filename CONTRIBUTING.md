@@ -1,4 +1,4 @@
-# Working on Notch
+# Working on Ninety
 
 Solo project. These conventions exist for one reason: **the git history is a portfolio
 artifact that people genuinely do look at** (§0.6). A clean history costs nothing to
@@ -95,9 +95,9 @@ fix(health): persist HKAnchoredObjectQuery anchor across launches
 Without this the app re-queried full history on every cold start — four
 seconds of hang on a device with two years of step data.
 
-design(design): add tier badge notch-count encoding
+design(design): add tier badge chevron-count encoding
 
-Tier is encoded in notch count as well as metal colour, so the ladder is
+Tier is encoded in chevron count as well as metal colour, so the ladder is
 legible without colour vision. Silver and Platinum were otherwise too close.
 ```
 

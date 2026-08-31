@@ -1,11 +1,11 @@
-# Notch — repository map
+# Ninety — repository map
 
 Native iOS health app that ranks on **normalised improvement and consistency**, not
 absolute numbers. Swift 6.3 / SwiftUI / iOS 18+ / Supabase.
 
 **Phase 0 closed 31 Aug 2026** — every exit criterion met, HealthKit proven on a real
 device. **Phase 1 (single-player core) is live**, and is the first phase that builds:
-no `Notch/` or `Packages/` exists yet, and creating them is Phase 1's job.
+no `Ninety/` or `Packages/` exists yet, and creating them is Phase 1's job.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -25,7 +25,7 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | What a screen should look like | `design/redesign/README.md` → the six PNGs in `screens/` |
 | Why the app looks like a football broadcast | `design/redesign/README.md`, and `PRODUCT.md` §Brand Commitments |
 | Component/copy rules behind a screen | `design/spec/` + `design/preview/design-system.html` |
-| What a colour or spacing value is | `design/tokens/notch.tokens.json` — **generated, never hand-edit the Swift/CSS** |
+| What a colour or spacing value is | `design/tokens/ninety.tokens.json` — **generated, never hand-edit the Swift/CSS** |
 | How the vision harness works | `spikes/vision-accuracy/README.md` |
 | HealthKit patterns for Phase 1 | `spikes/healthkit/HealthSpike.swift` (the notes at the bottom) |
 | Measured numbers so far | `docs/phase-0/07-spike-findings.md` |
@@ -46,7 +46,7 @@ docs/
   security/    secrets policy. The anon key is public; RLS is the security boundary
 
 design/
-  tokens/      notch.tokens.json is the SINGLE SOURCE OF TRUTH for every colour
+  tokens/      ninety.tokens.json is the SINGLE SOURCE OF TRUTH for every colour
   generated/   emitted by generate.py. Never edit by hand — CI fails on drift
   preview/     design-system.html — the visual reference
   spec/        principles, component specs, copy deck (17 phrases banned at lint-error)
@@ -61,14 +61,14 @@ scripts/       verify-toolchain.sh (the Mac) · verify-accounts.sh (the .env)
                git config core.hooksPath .githooks
 ```
 
-No `Notch/` or `Packages/` yet. CI probes for them and skips the expensive macOS job
+No `Ninety/` or `Packages/` yet. CI probes for them and skips the expensive macOS job
 until they exist.
 
 ---
 
 ## Things that will bite you
 
-- **Colours are generated.** Edit `notch.tokens.json`, run
+- **Colours are generated.** Edit `ninety.tokens.json`, run
   `python3 design/tokens/generate.py`, commit both. `--check` runs in CI and fails on
   drift. The generator also validates WCAG AA and will refuse a failing pair.
 - **`.env` is not merged, it is shadowed.** The loader walks up and takes the *nearest*

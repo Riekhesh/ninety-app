@@ -67,7 +67,7 @@ jobs:
       - name: Is there any Swift yet?
         id: probe
         run: |
-          if [ -d Notch ] || [ -d Packages ]; then
+          if [ -d Ninety ] || [ -d Packages ]; then
             echo "found=true" >> "$GITHUB_OUTPUT"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
@@ -102,10 +102,10 @@ jobs:
         run: swift test --package-path Packages/RankingEngine
 
       - name: Build app
-        if: steps.probe.outputs.found == 'true' && hashFiles('Notch.xcodeproj/project.pbxproj', 'Notch.xcworkspace/contents.xcworkspacedata') != ''
+        if: steps.probe.outputs.found == 'true' && hashFiles('Ninety.xcodeproj/project.pbxproj', 'Ninety.xcworkspace/contents.xcworkspacedata') != ''
         run: |
           xcodebuild build \
-            -scheme Notch \
+            -scheme Ninety \
             -destination 'platform=iOS Simulator,name=iPhone 17' \
             -skipPackagePluginValidation \
             CODE_SIGNING_ALLOWED=NO \

@@ -91,7 +91,7 @@ Concretely:
   in between. A designer reaching for "the red one" for over-budget will not find it.
 - **Losing a tier shows the way back**, not the drop: *"Reset to Silver. Gold is four
   consistent days away."*
-- **A missed day is drawn as an empty notch**, not a crossed-out one. Absence, not damage.
+- **A missed day is drawn as an empty mark**, not a crossed-out one. Absence, not damage.
 - **No streak-loss animation.** Ever.
 
 `no_punishment_framing` in `.swiftlint.yml` enforces the string half of this at `error`
@@ -193,7 +193,7 @@ product copy.
 
 **Never medical.** No diagnosis, no prescription, no "you should." §10 lists App Store
 rejection for medical claims as a live risk, and the app genuinely is not qualified to make
-them. Notch reports what you logged and how consistent you were. That is all it knows.
+them. Ninety reports what you logged and how consistent you were. That is all it knows.
 
 Full string-by-string treatment, including the banned-phrase list the linter enforces:
 [`04-copy-deck.md`](04-copy-deck.md).

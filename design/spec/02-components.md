@@ -1,7 +1,7 @@
 # Component specs
 
 §0.5 caps the component set: *"Button, text input, food row, stat card, tier badge, chart
-container. That's it."* Six, plus one addition — the **notch ring** — justified below.
+container. That's it."* Six, plus one addition — the **form guide** — justified below.
 
 Every spec lists its states, because **the states are the actual work.** A component with a
 happy path and no empty state is a component you will rewrite in Phase 1.
@@ -119,7 +119,7 @@ The Today dashboard is made of these.
 └───────────────────────────┘
 ```
 
-**Geometry.** `notchCard()` (the generated helper picks hairline-on-dark vs shadow-on-light),
+**Geometry.** `ninetyCard()` (the generated helper picks hairline-on-dark vs shadow-on-light),
 padding `Space.lg`, `Radius.lg`. Grid: two-up for secondary stats, full-width for the primary.
 
 **Required anatomy.** Label · value · **comparison** · optional indicator. The comparison slot
@@ -135,23 +135,24 @@ is not optional — principle 1. If a stat has nothing to compare against yet, t
 
 The differentiator, and the only saturated thing in the app.
 
-**Form.** A shield/chevron with **N notches cut into its leading edge**, where N is the tier's
-position 1–5 (ADR 0012). Fill is the tier metal; notches are cut through to the ground behind,
-so they read at any size.
+**Form.** **N stacked chevrons**, where N is the division's position 1–5 (ADR 0012).
+Drawn in the division metal on the pitch ground. Count is the signal; colour is
+decoration that a colourblind user can lose without losing the meaning.
 
 ```
    Bronze          Silver           Gold          Platinum        Diamond
-  ╭──────╮       ╭──────╮        ╭──────╮        ╭──────╮        ╭──────╮
-  │▍     │       │▍▍    │        │▍▍▍   │        │▍▍▍▍  │        │▍▍▍▍▍ │
-  ╰──╲╱──╯       ╰──╲╱──╯        ╰──╲╱──╯        ╰──╲╱──╯        ╰──╲╱──╯
-     1 notch        2               3               4               5
+                                                                    ⌃
+                                                     ⌃              ⌃
+                      ⌃              ⌃               ⌃              ⌃
+     ⌃                ⌃              ⌃               ⌃              ⌃
+  1 chevron           2              3               4              5
 ```
 
 **Three sizes.** `sm` 20pt (tab bar, inline in copy) · `md` 44pt (Today dashboard) ·
 `hero` 240pt (rank screen only).
 
 **Accessibility.** `Tier.accessibilityLabel` — *"Gold. Tier 3 of 5."* — is generated, so the
-count is available to VoiceOver whether or not the badge is seen. The notch count means the
+count is available to VoiceOver whether or not the badge is seen. The chevron count means the
 ladder is also legible without colour vision, which colour-only metals are not
 (`generate.py` prints which pairs fail: silver/gold at 1.14:1, platinum/diamond at 1.23:1).
 
@@ -160,8 +161,8 @@ reached (`stroke` outline only, no fill) · calibrating (outline plus a `TypeSty
 "CALIBRATING" chip — no tier is assigned until the 14-day window closes, §2.3).
 
 **The reveal** is the one place the motion budget opens up: badge scales 0.9 → 1.0 with
-`revealSpring` over `Motion.reveal` (0.9s), notches filling in sequence. Gated on Reduce Motion
-via `Notch.Motion.animation(_:reduceMotion:)` — with Reduce Motion on, it cross-fades. No
+`revealSpring` over `Motion.reveal` (0.9s), chevrons filling in sequence. Gated on Reduce Motion
+via `Ninety.Motion.animation(_:reduceMotion:)` — with Reduce Motion on, it cross-fades. No
 confetti (principle 4 anti-patterns: confetti rewards rate, which the engine caps).
 
 ---
@@ -191,7 +192,7 @@ granted.
 
 ---
 
-## 7. Notch ring — *the one addition*
+## 7. Ninety ring — *the one addition*
 
 §0.5 lists six components. This is a seventh, and the justification is that §1.6 requires a
 "consistency ring" on the Today dashboard, and rendering it as a **continuous** ring would
@@ -211,9 +212,9 @@ day was the 0.71?" — a seven-segment ring answers it.
 **Geometry.** Seven segments, 2° gaps, stroke 8 at `md` size. Filled = `positive`,
 empty = `stroke`. Centre shows `5/7` in `metricM`.
 
-Missed days are **empty**, never crossed out or `critical` (principle 4). Reusing the notch
+Missed days are **empty**, never crossed out or `critical` (principle 4). Reusing the chevron
 metaphor from the tier badge means the design system contains one idea rather than several —
-notches are how Notch counts things.
+chevrons are how Ninety counts things.
 
 **States:** in progress · complete (all seven filled, brief `positive` pulse at `Motion.fast`)
 · week not started · calibrating.
@@ -232,4 +233,4 @@ Because §0.5's "That's it" is the point:
   component.
 
 If Phase 1 wants an eighth component, it needs a line in this file saying why, in the same shape
-as the notch ring above.
+as the chevron ring above.

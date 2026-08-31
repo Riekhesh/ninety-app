@@ -18,7 +18,7 @@ bad()  { printf '  \033[31m✗\033[0m %s\n' "$1"; FAILED=1; }
 info() { printf '    \033[2m%s\033[0m\n' "$1"; }
 
 FAILED=0
-printf '\n\033[1mNotch — Phase 0 accounts check\033[0m\n\n'
+printf '\n\033[1mNinety — Phase 0 accounts check\033[0m\n\n'
 
 repo_root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 env_file="$repo_root/.env"

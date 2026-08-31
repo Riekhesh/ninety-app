@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate Swift and CSS from notch.tokens.json, and verify the design system's
+Generate Swift and CSS from ninety.tokens.json, and verify the design system's
 accessibility claims are true rather than aspirational.
 
     python3 design/tokens/generate.py            # write generated files
@@ -19,10 +19,10 @@ Three things happen here:
      eyesight.
 
   3. Tier-distinctness check. Verifies the five tier colours are ordered by
-     notch count and flags any adjacent pair that is too close in luminance to
+     chevron count and flags any adjacent pair that is too close in luminance to
      tell apart — which is the whole reason ADR 0012 encodes tier as a count.
      The check is expected to FLAG Silver/Platinum; that is the point. It fails
-     only if the notch counts are wrong, because the count is the real signal.
+     only if the chevron counts are wrong, because the count is the real signal.
 
 No third-party dependencies. Runs on a clean Python 3.11.
 """
@@ -36,7 +36,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TOKENS = ROOT / "design" / "tokens" / "notch.tokens.json"
+TOKENS = ROOT / "design" / "tokens" / "ninety.tokens.json"
 OUT_SWIFT = ROOT / "design" / "generated" / "DesignTokens.generated.swift"
 OUT_CSS = ROOT / "design" / "generated" / "tokens.generated.css"
 BRIEF_TEMPLATE = ROOT / "design" / "spec" / "brief.template.md"
@@ -44,7 +44,7 @@ OUT_BRIEF = ROOT / "design" / "generated" / "claude-design-brief.md"
 
 BANNER = (
     "// GENERATED FILE — DO NOT EDIT.\n"
-    "// Source: design/tokens/notch.tokens.json\n"
+    "// Source: design/tokens/ninety.tokens.json\n"
     "// Regenerate: python3 design/tokens/generate.py\n"
 )
 
@@ -123,7 +123,7 @@ def check_contrast(tokens: dict) -> list[str]:
             tier["$value"], tokens["theme"]["dark"]["canvas"]["$value"]
         )
         light_ratio = contrast_ratio(
-            tier["$extensions"]["notch.light"],
+            tier["$extensions"]["ninety.light"],
             tokens["theme"]["light"]["canvas"]["$value"],
         )
         for label, ratio in (("dark", dark_ratio), ("light", light_ratio)):
@@ -137,23 +137,23 @@ def check_contrast(tokens: dict) -> list[str]:
 
 
 def check_tiers(tokens: dict) -> tuple[list[str], list[str]]:
-    """Verify notch counts are 1..5 in ladder order. Returns (failures, notes)."""
+    """Verify chevron counts are 1..5 in ladder order. Returns (failures, notes)."""
     failures: list[str] = []
     notes: list[str] = []
 
     ladder = ["bronze", "silver", "gold", "platinum", "diamond"]
     if [k for k, _ in _entries(tokens["tier"])] != ladder:
         failures.append(
-            "tier order in notch.tokens.json must be "
+            "tier order in ninety.tokens.json must be "
             f"{' -> '.join(ladder)} (§03 ladder order)"
         )
         return failures, notes
 
     for expected, name in enumerate(ladder, start=1):
-        actual = tokens["tier"][name]["$extensions"]["notch.count"]
+        actual = tokens["tier"][name]["$extensions"]["ninety.count"]
         if actual != expected:
             failures.append(
-                f"tier.{name} has notch.count {actual}, expected {expected}. "
+                f"tier.{name} has ninety.count {actual}, expected {expected}. "
                 "The count IS the tier signal (ADR 0012) — it cannot be wrong."
             )
 
@@ -165,8 +165,8 @@ def check_tiers(tokens: dict) -> tuple[list[str], list[str]]:
         if ratio < 1.35:
             notes.append(
                 f"{a}/{b} differ by only {ratio:.2f}:1 — indistinguishable by "
-                f"colour alone. Carried by notch count ({tokens['tier'][a]['$extensions']['notch.count']} "
-                f"vs {tokens['tier'][b]['$extensions']['notch.count']}). Working as designed."
+                f"colour alone. Carried by chevron count ({tokens['tier'][a]['$extensions']['ninety.count']} "
+                f"vs {tokens['tier'][b]['$extensions']['ninety.count']}). Working as designed."
             )
 
     return failures, notes
@@ -202,16 +202,16 @@ def render_swift(tokens: dict) -> str:
     out: list[str] = [BANNER, ""]
     out.append("import SwiftUI\nimport UIKit\n")
     out.append(
-        "/// Notch design system tokens.\n"
+        "/// Ninety design system tokens.\n"
         "///\n"
         "/// Every colour, size, radius and duration in the app comes from here.\n"
         "/// SwiftLint enforces it (`no_hardcoded_colour`, `no_magic_corner_radius`).\n"
-        "public enum Notch {}\n"
+        "public enum Ninety {}\n"
     )
 
     # ── Colour ──
     out.append("// MARK: - Colour\n")
-    out.append("public extension Notch {")
+    out.append("public extension Ninety {")
     out.append("    /// Semantic colours. Each resolves per colour scheme automatically.")
     out.append("    enum Colour {")
     colour_keys = [k for k in dark if not k.startswith("$")]
@@ -230,26 +230,26 @@ def render_swift(tokens: dict) -> str:
     out.append(
         "/// The five-rung ladder.\n"
         "///\n"
-        "/// `notches` is the PRIMARY signal and `colour` is secondary (ADR 0012):\n"
+        "/// `chevrons` is the PRIMARY signal and `colour` is secondary (ADR 0012):\n"
         "/// Silver and Platinum are near-identical metals, and roughly 1 in 12 men\n"
         "/// have some colour vision deficiency. Both are derived from this single\n"
         "/// enum so they can never disagree.\n"
         "public enum Tier: Int, CaseIterable, Comparable, Sendable {"
     )
     for name, node in _entries(tokens["tier"]):
-        count = node["$extensions"]["notch.count"]
+        count = node["$extensions"]["ninety.count"]
         out.append(f"    /// {node['$description']}")
         out.append(f"    case {camel(name)} = {count}")
     out.append("")
-    out.append("    /// Number of notches cut into the badge. The primary tier signal.")
-    out.append("    public var notches: Int { rawValue }")
+    out.append("    /// Number of chevrons in the badge. The primary tier signal.")
+    out.append("    public var chevrons: Int { rawValue }")
     out.append("")
     out.append("    public var colour: Color {")
     out.append("        switch self {")
     for name, node in _entries(tokens["tier"]):
         out.append(
             f"        case .{camel(name)}: Color("
-            f"light: {hex_to_swift_literal(node['$extensions']['notch.light'])}, "
+            f"light: {hex_to_swift_literal(node['$extensions']['ninety.light'])}, "
             f"dark: {hex_to_swift_literal(node['$value'])})"
         )
     out.append("        }")
@@ -279,7 +279,7 @@ def render_swift(tokens: dict) -> str:
 
     # ── Typography ──
     out.append("// MARK: - Typography\n")
-    out.append("public extension Notch {")
+    out.append("public extension Ninety {")
     out.append(
         "    /// Type scale. Every style is bound to an iOS text style so Dynamic\n"
         "    /// Type works for free — required, not optional, in a health app."
@@ -329,7 +329,7 @@ def render_swift(tokens: dict) -> str:
         "caption2": "caption2",
     }
     for name, node in _entries(tokens["type"]):
-        raw = node.get("$extensions", {}).get("notch.iosTextStyle", "body")
+        raw = node.get("$extensions", {}).get("ninety.iosTextStyle", "body")
         out.append(f"            case .{camel(name)}: .{ios_style_map[raw]}")
     out.append("            }")
     out.append("        }")
@@ -343,7 +343,7 @@ def render_swift(tokens: dict) -> str:
     tabular = [
         camel(n)
         for n, node in _entries(tokens["type"])
-        if node.get("$extensions", {}).get("notch.tabularFigures")
+        if node.get("$extensions", {}).get("ninety.tabularFigures")
     ]
     if tabular:
         out.append(
@@ -383,7 +383,7 @@ def render_swift(tokens: dict) -> str:
     upper = [
         camel(n)
         for n, node in _entries(tokens["type"])
-        if node.get("$extensions", {}).get("notch.transform") == "uppercase"
+        if node.get("$extensions", {}).get("ninety.transform") == "uppercase"
     ]
     if upper:
         cases = ", ".join(f".{u}" for u in upper)
@@ -396,8 +396,8 @@ def render_swift(tokens: dict) -> str:
 
     out.append(
         "public extension View {\n"
-        "    /// Apply a Notch type style, including tracking and casing.\n"
-        "    func notchType(_ style: Notch.TypeStyle) -> some View {\n"
+        "    /// Apply a Ninety type style, including tracking and casing.\n"
+        "    func ninetyType(_ style: Ninety.TypeStyle) -> some View {\n"
         "        font(style.font).tracking(style.tracking)\n"
         "    }\n"
         "}\n"
@@ -410,7 +410,7 @@ def render_swift(tokens: dict) -> str:
         ("border", "Stroke widths."),
     ):
         out.append(f"// MARK: - {group.title()}\n")
-        out.append("public extension Notch {")
+        out.append("public extension Ninety {")
         out.append(f"    /// {doc}")
         out.append(f"    enum {group.title()} {{")
         for name, node in _entries(tokens[group]):
@@ -423,10 +423,10 @@ def render_swift(tokens: dict) -> str:
 
     # ── Motion ──
     out.append("// MARK: - Motion\n")
-    out.append("public extension Notch {")
+    out.append("public extension Ninety {")
     out.append(
         "    /// MOTION BUDGET: nothing but `.reveal` may exceed 0.3s.\n"
-        "    /// Always respect Reduce Motion — use `Notch.Motion.animation(_:reduceMotion:)`."
+        "    /// Always respect Reduce Motion — use `Ninety.Motion.animation(_:reduceMotion:)`."
     )
     out.append("    enum Motion {")
     for name, node in _entries(tokens["motion"]["duration"]):
@@ -435,7 +435,7 @@ def render_swift(tokens: dict) -> str:
         out.append(f"        public static let {camel(name)}: Double = {seconds}")
     out.append("")
     for name, node in _entries(tokens["motion"]["spring"]):
-        expr = node["$extensions"]["notch.swiftUI"]
+        expr = node["$extensions"]["ninety.swiftUI"]
         out.append(f"        public static let {camel(name)}Spring: Animation = .{expr}")
     out.append("")
     out.append(
@@ -460,31 +460,31 @@ def render_swift(tokens: dict) -> str:
         "public extension View {\n"
         "    /// Rounded rect with the iOS continuous curve. Using this instead of\n"
         "    /// `.cornerRadius(_:)` is why `no_magic_corner_radius` can be a lint rule.\n"
-        "    func notchCorners(_ radius: CGFloat) -> some View {\n"
+        "    func ninetyCorners(_ radius: CGFloat) -> some View {\n"
         "        clipShape(.rect(cornerRadius: radius, style: .continuous))\n"
         "    }\n"
         "\n"
         "    /// Card surface. Dark mode gets a lightness step plus a hairline;\n"
         "    /// light mode gets a shadow. Shadows do not read on near-black, so the\n"
         "    /// two schemes need genuinely different treatments — this picks for you.\n"
-        "    func notchCard(radius: CGFloat = Notch.Radius.lg) -> some View {\n"
-        "        modifier(NotchCardStyle(radius: radius))\n"
+        "    func ninetyCard(radius: CGFloat = Ninety.Radius.lg) -> some View {\n"
+        "        modifier(NinetyCardStyle(radius: radius))\n"
         "    }\n"
         "}\n"
         "\n"
-        "public struct NotchCardStyle: ViewModifier {\n"
+        "public struct NinetyCardStyle: ViewModifier {\n"
         "    @Environment(\\.colorScheme) private var scheme\n"
         "    let radius: CGFloat\n"
         "\n"
         "    public func body(content: Content) -> some View {\n"
         "        content\n"
-        "            .background(Notch.Colour.surface)\n"
-        "            .notchCorners(radius)\n"
+        "            .background(Ninety.Colour.surface)\n"
+        "            .ninetyCorners(radius)\n"
         "            .overlay(\n"
         "                RoundedRectangle(cornerRadius: radius, style: .continuous)\n"
         "                    .strokeBorder(\n"
-        "                        Notch.Colour.stroke,\n"
-        "                        lineWidth: scheme == .dark ? Notch.Border.hairline : 0\n"
+        "                        Ninety.Colour.stroke,\n"
+        "                        lineWidth: scheme == .dark ? Ninety.Border.hairline : 0\n"
         "                    )\n"
         "            )\n"
         "            .shadow(\n"
@@ -528,7 +528,7 @@ def render_css(tokens: dict) -> str:
     dark, light = tokens["theme"]["dark"], tokens["theme"]["light"]
     lines = [
         "/* GENERATED FILE — DO NOT EDIT.",
-        "   Source: design/tokens/notch.tokens.json",
+        "   Source: design/tokens/ninety.tokens.json",
         "   Regenerate: python3 design/tokens/generate.py */",
         "",
     ]
@@ -540,14 +540,14 @@ def render_css(tokens: dict) -> str:
             if not k.startswith("$")
         ]
         rows += [
-            f"  --tier-{k}: {(v['$value'] if tier_key == '$value' else v['$extensions']['notch.light'])};"
+            f"  --tier-{k}: {(v['$value'] if tier_key == '$value' else v['$extensions']['ninety.light'])};"
             for k, v in tokens["tier"].items()
             if not k.startswith("$")
         ]
         return rows
 
     lines.append(":root {")
-    lines += colour_block(light, "notch.light")
+    lines += colour_block(light, "ninety.light")
     for group, unit in (("space", "px"), ("radius", "px"), ("border", "px")):
         for name, node in _entries(tokens[group]):
             lines.append(f"  --{group[:3]}-{kebab(name)}: {node['$value']}{unit};")
@@ -585,7 +585,7 @@ def render_css(tokens: dict) -> str:
     lines.append("}")
     lines.append("")
     lines.append(':root[data-theme="light"] {')
-    lines += colour_block(light, "notch.light")
+    lines += colour_block(light, "ninety.light")
     lines.append("}")
     lines.append("")
 
@@ -623,7 +623,7 @@ def _use_note(node: dict) -> str:
     full text stays in the tokens file and in the generated Swift doc comments.
     """
     text = (node.get("$description")
-            or node.get("$extensions", {}).get("notch.usage") or "").strip()
+            or node.get("$extensions", {}).get("ninety.usage") or "").strip()
     if len(text) <= BRIEF_NOTE_BUDGET:
         return text
     kept: list[str] = []
@@ -691,7 +691,7 @@ def main() -> int:
         for f in failures:
             print(f"  ✗ {f}", file=sys.stderr)
         print(
-            "\nFix notch.tokens.json. Do not lower the thresholds in "
+            "\nFix ninety.tokens.json. Do not lower the thresholds in "
             "generate.py — they are WCAG 2.1, not preferences.",
             file=sys.stderr,
         )
