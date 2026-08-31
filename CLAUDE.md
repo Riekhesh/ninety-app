@@ -18,7 +18,9 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |
-| What a screen should look like | `design/spec/` + `design/preview/design-system.html` |
+| What a screen should look like | `design/redesign/README.md` → the six PNGs in `screens/` |
+| Why the app looks like a football broadcast | `design/redesign/README.md`, and `PRODUCT.md` §Brand Commitments |
+| Component/copy rules behind a screen | `design/spec/` + `design/preview/design-system.html` |
 | What a colour or spacing value is | `design/tokens/notch.tokens.json` — **generated, never hand-edit the Swift/CSS** |
 | How the vision harness works | `spikes/vision-accuracy/README.md` |
 | HealthKit patterns for Phase 1 | `spikes/healthkit/HealthSpike.swift` (the notes at the bottom) |
@@ -44,6 +46,7 @@ design/
   generated/   emitted by generate.py. Never edit by hand — CI fails on drift
   preview/     design-system.html — the visual reference
   spec/        principles, component specs, copy deck (17 phrases banned at lint-error)
+  redesign/    the MATCHDAY world: six screens as .dc.html + rendered PNGs
 
 spikes/        THROWAWAY de-risking code, not app code. Different quality bar
   vision-accuracy/   photo->calorie harness. Runs, scores, reports. Python
