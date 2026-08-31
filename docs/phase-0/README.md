@@ -1,7 +1,17 @@
 # Phase 0 — Foundations
 
-**3–16 August 2026 · 2 weeks · Objective: kill the risky unknowns before writing any
-real code.**
+**3–16 August 2026, closed 31 August · Objective: kill the risky unknowns before
+writing any real code.**
+
+> ## ✅ PHASE 0 IS CLOSED
+>
+> Every exit criterion is met. The last — HealthKit on a real device — passed on
+> 31 August, three weeks past the nominal window, effectively all of it spent waiting
+> on the Apple Developer enrolment that gates it. Phases end on a testable condition
+> and not a date; the condition is met, so the phase is done.
+>
+> **Nothing in this project can now turn out to be impossible.** That was the whole
+> objective.
 
 §0.7: *"The purpose of this phase is not to build. It is to make sure that nothing in
 weeks 3–16 turns out to be impossible."*
@@ -18,7 +28,7 @@ done — extend it and compress a later one.
 - [x] **Vision cost per image measured** → **$0.000862/image, $1.55/mo at 1,800 calls** — 12–35× under §10's $0.01–0.03 estimate. [Numbers](07-spike-findings.md#cost-per-image--measured-)
 - [x] **Competitor comparison table plus ten deliberate differences** → [04-competitor-teardown.md](04-competitor-teardown.md). Closed on desk research + prior hands-on use; **tap counts deliberately not measured** ([scope decision](04-competitor-teardown.md#scope-decision--closed-without-tap-counts)). The teardown's one finding that changed the project — Strava already rewards pace-agnostic consistency — is settled in [ADR 0013](../decisions/0013-narrowed-thesis-claim.md) and the narrowed wording is now live in the README, the design system page and the design brief.
 - [x] **Apple Developer Program membership active** — approved 2026-08-30. It existed only to unblock the next item
-- [ ] **Your own real step and weight history rendering on your own iPhone** → [Spike A](../../spikes/healthkit/README.md). **Unblocked, and now the only thing left in Phase 0.** ~90 min; the runbook is step-by-step
+- [x] **Your own real step and weight history rendering on your own iPhone** → **passed 2026-08-31**, iPhone on iOS 26.6.1. 31 days of steps, plus weight, active energy, exercise minutes and workouts. [Numbers and findings](07-spike-findings.md#spike-a--healthkit--measured-)
 
 **Moved out of the exit criteria** (see [ADR 0010](../decisions/0010-anthropic-as-vision-provider.md)):
 
@@ -63,17 +73,20 @@ Done ────────── Xcode · GEMINI_API_KEY in .env · cost chec
                 design — Matchday, six screens, palette in the tokens
                 dev account APPROVED
 
-Now ─────────── SPIKE A. The whole of what is left in Phase 0.
-                  1. put real data in Health first — walk a day, add 2–3 weights
-                  2. scripts/verify-toolchain.sh
-                  3. spikes/healthkit/README.md, top to bottom (~90 min)
-                  4. numbers into 07-spike-findings.md → the phase closes
+                SPIKE A PASSED — 56,764 → 0 on the anchor test
+
+Now ─────────── PHASE 1. Single-player core.
+                First design task: fixed type scale vs Dynamic Type
+                First build rule: HKStatisticsCollectionQuery, never raw samples
 
 Passive ─────── send the clinician pack (a Phase 3 gate, not this one)
                 the accuracy benchmark accumulates during Phase 1's 21 days
-
-Then ────────── Phase 1. First design task: fixed type scale vs Dynamic Type
 ```
+
+**Phase 0 delivered what it was for.** Two findings that change the build, both
+measured rather than assumed: HealthKit stores ~1,830 step samples *per day*, so daily
+totals must be bucketed inside HealthKit; and a denied read is indistinguishable from
+no data, so there is no permission-denied branch to write.
 
 **Spike A is the last criterion and the one that can still kill the project** — if a
 real device will not hand over weight and steps, no amount of design rescues it.
