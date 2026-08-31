@@ -62,8 +62,10 @@ risk is a missed reference surfacing later, which is why the token namespace
 (`ninety.*`) and the package (`ninetyvision`) were renamed together rather than left as
 "we'll get to it".
 
-**The GitHub repository is still `Notch-App`.** Renaming it is the owner's action, not
-a commit. GitHub redirects the old URL, so nothing breaks if it is never done.
+**The GitHub repository was renamed to `ninety-app`** on 31 Aug 2026, after this ADR
+landed. GitHub keeps a permanent redirect from `Notch-App`, so old clones and links
+still resolve; do not create a new repository under the old name, which would break
+that redirect.
 
 ## Reversal trigger
 
