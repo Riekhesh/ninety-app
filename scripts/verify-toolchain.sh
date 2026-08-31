@@ -41,12 +41,22 @@ else
 fi
 
 # ── Disk ────────────────────────────────────────────────────────────────────
+# §0.1's ~40 GB is the budget to INSTALL Xcode. Once it is installed that space
+# is already spent, and what is left to protect is build headroom — DerivedData,
+# device support files, simulator runtimes. Holding a machine that has Xcode to
+# the install figure reports a red that means nothing and trains you to ignore
+# the whole check.
 avail_gb=$(df -g / | awk 'NR==2 {print $4}')
-if [ "${avail_gb:-0}" -ge 40 ]; then
-  ok "${avail_gb} GB free (Xcode + simulators need ~40 GB)"
+if [ -d /Applications/Xcode.app ]; then
+  need_gb=25; need_why="build headroom — DerivedData, device support, simulator runtimes"
 else
-  bad "${avail_gb:-?} GB free — §0.1 budgets ~40 GB for Xcode and simulators"
-  info "a real constraint on a 256 GB machine; check before downloading"
+  need_gb=40; need_why="§0.1's budget to install Xcode and its simulators"
+fi
+if [ "${avail_gb:-0}" -ge "$need_gb" ]; then
+  ok "${avail_gb} GB free (need ~${need_gb}: ${need_why})"
+else
+  bad "${avail_gb:-?} GB free — need ~${need_gb} GB for ${need_why}"
+  info "a real constraint on a 256 GB machine; builds fail confusingly when this runs out"
 fi
 
 # ── Xcode ───────────────────────────────────────────────────────────────────
