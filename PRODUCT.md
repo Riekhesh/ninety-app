@@ -73,8 +73,12 @@ Nobody has made normalised improvement the headline ranking itself.
 
 - Every screen fits a 393×852 viewport without scrolling (Today's list may scroll
   below the fold, but the layout's spine must land inside it).
-- Open decision, deliberately undecided: fixed type scale (current tokens) vs Dynamic
-  Type (ios.md requires system styles). Resolve during this redesign before Phase 1.
+- **Open decision, still undecided after the redesign:** fixed type scale (current
+  tokens) vs Dynamic Type (ios.md requires system text styles and bans hard-coded
+  point sizes). The mockups use the fixed scale because an artboard cannot express
+  Dynamic Type; the SwiftUI build must pick one. Deciding it is Phase 1's first
+  design task, and it is the one thing in the redesign that a 393×852 mockup could
+  not settle.
 
 ## Brand Commitments
 

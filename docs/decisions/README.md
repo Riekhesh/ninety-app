@@ -43,7 +43,7 @@ Re-litigating settled decisions is the most expensive habit in solo projects.
 | [0008](0008-consistency-weighted-above-progress.md) | Consistency weighted above progress | Locked | 0 |
 | [0009](0009-no-workout-logging-in-v1.md) | No workout logging in v1 | Locked | 0 |
 | [0010](0010-anthropic-as-vision-provider.md) | Anthropic as the vision provider, behind an interface | Locked | 0 |
-| [0011](0011-dark-first-visual-direction.md) | Quiet premium, dark-first visual direction | Locked | 0 |
+| [0011](0011-dark-first-visual-direction.md) | Dark-first visual direction | **Reversed in part** — world is now Matchday | 0 |
 | [0012](0012-tier-encoded-as-notch-count.md) | Tier encoded as notch count, not colour alone | Locked | 0 |
 | [0013](0013-narrowed-thesis-claim.md) | Thesis narrowed: consistency is the rank, not absent elsewhere | Locked | 0 |
 

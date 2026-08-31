@@ -1,5 +1,10 @@
 <title>Notch — Design System</title>
 
+<!-- Palette comes from the generated file, never copied into this page: a second
+     copy of a hex value is a second source of truth, and this is the file that
+     drifted last time. Regenerate with python3 design/tokens/generate.py — CI
+     fails on drift. -->
+<link rel="stylesheet" href="../generated/tokens.generated.css">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
    TOKENS — mirrored from design/generated/tokens.generated.css
@@ -26,42 +31,6 @@
   --bor-hairline:1px; --bor-focus:2px;
   --dur-instant:120ms; --dur-fast:200ms; --dur-base:300ms; --dur-reveal:900ms;
   --ease-standard:cubic-bezier(0.32,0.72,0,1); --ease-reveal:cubic-bezier(0.16,1,0.3,1);
-}
-@media (prefers-color-scheme:dark){:root{
-  --c-canvas:#0C0B0A; --c-surface:#171614; --c-surface-raised:#201E1B; --c-surface-sunken:#070606;
-  --c-stroke:#2C2A26; --c-stroke-strong:#3D3A34;
-  --c-text-primary:#F6F4F1; --c-text-secondary:#A8A29A; --c-text-tertiary:#8A8479;
-  --c-text-disabled:#5A554D; --c-text-inverse:#0C0B0A;
-  --c-accent:#7C9EFF; --c-accent-pressed:#6B8BEE; --c-accent-subtle:#181B26;
-  --c-positive:#4FBF8B; --c-safety:#E2A03F; --c-critical:#E5674E;
-  --c-chart-line:#F6F4F1; --c-chart-baseline:#6E6960; --c-chart-band:#1E2A24;
-  --c-chart-grid:#221F1C; --c-chart-raw:#3D3A34;
-  --tier-bronze:#C8834E; --tier-silver:#C3C7CE; --tier-gold:#E7B23C;
-  --tier-platinum:#E3EAF0; --tier-diamond:#8AE0F2;
-}}
-:root[data-theme="dark"]{
-  --c-canvas:#0C0B0A; --c-surface:#171614; --c-surface-raised:#201E1B; --c-surface-sunken:#070606;
-  --c-stroke:#2C2A26; --c-stroke-strong:#3D3A34;
-  --c-text-primary:#F6F4F1; --c-text-secondary:#A8A29A; --c-text-tertiary:#8A8479;
-  --c-text-disabled:#5A554D; --c-text-inverse:#0C0B0A;
-  --c-accent:#7C9EFF; --c-accent-pressed:#6B8BEE; --c-accent-subtle:#181B26;
-  --c-positive:#4FBF8B; --c-safety:#E2A03F; --c-critical:#E5674E;
-  --c-chart-line:#F6F4F1; --c-chart-baseline:#6E6960; --c-chart-band:#1E2A24;
-  --c-chart-grid:#221F1C; --c-chart-raw:#3D3A34;
-  --tier-bronze:#C8834E; --tier-silver:#C3C7CE; --tier-gold:#E7B23C;
-  --tier-platinum:#E3EAF0; --tier-diamond:#8AE0F2;
-}
-:root[data-theme="light"]{
-  --c-canvas:#FBFAF7; --c-surface:#FFFFFF; --c-surface-raised:#FFFFFF; --c-surface-sunken:#F2F0EB;
-  --c-stroke:#E5E2DB; --c-stroke-strong:#CFCBC1;
-  --c-text-primary:#17150F; --c-text-secondary:#5C574D; --c-text-tertiary:#767063;
-  --c-text-disabled:#ADA79B; --c-text-inverse:#FBFAF7;
-  --c-accent:#3B5BDB; --c-accent-pressed:#2F4BC0; --c-accent-subtle:#EDF0FD;
-  --c-positive:#1E8A5F; --c-safety:#A66A00; --c-critical:#B4341A;
-  --c-chart-line:#17150F; --c-chart-baseline:#9A9488; --c-chart-band:#E6F2EB;
-  --c-chart-grid:#EFEDE7; --c-chart-raw:#CFCBC1;
-  --tier-bronze:#9A5F2E; --tier-silver:#6E747E; --tier-gold:#A8781A;
-  --tier-platinum:#7C8794; --tier-diamond:#1F7F96;
 }
 /* ==== END GENERATED TOKENS ==== */
 
@@ -387,7 +356,7 @@ footer p{max-width:var(--measure);line-height:1.6}
 
   <div class="mast-meta">
     <div><span class="eyebrow">Phase</span><strong>0 · Foundations</strong></div>
-    <div><span class="eyebrow">Direction</span><strong>Quiet premium, dark-first</strong></div>
+    <div><span class="eyebrow">Direction</span><strong>Matchday · dark-first</strong></div>
     <div><span class="eyebrow">Source of truth</span><strong class="mono">notch.tokens.json</strong></div>
     <div><span class="eyebrow">Screens</span><strong>6 wireframes · 1 hero</strong></div>
   </div>

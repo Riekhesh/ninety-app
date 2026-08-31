@@ -17,50 +17,50 @@ public enum Notch {}
 public extension Notch {
     /// Semantic colours. Each resolves per colour scheme automatically.
     enum Colour {
-        /// App background. Warm near-black.
-        public static let canvas = Color(light: 0xFBFAF7, dark: 0x0C0B0A)
-        /// Cards, rows, sheets.
-        public static let surface = Color(light: 0xFFFFFF, dark: 0x171614)
-        /// Elevated card on a card. Elevation on dark is a lightness step plus a hairline, never a shadow — shadows do not read on near-black.
-        public static let surfaceRaised = Color(light: 0xFFFFFF, dark: 0x201E1B)
-        /// Inset wells: chart backgrounds, input fields.
-        public static let surfaceSunken = Color(light: 0xF2F0EB, dark: 0x070606)
-        /// Hairline dividers and card edges.
-        public static let stroke = Color(light: 0xE5E2DB, dark: 0x2C2A26)
-        /// Input borders, focus-adjacent edges.
-        public static let strokeStrong = Color(light: 0xCFCBC1, dark: 0x3D3A34)
-        /// Warm white. 18.4:1 on canvas.
-        public static let textPrimary = Color(light: 0x17150F, dark: 0xF6F4F1)
-        /// Supporting copy, units, axis labels. 7.8:1 on canvas — AA at body size.
-        public static let textSecondary = Color(light: 0x5C574D, dark: 0xA8A29A)
-        /// Least-emphasis labels. 5.3:1 on canvas, 4.9:1 on surface — AA at body size on both. Deliberately NOT darker: a tertiary token that fails AA gets used for real content eventually. The first draft (#837D73) passed on canvas and failed on surface at 4.43:1 — generate.py caught it.
-        public static let textTertiary = Color(light: 0x767063, dark: 0x8A8479)
-        /// 3.0:1 — DISABLED CONTROLS ONLY. Never for content. WCAG exempts disabled controls; nothing else may use this.
-        public static let textDisabled = Color(light: 0xADA79B, dark: 0x5A554D)
-        /// On accent or tier-metal fills.
-        public static let textInverse = Color(light: 0xFBFAF7, dark: 0x0C0B0A)
-        /// The single accent. Cool blue on warm ground — a deliberate tension. 7.7:1 on canvas. Used for interactive affordance only, never for data.
-        public static let accent = Color(light: 0x3B5BDB, dark: 0x7C9EFF)
-        /// Pressed state.
-        public static let accentPressed = Color(light: 0x2F4BC0, dark: 0x6B8BEE)
-        /// Tinted surface behind selected rows and accent chips.
-        public static let accentSubtle = Color(light: 0xEDF0FD, dark: 0x181B26)
-        /// Jade. 'Inside your band', 'synced'. NEVER used to reward faster weight loss (safety §10 / rate ceiling).
-        public static let positive = Color(light: 0x1E8A5F, dark: 0x4FBF8B)
-        /// RESERVED for §10 safety interventions: calorie floor breach, unsafe goal weight, rate-of-loss ceiling. Named 'safety', not 'warning', so its scope cannot creep.
-        public static let safety = Color(light: 0xA66A00, dark: 0xE2A03F)
-        /// Destructive confirmation and hard safety blocks ONLY. There is deliberately no 'error' colour for logged intake — going over your band is not an error. See design/spec/00-design-principles.md.
-        public static let critical = Color(light: 0xB4341A, dark: 0xE5674E)
-        /// The weight trend line (the 7-day EWMA). Primary data gets the primary text colour, not the accent.
-        public static let chartLine = Color(light: 0x17150F, dark: 0xF6F4F1)
-        /// The 'you, four weeks ago' reference line. Present on every chart — the thesis rendered as a gridline.
-        public static let chartBaseline = Color(light: 0x9A9488, dark: 0x6E6960)
-        /// Target band fill. Wide, soft, unmistakably a range.
-        public static let chartBand = Color(light: 0xE6F2EB, dark: 0x1E2A24)
-        /// Barely-there gridlines.
-        public static let chartGrid = Color(light: 0xEFEDE7, dark: 0x221F1C)
-        /// Raw daily weight dots. Faint by design, off by default (§1.5).
-        public static let chartRaw = Color(light: 0xCFCBC1, dark: 0x3D3A34)
+        /// The pitch under floodlight. Deep, warm-shifted green — never neutral black.
+        public static let canvas = Color(light: 0xF1F4EC, dark: 0x08210F)
+        /// Cards and rows: the pitch one mow-stripe lighter.
+        public static let surface = Color(light: 0xFFFFFF, dark: 0x0C2B18)
+        /// Sheets and anything lifted off the pitch.
+        public static let surfaceRaised = Color(light: 0xFFFFFF, dark: 0x11351E)
+        /// Inset wells: chart grounds, the tab bar, input fields.
+        public static let surfaceSunken = Color(light: 0xE3EADE, dark: 0x04120B)
+        /// Faint chalk. Dividers inside a panel.
+        public static let stroke = Color(light: 0xCBD9CD, dark: 0x2A4A35)
+        /// Chalk. Panel edges and the mastheads, drawn at 2px.
+        public static let strokeStrong = Color(light: 0x2E5A3C, dark: 0xB9CFC0)
+        /// Chalk white, very slightly warm. All data and headlines.
+        public static let textPrimary = Color(light: 0x0B2416, dark: 0xF2EFE6)
+        /// Supporting copy and row subtitles.
+        public static let textSecondary = Color(light: 0x3D5C48, dark: 0xB6CCBC)
+        /// Condensed micro-labels — the broadcast caption voice.
+        public static let textTertiary = Color(light: 0x4A6B55, dark: 0x9FBBA8)
+        /// Placeholder and unavailable.
+        public static let textDisabled = Color(light: 0x7A9184, dark: 0x628070)
+        /// On gold: the KICK OFF and GIVE THE DECISION buttons.
+        public static let textInverse = Color(light: 0xFFFFFF, dark: 0x08210F)
+        /// Division gold. Tier identity, the target band, the primary action. Reserved — never decoration.
+        public static let accent = Color(light: 0x8A6410, dark: 0xE8B54A)
+        /// Gold, pressed.
+        public static let accentPressed = Color(light: 0x6F4F0B, dark: 0xD2A139)
+        /// Gold at page scale: the tinted leader row and division strip.
+        public static let accentSubtle = Color(light: 0xF5EBD4, dark: 0x1A2E1A)
+        /// Confirmations and sync. Never used to reward faster loss (S3).
+        public static let positive = Color(light: 0x1B7A4B, dark: 0x7FD6A0)
+        /// §10 interventions only — floor, rate ceiling, goal-weight refusal. Shares gold's hue deliberately: on this surface a safety notice reads as the app's own voice, not an alarm.
+        public static let safety = Color(light: 0x8A6410, dark: 0xE8B54A)
+        /// Destructive confirmation only. There is still no error colour for logged intake.
+        public static let critical = Color(light: 0xA6321C, dark: 0xE0705A)
+        /// The trend line. Primary data wears the primary ink, not the accent.
+        public static let chartLine = Color(light: 0x0B2416, dark: 0xF2EFE6)
+        /// The dashed four-week mark.
+        public static let chartBaseline = Color(light: 0x5E7A68, dark: 0x8FA894)
+        /// Goal-corridor fill — the pace you signed up for.
+        public static let chartBand = Color(light: 0xE4EFD8, dark: 0x2E3A1E)
+        /// Mow stripes and grid.
+        public static let chartGrid = Color(light: 0xDCE7DD, dark: 0x1B3A26)
+        /// Raw dailies, behind the off-by-default switch.
+        public static let chartRaw = Color(light: 0x93A897, dark: 0x4A6B55)
     }
 }
 
@@ -73,15 +73,15 @@ public extension Notch {
 /// have some colour vision deficiency. Both are derived from this single
 /// enum so they can never disagree.
 public enum Tier: Int, CaseIterable, Comparable, Sendable {
-    /// 1 notch. Starting out.
+    /// 1 chevron. Starting out.
     case bronze = 1
-    /// 2 notches. Building habit.
+    /// 2 chevrons.
     case silver = 2
-    /// 3 notches. Consistent.
+    /// 3 chevrons. The division the mockups sit in.
     case gold = 3
-    /// 4 notches. Dialled in.
+    /// 4 chevrons.
     case platinum = 4
-    /// 5 notches. Exceptional.
+    /// 5 chevrons.
     case diamond = 5
 
     /// Number of notches cut into the badge. The primary tier signal.
@@ -89,11 +89,11 @@ public enum Tier: Int, CaseIterable, Comparable, Sendable {
 
     public var colour: Color {
         switch self {
-        case .bronze: Color(light: 0x9A5F2E, dark: 0xC8834E)
-        case .silver: Color(light: 0x6E747E, dark: 0xC3C7CE)
-        case .gold: Color(light: 0xA8781A, dark: 0xE7B23C)
-        case .platinum: Color(light: 0x7C8794, dark: 0xE3EAF0)
-        case .diamond: Color(light: 0x1F7F96, dark: 0x8AE0F2)
+        case .bronze: Color(light: 0x7E4A1E, dark: 0xC07A44)
+        case .silver: Color(light: 0x5C6B62, dark: 0xBFC7C2)
+        case .gold: Color(light: 0x8A6410, dark: 0xE8B54A)
+        case .platinum: Color(light: 0x5F7168, dark: 0xDCE6E2)
+        case .diamond: Color(light: 0x1B7A70, dark: 0x8FE0D6)
         }
     }
 

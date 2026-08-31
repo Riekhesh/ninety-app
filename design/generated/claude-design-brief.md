@@ -36,21 +36,21 @@ Dark is the default. Light is full parity, not an afterthought.
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
-| canvas | `#0C0B0A` | `#FBFAF7` | App background. Warm near-black. |
-| surface | `#171614` | `#FFFFFF` | Cards, rows, sheets. |
-| surfaceSunken | `#070606` | `#F2F0EB` | Inset wells: chart backgrounds, input fields. |
-| stroke | `#2C2A26` | `#E5E2DB` | Hairline dividers and card edges. |
-| strokeStrong | `#3D3A34` | `#CFCBC1` | Input borders, focus-adjacent edges. |
-| textPrimary | `#F6F4F1` | `#17150F` | Warm white. 18.4:1 on canvas. |
-| textSecondary | `#A8A29A` | `#5C574D` | Supporting copy, units, axis labels. 7.8:1 on canvas — AA at body size. |
-| textTertiary | `#8A8479` | `#767063` | Least-emphasis labels. 5.3:1 on canvas, 4.9:1 on surface — AA at body size on both. |
-| accent | `#7C9EFF` | `#3B5BDB` | The single accent. Cool blue on warm ground — a deliberate tension. 7.7:1 on canvas. |
-| positive | `#4FBF8B` | `#1E8A5F` | Jade. 'Inside your band', 'synced'. |
-| safety | `#E2A03F` | `#A66A00` | RESERVED for §10 safety interventions: calorie floor breach, unsafe goal weight, rate-of-loss ceiling. |
-| critical | `#E5674E` | `#B4341A` | Destructive confirmation and hard safety blocks ONLY. |
-| chartLine | `#F6F4F1` | `#17150F` | The weight trend line (the 7-day EWMA). |
-| chartBaseline | `#6E6960` | `#9A9488` | The 'you, four weeks ago' reference line. |
-| chartBand | `#1E2A24` | `#E6F2EB` | Target band fill. Wide, soft, unmistakably a range. |
+| canvas | `#08210F` | `#F1F4EC` | The pitch under floodlight. Deep, warm-shifted green — never neutral black. |
+| surface | `#0C2B18` | `#FFFFFF` | Cards and rows: the pitch one mow-stripe lighter. |
+| surfaceSunken | `#04120B` | `#E3EADE` | Inset wells: chart grounds, the tab bar, input fields. |
+| stroke | `#2A4A35` | `#CBD9CD` | Faint chalk. Dividers inside a panel. |
+| strokeStrong | `#B9CFC0` | `#2E5A3C` | Chalk. Panel edges and the mastheads, drawn at 2px. |
+| textPrimary | `#F2EFE6` | `#0B2416` | Chalk white, very slightly warm. All data and headlines. |
+| textSecondary | `#B6CCBC` | `#3D5C48` | Supporting copy and row subtitles. |
+| textTertiary | `#9FBBA8` | `#4A6B55` | Condensed micro-labels — the broadcast caption voice. |
+| accent | `#E8B54A` | `#8A6410` | Division gold. Tier identity, the target band, the primary action. Reserved — never decoration. |
+| positive | `#7FD6A0` | `#1B7A4B` | Confirmations and sync. Never used to reward faster loss (S3). |
+| safety | `#E8B54A` | `#8A6410` | §10 interventions only — floor, rate ceiling, goal-weight refusal. |
+| critical | `#E0705A` | `#A6321C` | Destructive confirmation only. There is still no error colour for logged intake. |
+| chartLine | `#F2EFE6` | `#0B2416` | The trend line. Primary data wears the primary ink, not the accent. |
+| chartBaseline | `#8FA894` | `#5E7A68` | The dashed four-week mark. |
+| chartBand | `#2E3A1E` | `#E4EFD8` | Goal-corridor fill — the pace you signed up for. |
 
 **Tier metals (the only saturated colour in the entire app):**
 bronze `#C8834E` · silver `#C3C7CE` · gold `#E7B23C` · platinum `#E3EAF0` · diamond `#8AE0F2`

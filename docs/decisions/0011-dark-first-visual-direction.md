@@ -65,3 +65,35 @@ to insufficient colour contrast between interactive and static elements), or acc
 testing failing WCAG AA on a surface the tokens claim to cover.
 
 "I got bored of it in week six" is not a trigger.
+
+---
+
+## Reversed in part — 2026-08-30: the direction is Matchday, not quiet premium
+
+**What new information changed it.** Not a metric — a design round with real screens
+in front of us. Three directions were built at full fidelity and compared
+(`design/redesign/`); the developer's verdict on the two that stayed inside the
+original "quiet premium" register was that they read as generated. The third,
+committed to a single strong world, did not. That is evidence this ADR could not have
+had at the time: it was written before any screen existed to react to.
+
+**What is reversed:** *quiet premium*. Matchday is a committed world, not a restrained
+one — a lit pitch with mown stripes, chalk lines at 2px, a floodlight, and gold used
+at page scale for the division. The original decision's instinct that restraint reads
+as premium is not wrong in general; it was wrong for a product whose entire thesis is
+a **rank**, where the weekly result has to feel like a result.
+
+**What is unchanged, and is most of this ADR:**
+
+- **Dark-first**, for the reasons already recorded here. Light is full parity.
+- **The colour budget.** One accent, reserved. Matchday spends it harder than the
+  original palette did, but on one thing — the division — and nothing else.
+- **No error colour for logged intake.** Still absent from the token set by design.
+- **Tier never carried by colour alone** ([ADR 0012](0012-tier-encoded-as-notch-count.md))
+  — the notch count became a chevron count; the constraint is untouched.
+- The WCAG AA validator in `generate.py` still gates every pair, and passed the whole
+  Matchday palette without a threshold being lowered.
+
+**Reversal trigger for the new direction:** Phase 3 testers who do not follow football
+find the metaphor alienating or confusing rather than incidental — measured by whether
+they can say what a "division" is after a week. Record the answers, not the impression.
