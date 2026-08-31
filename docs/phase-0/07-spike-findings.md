@@ -8,50 +8,101 @@ tells you what's outstanding; CI prints it on every push.
 
 ---
 
-## Spike A — HealthKit
+## Spike A — HealthKit — **MEASURED** ✅
 
-**Status:** blocked on Apple Developer Program enrolment.
-**Run on:** `TO BE MEASURED` (date, device, iOS version)
+**Status:** **passed.** The exit criterion — *"your own real step and weight history
+rendering on your own iPhone"* — is met.
+**Run on:** 2026-08-31, physical iPhone, iOS 26.6.1, Xcode 26.6 (17F113), deployment
+target iOS 18.0.
 
 ### Did it work
 
 | | |
 |---|---|
-| Authorisation sheet appeared | `TO BE MEASURED` |
-| Days of step data returned | `TO BE MEASURED` |
-| Days of weight data returned | `TO BE MEASURED` |
-| Active energy | `TO BE MEASURED` |
-| Exercise minutes | `TO BE MEASURED` |
-| Workouts | `TO BE MEASURED` |
+| Authorisation sheet appeared | Yes. All types granted on the first run |
+| Days of step data returned | **31** · mean 3,588.5 steps/day |
+| Days of weight data returned | 1 (only same-day entries existed to read) |
+| Active energy | 22 days · mean 259.8 kcal |
+| Exercise minutes | 21 days · mean 24.5 min |
+| Workouts | 40 samples read — see the empty-state bug below |
+
+**The project's one genuinely fatal unknown is closed.** HealthKit hands over weight
+and steps on a real device, through the modern async API, at a usable speed.
 
 ### The anchor test — the performance finding
 
 | | Samples reported |
 |---|---:|
-| First read (no anchor) | `TO BE MEASURED` |
-| Second read (anchor saved) | `TO BE MEASURED` |
-| After force-quit and relaunch | `TO BE MEASURED` |
-| After resetting anchors | `TO BE MEASURED` |
+| First read (no anchor) | **56,764** (steps) |
+| Second read (anchor saved) | **0** |
+| After force-quit and relaunch | ~0 — the anchor survived the launch |
+| After resetting anchors | back to the full count |
 
-§1.4 calls the persisted anchor *"the entire trick"*. The gap between the first and
-second numbers is what that means in practice.
+§1.4 calls the persisted anchor *"the entire trick"*, and the gap above is what that
+means: **56,764 → 0**. Without it, every cold launch re-reads the lot.
+
+### The finding nobody wrote down in advance: samples are not days
+
+| Type | Raw samples | Days of data | Samples per day |
+|---|---:|---:|---:|
+| Steps | 56,764 | 31 | **~1,830** |
+| Active energy | 66,165 | 22 | **~3,000** |
+| Exercise minutes | 1,089 | 21 | ~52 |
+
+HealthKit does not store *"3,917 steps on Sunday"*. It stores hundreds of small
+increments per day, per source — phone and watch both writing continuously.
+
+**The Phase 1 consequence, and it is a hard rule:** never iterate raw samples to build
+a daily total. `HKStatisticsCollectionQuery` buckets inside HealthKit and returns 31
+values instead of 56,764 objects. The spike used it and returned promptly; the naive
+version would have the Today screen chewing through ~123,000 objects on every launch.
+This is the measured reason the architecture is right, rather than an assumption that
+it is.
 
 ### The denied-read test
 
-Turn Steps off in Settings → Health → Data Access & Devices, then read again.
+Steps turned off in Settings → Health → Data Access & Devices, then read again.
 
-**What you got back:** `TO BE MEASURED`
+**What came back:** an empty result. No error, no exception, no signal of any kind
+that a permission was refused.
 
-**Was it distinguishable from "no data"?** `TO BE MEASURED` *(expected: no)*
+**Distinguishable from "no data"?** **No** — exactly as §0.7 predicted. iOS withholds
+this deliberately: knowing a user hid a data type is itself information about them,
+so there is no read-permission API and there will not be one.
+`authorizationStatus(for:)` reports **write** permission only, and using it to infer
+read access is a trap.
 
-Write down what you actually saw. This is the finding that drives principle 5 in the
-design system — every data surface needs a designed empty state, and no-data and
-permission-denied have to be worded identically because the app genuinely cannot tell
-them apart.
+**The design consequence, which is the actual deliverable of this spike:** there is no
+permission-denied branch to write, because the app cannot know. Every data surface
+needs a designed empty state, and "no data" and "access declined" must be worded
+identically — because they are the same event as far as the code is concerned. This is
+principle 5 in the design system and it is now measured rather than assumed.
 
 ### Anything surprising
 
-`TO BE MEASURED`
+**1. The spike's own empty state was dishonest, and that is a finding.** The workouts
+row read **40 samples successfully** and then printed *"no daily values — either there
+is nothing recorded, or read access was declined."* Both halves of that sentence were
+false: data was read, and nothing was declined. Workouts are not a quantity type, so
+they have no daily buckets, and the code fell through to the shared empty-state copy.
+
+Small bug, real lesson: an empty state that guesses at *why* it is empty will
+eventually guess wrong in front of a user. Phase 1's version should say what it knows
+("no daily totals for this type") and stop there.
+
+**2. The spike code had never been compiled.** Written in Phase 0 with no Apple
+Developer account, it produced three errors on its first real build — all from being
+written against the older callback-based `HKAnchoredObjectQuery` rather than the async
+descriptor: `HKSamplePredicate` is generic and cannot be unified across quantity
+samples and workouts, and `result.newAnchor` is non-optional so the `if let` around it
+could not bind. Fixed, with comments explaining why, in `HealthSpike.swift`.
+
+Worth noting for Phase 1: every HealthKit tutorial online shows the callback form, and
+the difference is invisible until the compiler objects.
+
+**3. Bodyweight read 120.00 kg from a same-day entry**, so the 30-day weight trend had
+a single point. Nothing wrong — there was simply no back-history to read. Phase 1's
+trend view needs to handle "one data point" as a real state, not just a sparse one.
 
 ---
 
