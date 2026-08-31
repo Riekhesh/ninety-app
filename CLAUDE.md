@@ -17,6 +17,7 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | If the question is… | Read only |
 |---|---|
 | What is this project, what's the pitch | `README.md` |
+| The brief itself (§ references resolve here) | `docs/brief/` — but read the ADR or safety rule first; only §2.2's maths and §2.3's anti-gaming live nowhere else |
 | What Phase 0 proved, and the measured numbers | `docs/phase-0/07-spike-findings.md` |
 | What Phase 1 has to do | `docs/phase-0/README.md` (closed tracker) + `PRODUCT.md` |
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
