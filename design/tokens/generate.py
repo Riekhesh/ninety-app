@@ -41,6 +41,17 @@ OUT_SWIFT = ROOT / "design" / "generated" / "DesignTokens.generated.swift"
 OUT_CSS = ROOT / "design" / "generated" / "tokens.generated.css"
 BRIEF_TEMPLATE = ROOT / "design" / "spec" / "brief.template.md"
 OUT_BRIEF = ROOT / "design" / "generated" / "claude-design-brief.md"
+ASSETS = ROOT / "Ninety" / "Assets.xcassets"
+
+# Two colours the app needs *outside* Swift: the global tint (which UIKit
+# reads before any of our code runs) and the launch screen ground (drawn by
+# the system before the process exists). An asset catalogue is the only place
+# either can live — so they are generated here too, rather than being the two
+# hand-typed hex values that quietly drift from the rest of the palette.
+ASSET_COLOURS = {
+    "AccentColor": ("accent", "Global tint. UIKit reads it before any Swift runs."),
+    "LaunchCanvas": ("canvas", "Launch screen ground, drawn before the process exists."),
+}
 
 BANNER = (
     "// GENERATED FILE — DO NOT EDIT.\n"
@@ -136,6 +147,68 @@ def check_contrast(tokens: dict) -> list[str]:
     return failures
 
 
+FONT_DIR = ROOT / "Ninety" / "Resources" / "Fonts"
+
+
+def font_name(tokens: dict, node: dict) -> str:
+    """The PostScript name a type style must ask SwiftUI for.
+
+    Weight lives in the *file*, not in a `.weight()` modifier: applying one on
+    top of a custom face makes iOS synthesise a bolder outline, which is a
+    visibly worse rendering of a weight the family already ships.
+    """
+    ext = node.get("$extensions", {})
+    role = ext.get("ninety.fontRole", "ui")
+    weight = node["$value"]["fontWeight"]
+    return tokens["font"][role]["$extensions"]["ninety.postScriptNames"][weight]
+
+
+def check_fonts(tokens: dict) -> list[str]:
+    """Fail on a type style the bundled faces cannot actually render.
+
+    Three ways this goes wrong silently, and iOS reports none of them — it just
+    falls back to San Francisco and the Matchday world quietly becomes a
+    generic SwiftUI app:
+
+      · a style asks for a weight the family does not ship
+      · a metric style is put on the condensed face, which has no `tnum`, so
+        its digits jitter as the value updates
+      · the .ttf naming the token file promises is not in the bundle
+    """
+    failures: list[str] = []
+
+    for name, node in _entries(tokens["type"]):
+        ext = node.get("$extensions", {})
+        role = ext.get("ninety.fontRole", "ui")
+        if role not in tokens["font"]:
+            failures.append(f"type.{name}: unknown font role {role!r}")
+            continue
+
+        family = tokens["font"][role]
+        names = family["$extensions"]["ninety.postScriptNames"]
+        weight = node["$value"]["fontWeight"]
+        if weight not in names:
+            failures.append(
+                f"type.{name}: {family['$value']} does not ship weight {weight} "
+                f"(has {', '.join(sorted(names))}). Pick a shipped weight or bundle the file."
+            )
+            continue
+
+        if ext.get("ninety.tabularFigures") and role == "broadcast":
+            failures.append(
+                f"type.{name} wants tabular figures on {family['$value']}, which has no "
+                f"tnum table. Digits that update in place must use the ui role."
+            )
+
+        ttf = FONT_DIR / f"{names[weight]}.ttf"
+        if not ttf.exists():
+            failures.append(
+                f"type.{name} needs {ttf.relative_to(ROOT)}, which is not in the bundle"
+            )
+
+    return failures
+
+
 def check_tiers(tokens: dict) -> tuple[list[str], list[str]]:
     """Verify chevron counts are 1..5 in ladder order. Returns (failures, notes)."""
     failures: list[str] = []
@@ -191,6 +264,40 @@ def hex_to_swift_literal(hex_colour: str) -> str:
 def swift_doc(node: dict) -> str:
     desc = node.get("$description")
     return f"    /// {desc}\n" if desc else ""
+
+
+def render_colorset(tokens: dict, token_name: str) -> str:
+    """One .colorset, light and dark, in the catalogue's own JSON.
+
+    No header comment: this format is strict JSON, so the note explaining why
+    each of these exists lives on ASSET_COLOURS instead.
+    """
+
+    def components(hex_colour: str) -> dict:
+        h = hex_colour.lstrip("#")
+        return {
+            "alpha": "1.000",
+            "red": f"0x{h[0:2].upper()}",
+            "green": f"0x{h[2:4].upper()}",
+            "blue": f"0x{h[4:6].upper()}",
+        }
+
+    def entry(hex_colour: str, dark: bool) -> dict:
+        node = {"idiom": "universal"}
+        if dark:
+            node["appearances"] = [{"appearance": "luminosity", "value": "dark"}]
+        node["color"] = {"color-space": "srgb", "components": components(hex_colour)}
+        return node
+
+    body = {
+        "colors": [
+            entry(tokens["theme"]["light"][token_name]["$value"], dark=False),
+            entry(tokens["theme"]["dark"][token_name]["$value"], dark=True),
+        ],
+        "info": {"author": "xcode", "version": 1},
+        "properties": {"localizable": False},
+    }
+    return json.dumps(body, indent=2) + "\n"
 
 
 # ─── Swift ───────────────────────────────────────────────────────────────────
@@ -284,7 +391,10 @@ def render_swift(tokens: dict) -> str:
         "    /// Type scale. Every style is bound to an iOS text style so Dynamic\n"
         "    /// Type works for free — required, not optional, in a health app."
     )
-    out.append("    enum TypeStyle: Sendable {")
+    # CaseIterable is synthesised only in the file that declares the enum, so it
+    # has to be here: BrandFont walks every style to verify the bundled faces
+    # actually registered.
+    out.append("    enum TypeStyle: String, CaseIterable, Sendable {")
     for name, _ in _entries(tokens["type"]):
         out.append(f"        case {camel(name)}")
     out.append("")
@@ -300,6 +410,12 @@ def render_swift(tokens: dict) -> str:
     out.append("            }")
     out.append("        }")
     out.append("")
+    out.append(
+        "        /// Informational only — the weight is baked into `fontName`.\n"
+        "        /// Do NOT apply this with `.weight()` on top of the custom face:\n"
+        "        /// iOS would synthesise a bolder outline over a weight the family\n"
+        "        /// already ships properly drawn."
+    )
     out.append("        public var weight: Font.Weight {")
     out.append("            switch self {")
     weight_map = {"400": "regular", "600": "semibold", "700": "bold"}
@@ -353,11 +469,37 @@ def render_swift(tokens: dict) -> str:
         out.append("            false")
     out.append("        }")
     out.append("")
+    out.append(
+        "        /// The bundled face, by PostScript name. The static builds\n"
+        "        /// have inconsistent *family* names; PostScript names are exact,\n"
+        "        /// and an exact name is the difference between the Matchday world\n"
+        "        /// and a silent fallback to San Francisco."
+    )
+    out.append("        public var fontName: String {")
+    out.append("            switch self {")
+    for name, node in _entries(tokens["type"]):
+        out.append(f'            case .{camel(name)}: "{font_name(tokens, node)}"')
+    out.append("            }")
+    out.append("        }")
+    out.append("")
+    out.append(
+        "        /// The SwiftUI text style the face scales against.\n"
+        "        /// `Font.custom(_:size:relativeTo:)` is what makes a bundled face\n"
+        "        /// honour Dynamic Type — a plain `Font.custom(_:size:)` does not\n"
+        "        /// scale at all, and that failure is invisible until someone with\n"
+        "        /// a larger reading size opens the app (ADR 0015)."
+    )
+    out.append("        public var scalesAgainst: Font.TextStyle {")
+    out.append("            switch self {")
+    for name, node in _entries(tokens["type"]):
+        raw = node.get("$extensions", {}).get("ninety.iosTextStyle", "body")
+        out.append(f"            case .{camel(name)}: .{raw}")
+    out.append("            }")
+    out.append("        }")
+    out.append("")
     out.append("        public var font: Font {")
     out.append(
-        "            let scaled = UIFontMetrics(forTextStyle: textStyle)\n"
-        "                .scaledValue(for: size)\n"
-        "            let base = Font.system(size: scaled, weight: weight, design: .default)\n"
+        "            let base = Font.custom(fontName, size: size, relativeTo: scalesAgainst)\n"
         "            return usesTabularFigures ? base.monospacedDigit() : base"
     )
     out.append("        }")
@@ -396,9 +538,15 @@ def render_swift(tokens: dict) -> str:
 
     out.append(
         "public extension View {\n"
-        "    /// Apply a Ninety type style, including tracking and casing.\n"
+        "    /// Apply a Ninety type style: face, Dynamic Type scaling, tracking and casing.\n"
+        "    ///\n"
+        "    /// Casing is applied here rather than in the string so the copy deck and\n"
+        "    /// the accessibility label both keep their sentence case — VoiceOver\n"
+        "    /// spells out an all-caps string letter by letter.\n"
         "    func ninetyType(_ style: Ninety.TypeStyle) -> some View {\n"
-        "        font(style.font).tracking(style.tracking)\n"
+        "        font(style.font)\n"
+        "            .tracking(style.tracking)\n"
+        "            .textCase(style.isUppercased ? .uppercase : nil)\n"
         "    }\n"
         "}\n"
     )
@@ -524,6 +672,18 @@ def render_swift(tokens: dict) -> str:
 # ─── CSS ─────────────────────────────────────────────────────────────────────
 
 
+def _css_family(tokens: dict, node: dict) -> str:
+    """The web stack for a style's role, for the artboards and the preview."""
+    role = node.get("$extensions", {}).get("ninety.fontRole", "ui")
+    family = tokens["font"][role]["$value"]
+    fallback = (
+        "'Arial Narrow', Arial, sans-serif"
+        if role == "broadcast"
+        else "system-ui, -apple-system, sans-serif"
+    )
+    return f"'{family}', {fallback}"
+
+
 def render_css(tokens: dict) -> str:
     dark, light = tokens["theme"]["dark"], tokens["theme"]["light"]
     lines = [
@@ -557,7 +717,7 @@ def render_css(tokens: dict) -> str:
         v = node["$value"]
         lines.append(
             f"  --type-{kebab(name)}: {v['fontWeight']} {v['fontSize']}px/"
-            f"{v['lineHeight']}px system-ui, -apple-system, sans-serif;"
+            f"{v['lineHeight']}px {_css_family(tokens, node)};"
         )
         lines.append(f"  --track-{kebab(name)}: {v['letterSpacing']}px;")
     for name, node in tokens["motion"]["duration"].items():
@@ -683,6 +843,7 @@ def main() -> int:
     tokens = json.loads(TOKENS.read_text())
 
     failures = check_contrast(tokens)
+    failures += check_fonts(tokens)
     tier_failures, tier_notes = check_tiers(tokens)
     failures += tier_failures
 
@@ -705,6 +866,10 @@ def main() -> int:
         OUT_CSS: render_css(tokens),
         OUT_BRIEF: render_brief(tokens),
     }
+    for asset, (token_name, _why) in ASSET_COLOURS.items():
+        outputs[ASSETS / f"{asset}.colorset" / "Contents.json"] = render_colorset(
+            tokens, token_name
+        )
 
     if args.check:
         stale = [
@@ -731,8 +896,9 @@ def main() -> int:
     print(
         f"✓ {n_colours} semantic colours × 2 themes, "
         f"{len(_entries(tokens['tier']))} tiers, "
-        f"{len(_entries(tokens['type']))} type styles — "
-        f"all contrast rules pass"
+        f"{len(_entries(tokens['type']))} type styles on "
+        f"{len(_entries(tokens['font']))} bundled faces — "
+        f"all contrast and font rules pass"
     )
     return 0
 

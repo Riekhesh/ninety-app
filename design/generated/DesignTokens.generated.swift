@@ -121,7 +121,7 @@ public enum Tier: Int, CaseIterable, Comparable, Sendable {
 public extension Ninety {
     /// Type scale. Every style is bound to an iOS text style so Dynamic
     /// Type works for free — required, not optional, in a health app.
-    enum TypeStyle: Sendable {
+    enum TypeStyle: String, CaseIterable, Sendable {
         case display
         case title1
         case title2
@@ -133,6 +133,7 @@ public extension Ninety {
         case footnote
         case caption
         case label
+        case masthead
         case metricXL
         case metricL
         case metricM
@@ -152,6 +153,7 @@ public extension Ninety {
             case .footnote: 13
             case .caption: 12
             case .label: 11
+            case .masthead: 21
             case .metricXL: 56
             case .metricL: 40
             case .metricM: 28
@@ -159,6 +161,10 @@ public extension Ninety {
             }
         }
 
+        /// Informational only — the weight is baked into `fontName`.
+        /// Do NOT apply this with `.weight()` on top of the custom face:
+        /// iOS would synthesise a bolder outline over a weight the family
+        /// already ships properly drawn.
         public var weight: Font.Weight {
             switch self {
             case .display: .semibold
@@ -172,6 +178,7 @@ public extension Ninety {
             case .footnote: .regular
             case .caption: .regular
             case .label: .semibold
+            case .masthead: .regular
             case .metricXL: .semibold
             case .metricL: .semibold
             case .metricM: .semibold
@@ -194,6 +201,7 @@ public extension Ninety {
             case .footnote: .footnote
             case .caption: .caption1
             case .label: .caption2
+            case .masthead: .title3
             case .metricXL: .largeTitle
             case .metricL: .title1
             case .metricM: .title2
@@ -208,10 +216,59 @@ public extension Ninety {
             switch self { case .metricXL, .metricL, .metricM, .metricS: true; default: false }
         }
 
+        /// The bundled face, by PostScript name. The static builds
+        /// have inconsistent *family* names; PostScript names are exact,
+        /// and an exact name is the difference between the Matchday world
+        /// and a silent fallback to San Francisco.
+        public var fontName: String {
+            switch self {
+            case .display: "Saira-SemiBold"
+            case .title1: "Saira-SemiBold"
+            case .title2: "Saira-SemiBold"
+            case .title3: "Saira-SemiBold"
+            case .headline: "Saira-SemiBold"
+            case .body: "Saira-Regular"
+            case .callout: "Saira-Regular"
+            case .subhead: "Saira-Regular"
+            case .footnote: "Saira-Regular"
+            case .caption: "Saira-Regular"
+            case .label: "SairaCondensed-SemiBold"
+            case .masthead: "SairaCondensed-ExtraBold"
+            case .metricXL: "Saira-SemiBold"
+            case .metricL: "Saira-SemiBold"
+            case .metricM: "Saira-SemiBold"
+            case .metricS: "Saira-SemiBold"
+            }
+        }
+
+        /// The SwiftUI text style the face scales against.
+        /// `Font.custom(_:size:relativeTo:)` is what makes a bundled face
+        /// honour Dynamic Type — a plain `Font.custom(_:size:)` does not
+        /// scale at all, and that failure is invisible until someone with
+        /// a larger reading size opens the app (ADR 0015).
+        public var scalesAgainst: Font.TextStyle {
+            switch self {
+            case .display: .largeTitle
+            case .title1: .title
+            case .title2: .title2
+            case .title3: .title3
+            case .headline: .headline
+            case .body: .body
+            case .callout: .callout
+            case .subhead: .subheadline
+            case .footnote: .footnote
+            case .caption: .caption
+            case .label: .caption2
+            case .masthead: .title3
+            case .metricXL: .largeTitle
+            case .metricL: .title
+            case .metricM: .title2
+            case .metricS: .headline
+            }
+        }
+
         public var font: Font {
-            let scaled = UIFontMetrics(forTextStyle: textStyle)
-                .scaledValue(for: size)
-            let base = Font.system(size: scaled, weight: weight, design: .default)
+            let base = Font.custom(fontName, size: size, relativeTo: scalesAgainst)
             return usesTabularFigures ? base.monospacedDigit() : base
         }
 
@@ -228,6 +285,7 @@ public extension Ninety {
             case .footnote: 18
             case .caption: 16
             case .label: 14
+            case .masthead: 26
             case .metricXL: 58
             case .metricL: 44
             case .metricM: 32
@@ -247,7 +305,8 @@ public extension Ninety {
             case .subhead: 0
             case .footnote: 0
             case .caption: 0
-            case .label: 0.6
+            case .label: 1.6
+            case .masthead: 2.5
             case .metricXL: -1.5
             case .metricL: -0.8
             case .metricM: -0.3
@@ -257,15 +316,21 @@ public extension Ninety {
 
         /// Labels are set in caps; nothing else is.
         public var isUppercased: Bool {
-            switch self { case .label: true; default: false }
+            switch self { case .label, .masthead: true; default: false }
         }
     }
 }
 
 public extension View {
-    /// Apply a Ninety type style, including tracking and casing.
+    /// Apply a Ninety type style: face, Dynamic Type scaling, tracking and casing.
+    ///
+    /// Casing is applied here rather than in the string so the copy deck and
+    /// the accessibility label both keep their sentence case — VoiceOver
+    /// spells out an all-caps string letter by letter.
     func ninetyType(_ style: Ninety.TypeStyle) -> some View {
-        font(style.font).tracking(style.tracking)
+        font(style.font)
+            .tracking(style.tracking)
+            .textCase(style.isUppercased ? .uppercase : nil)
     }
 }
 

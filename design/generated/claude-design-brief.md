@@ -75,7 +75,8 @@ SF Pro (`system-ui`). Numbers that update in place use **tabular figures**.
 | subhead | 15/20 | 400 | Brand and portion under a food name. |
 | footnote | 13/18 | 400 |  |
 | caption | 12/16 | 400 |  |
-| label | 11/14 | 600 | Section eyebrows, stat card labels. |
+| label | 11/14 | 600 | Condensed micro-labels — the broadcast caption voice. Tracked out for caps at 11pt. |
+| masthead | 21/26 | 800 | The screen masthead beside the kit stripes: MATCHDAY, THE RUN, THE TABLE. |
 | metricXL | 56/58 | 600 | The composite score on the rank screen. One per screen, maximum. |
 | metricL | 40/44 | 600 | Calories remaining. |
 | metricM | 28/32 | 600 |  |
