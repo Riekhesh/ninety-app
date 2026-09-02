@@ -1,0 +1,361 @@
+Issue Type,Summary,Epic Name,Epic Link,Description,Priority,Story point estimate,Labels,Labels,Labels,Labels
+Epic,P1-A Foundations & app skeleton,P1-A Foundations & app skeleton,,"Xcode project, Packages/, design tokens wired in, the macOS CI job switched on, and the one open design decision from Phase 0 settled. Nothing else can start until this does. Refs: PRODUCT.md, .github/workflows/ci.yml, design/generated/DesignTokens.generated.swift",Highest,,phase-1,,,
+Epic,"P1-B Data layer, schema & RLS","P1-B Data layer, schema & RLS",,"Supabase migration 001 with RLS on from the first line, SwiftData as the local source of truth, protocol-based repositories, and the outbox. Brief SS04 (core data model) + ADR 0003/0004/0005.",Highest,,phase-1,,,
+Epic,P1-C Authentication,P1-C Authentication,,"Sign in with Apple via Supabase Auth, plus the Article 9 health-data consent that must be separate from ToS acceptance. Brief SS1.1.",High,,phase-1,,,
+Epic,P1-D Pre-Season: onboarding & the SS10 safety gates,P1-D Pre-Season: onboarding & the SS10 safety gates,,"Onboarding collects only what the engine needs, computes a band via Mifflin-St Jeor, and enforces S1-S7 at build time. docs/safety/safety-requirements.md is the spec; its named tests are the acceptance criteria. Brief SS1.2.",Highest,,phase-1,,,
+Epic,P1-E HealthKit sync,P1-E HealthKit sync,,"Incremental sync with a persisted anchor, daily buckets via HKStatisticsCollectionQuery, background delivery. The two Phase 0 findings bind this epic and are not negotiable. Brief SS1.4 + docs/phase-0/07-spike-findings.md.",High,,phase-1,,,
+Epic,"P1-F Sub On: food logging, four routes","P1-F Sub On: food logging, four routes",,"Manual, text search, barcode, photo. Barcode ships before photo (cheapest, fastest path). The photo route never silently accepts an estimate. Brief SS1.3 + design/redesign/SubOn.dc.html + Var.dc.html.",High,,phase-1,,,
+Epic,P1-G The Run: weight & trend,P1-G The Run: weight & trend,,"Manual entry plus HealthKit reads, rendered as a 7-day EWMA against the pace chosen at onboarding. Never raw daily weight. Brief SS1.5 + design/redesign/Season.dc.html.",Medium,,phase-1,,,
+Epic,P1-H Matchday: the Today dashboard,P1-H Matchday: the Today dashboard,,"One screen: band and remaining, macro split, weight sparkline, Form ring, and a placeholder where the division badge lands in Phase 2. Three tabs maximum across the whole app. Brief SS1.6 + design/redesign/Main.dc.html.",High,,phase-1,,,
+Epic,P1-I Offline-first sync,P1-I Offline-first sync,,"The UI never waits on the network. Outbox drains on reconnect, last-write-wins on server timestamps, verified in airplane mode. ADR 0005.",High,,phase-1,,,
+Epic,P1-J Dogfood: 21 consecutive days,P1-J Dogfood: 21 consecutive days,,"The actual purpose of the phase. 21 consecutive days of real logged data on a real device, and the photo-accuracy benchmark that accumulates alongside it. This epic is wall-clock bound - it cannot be compressed by working harder.",Highest,,phase-1,,,
+Epic,P1-X Phase 1 exit criteria,P1-X Phase 1 exit criteria,,"The six testable conditions that close the phase. Phases end on a condition, not a date. Mirror of docs/phase-0/README.md's format.",Highest,,phase-1,,,
+Spike,DECIDE: fixed type scale vs Dynamic Type (ADR 0015),,P1-A Foundations & app skeleton,"The one thing a 393x852 artboard could not settle, and Phase 1's first design task (PRODUCT.md, design/redesign/README.md).
+
+The mockups use the fixed scale in ninety.tokens.json because a static frame cannot express Dynamic Type. iOS wants system text styles and bans hard-coded point sizes. Whichever wins changes how the type tokens are structured, so this blocks every view ticket.
+
+Acceptance criteria
+* A decision, written up as ADR 0015 in docs/decisions/ with a pre-written reversal trigger (see docs/decisions/README.md)
+* The index table in docs/decisions/README.md updated. Do not renumber existing ADRs
+* If Dynamic Type wins: ninety.tokens.json restructured to emit text styles, generate.py updated, generated Swift + CSS regenerated and committed together
+* One screen (Matchday) proven at both the smallest and largest accessibility sizes, or an explicit written note that the fixed scale was chosen and why",Highest,3,phase-1,design,decision,
+Task,Create the Ninety/ Xcode project,,P1-A Foundations & app skeleton,"No Ninety/ exists yet; creating it is Phase 1's job (CLAUDE.md).
+
+Acceptance criteria
+* iOS 18.0 deployment target (ADR 0002), Xcode 26.6 / Swift 6.3
+* Swift 6 strict concurrency on, not warnings-only
+* Builds and runs on the physical iPhone, not just the Simulator
+* Bundle id and team set against the Apple Developer account approved 2026-08-30
+* SwiftLint runs as a build phase against the existing .swiftlint.yml",Highest,3,phase-1,build,,
+Task,Wire DesignTokens.generated.swift into the app target,,P1-A Foundations & app skeleton,"Colours are generated, never hand-written. Editing the Swift by hand is the failure mode this ticket exists to prevent.
+
+Acceptance criteria
+* design/generated/DesignTokens.generated.swift compiles inside the app target
+* A deliberate hardcoded Color in a view fails the build via the no_hardcoded_colour rule
+* python3 design/tokens/generate.py --check still passes in CI",High,2,phase-1,design,build,
+Task,Scaffold Packages/RankingEngine as a pure Swift package,,P1-A Foundations & app skeleton,"Phase 2 owns the maths; Phase 1 owns the boundary. Creating the package now means the SwiftLint purity rules have something to police from day one (ADR 0006).
+
+Acceptance criteria
+* Packages/RankingEngine builds as a standalone SPM package with no UI imports, no ambient clock, no randomness
+* A deliberate `import SwiftUI` inside it fails lint
+* Swift Testing target present, even if it only holds one placeholder test",Medium,2,phase-1,build,,
+Task,Switch on the gated macOS CI job,,P1-A Foundations & app skeleton,".github/workflows/ci.yml skips the expensive macOS job until Ninety/ exists. Once it does, the path filter should let it run.
+
+Acceptance criteria
+* macOS job builds the app and runs the test target on PRs that touch Swift
+* Docs- and design-only commits still skip it (200 real macOS minutes/month is the budget)
+* SwiftLint runs in CI at the configured severities",High,2,phase-1,ci,,
+Task,Enable the git hooks and prove the safety lint fires,,P1-A Foundations & app skeleton,"git config core.hooksPath .githooks. The hooks are already written; nobody has confirmed they bite.
+
+Acceptance criteria
+* Secret and health-data tripwires block a deliberate test commit
+* commit-msg rejects a non-conventional message
+* A string containing one of the 17 banned phrases fails the build at error severity (S5)",Medium,1,phase-1,safety,chore,
+Story,"App shell: three tabs, no more",,P1-A Foundations & app skeleton,"Brief SS1.6 caps the whole app at three tabs. Matchday / The Run / The Table, with The Table showing the Phase 2 placeholder.
+
+Acceptance criteria
+* Navigation shell renders with tokens, in the Matchday world (kit stripes in the masthead)
+* Every screen's spine fits 393x852 without scrolling
+* The Table tab exists and states plainly that ranking arrives in Phase 2 - no fake data, no lorem",High,3,phase-1,design,,
+Story,"Supabase migration 001: every table, RLS on from the first line",,"P1-B Data layer, schema & RLS","Brief SS04. Retrofitting RLS onto a live database holding real health data is described in the brief as ""a genuinely bad afternoon"".
+
+Tables: profiles, foods, food_logs, photo_estimates, weight_logs, health_samples, weekly_scores, sync_outbox - plus friendships and leaderboard_entries, created empty now because nothing writes to them until Phase 4 and retrofitting relationships later is painful.
+
+Acceptance criteria
+* All ten tables created in one migration, with the key fields listed in the brief
+* weekly_scores carries engine_version - without it every historical score becomes meaningless the first time weights are retuned
+* ALTER TABLE ... ENABLE ROW LEVEL SECURITY on every table in the same migration, no exceptions
+* Migration is committed and re-runnable from scratch",Highest,5,phase-1,backend,gate,
+Story,"RLS policies, tested with two real accounts",,"P1-B Data layer, schema & RLS","Phase 1 exit criterion: ""RLS policies on every table, tested with two accounts.""
+
+Acceptance criteria
+* Per-table select/insert/update/delete policies keyed on auth.uid()
+* Account A cannot read, write or delete any row belonging to account B - proven, not assumed
+* The test is repeatable and written down (a SQL script or a test target), not a one-off afternoon in the dashboard
+* Storage bucket policies cover meal photos too, not just tables",Highest,5,phase-1,backend,gate,exit-criterion
+Story,SwiftData models as the local source of truth,,"P1-B Data layer, schema & RLS","ADR 0005: SwiftData is the local source of truth and the UI never waits on the network.
+
+Acceptance criteria
+* Local models mirror the Postgres schema, including sync_outbox
+* Every write path goes local-first and returns immediately
+* Migration story for the local store exists (it will change during the 21 days)",Highest,5,phase-1,backend,,
+Story,Protocol-based repositories with mocks,,"P1-B Data layer, schema & RLS","ADR 0004. Views -> @Observable ViewModels -> protocol repositories -> SwiftData / Supabase / HealthKit.
+
+Acceptance criteria
+* One protocol per data domain: food, weight, health, profile
+* Mock implementations injectable in tests; no ViewModel test touches the network, the device or the disk
+* Repositories return an empty result rather than throwing when there is no data - the HealthKit finding makes this a rule, not a preference",High,5,phase-1,backend,,
+Story,Mirror Open Food Facts + USDA into Postgres with a tsvector index,,"P1-B Data layer, schema & RLS","Brief SS1.3, Path 1. Never call a third-party API on every keystroke: slow, rate-limited, fails offline.
+
+Acceptance criteria
+* Both sources imported into the foods table with source correctly set (off/usda/custom)
+* search_vector populated and GIN-indexed; a two-word query returns in well under 100 ms
+* A documented, re-runnable refresh path - this data goes stale
+* Sensible subset if the full dump is unwieldy; write down what was cut and why",High,8,phase-1,backend,logging,
+Story,Sign in with Apple via Supabase Auth,,P1-C Authentication,"Brief SS1.1. A paid-programme entitlement, which is now available.
+
+Acceptance criteria
+* Sign in, sign out, and session restore across a cold launch
+* Supabase session token refreshes without user action
+* No third-party login is offered, so no Apple rework is needed later
+* Failure states use the copy deck's wording, not raw error strings",High,5,phase-1,auth,,
+Story,"Health-data consent, separate from terms acceptance",,P1-C Authentication,"UK GDPR Article 9: health data is special category data and needs explicit consent with a documented lawful basis. Required before the first external tester, but the screen belongs in onboarding, so build it now.
+
+Acceptance criteria
+* Consent for health data is a distinct, separately-recorded action from accepting terms
+* test_health_consent_is_separate_from_terms_acceptance passes
+* Consent timestamp persisted on the profile",High,3,phase-1,auth,safety,
+Story,Pre-Season onboarding flow,,P1-D Pre-Season: onboarding & the SS10 safety gates,"design/redesign/screens/1-pre-season.png and Signing.dc.html. Collect only what the scoring engine needs: date of birth, height, sex, activity level, goal type, target rate of change.
+
+Acceptance criteria
+* Every field persists to profiles
+* Every safety gate is stated in the flow rather than hidden behind a silent validation
+* Copy comes from design/spec/04-copy-deck.md SS1, unchanged
+* Resumable: quitting mid-flow does not lose what was entered",Highest,5,phase-1,onboarding,design,
+Story,"Mifflin-St Jeor target, presented as a band",,P1-D Pre-Season: onboarding & the SS10 safety gates,"""Hitting exactly 1,847 kcal is not a real human goal; landing between 1,750 and 1,950 is."" The band is never rendered as two numbers joined by a dash - it is one figure plus a tolerance (612 +/-100), per PRODUCT.md.
+
+Acceptance criteria
+* Target computed from DOB, height, sex, activity level and goal
+* Rendered as figure plus tolerance everywhere it appears
+* Recomputes when the profile changes",Highest,3,phase-1,onboarding,safety,
+Story,"S1: hard minimum calorie floor, clamping",,P1-D Pre-Season: onboarding & the SS10 safety gates,"Female 1,200 / male 1,500 / unspecified 1,500 kcal per day. Clamp, do not reject - then offer the lever that helps (a slower rate), rather than leaving the user stuck at the floor.
+
+Named tests (acceptance criteria)
+* test_calorie_target_never_below_floor_female
+* test_calorie_target_never_below_floor_male
+* test_unspecified_sex_uses_higher_floor
+* test_floor_breach_surfaces_slower_rate_option
+* test_floor_applies_after_deficit_not_before",Highest,3,phase-1,safety,gate,
+Story,"S2: goal weight validated against BMI 18.5, rejecting",,P1-D Pre-Season: onboarding & the SS10 safety gates,"minimum acceptable goal weight = 18.5 * height_m^2. Reject, do not clamp - silently substituting a goal would be dishonest about what the app tracks toward. Deliberately asymmetric: no upper bound.
+
+Named tests (acceptance criteria)
+* test_goal_weight_below_bmi_18_5_is_rejected
+* test_goal_weight_at_bmi_18_5_is_accepted
+* test_rejection_states_the_minimum_acceptable_weight
+* test_no_upper_bound_on_goal_weight
+* test_bmi_uses_metres_not_centimetres",Highest,3,phase-1,safety,gate,
+Story,S3: rate-of-loss ceiling enforced in onboarding,,P1-D Pre-Season: onboarding & the SS10 safety gates,"ceiling = min(1.0 kg/week, 1% of current body weight per week). Selectable rates 0.25 / 0.5 / 0.75, filtered to those at or below the ceiling. There is deliberately no ""maximum"" option.
+
+The scoring half of S3 - progress score peaking at target rate - is Phase 2 and explicitly out of scope here.
+
+Named tests (acceptance criteria)
+* test_rate_ceiling_is_one_percent_bodyweight_for_light_user
+* test_rate_ceiling_caps_at_1kg_for_heavy_user
+* test_onboarding_hides_rates_above_ceiling",Highest,3,phase-1,safety,gate,
+Story,"S4: age gate, hard stop, with signposting",,P1-D Pre-Season: onboarding & the SS10 safety gates,"Under 18 is a hard stop with no bypass: no ""continue anyway"", no parental-consent path. Computed on the actual date, not a year subtraction. The rejection screen signposts Beat's youth helpline - a user turned away should not leave with nothing.
+
+Named tests (acceptance criteria)
+* test_under_18_is_blocked
+* test_exactly_18_today_is_allowed
+* test_17_years_364_days_is_blocked
+* test_no_bypass_path_exists_from_the_age_gate
+* test_age_gate_screen_includes_support_signposting",Highest,3,phase-1,safety,gate,
+Story,"S5: no punishment framing, enforced in the build",,P1-D Pre-Season: onboarding & the SS10 safety gates,"17 banned phrases at lint-error severity, plus the structural half: no error colour for logged intake, a missed day renders empty rather than crossed out, no streak-loss animation, and losing a division always states the way back.
+
+Named tests (acceptance criteria)
+* test_no_banned_phrase_in_any_localised_string
+* test_missed_day_renders_empty_not_negative
+* test_over_band_state_does_not_use_critical_colour
+* test_tier_regression_copy_states_the_path_back (copy only in Phase 1; there is no tier yet)",Highest,3,phase-1,safety,gate,
+Story,"S6: competitive opt-out, two taps from Matchday",,P1-D Pre-Season: onboarding & the SS10 safety gates,"A switch that disables every competitive and social feature while leaving a fully useful food and weight tracker. ""An opt-out that leaves a crippled app is not an opt-out - it is a threat.""
+
+Named tests (acceptance criteria)
+* test_opt_out_hides_rank_tab
+* test_opt_out_stops_score_computation
+* test_opt_out_preserves_food_logging
+* test_opt_out_preserves_weight_trend_and_healthkit_sync
+* test_opt_out_is_reachable_in_two_taps
+* test_opt_out_is_reversible_and_preserves_history",High,5,phase-1,safety,gate,
+Story,S7: signposting always available in Settings,,P1-D Pre-Season: onboarding & the SS10 safety gates,"Beat (0808 801 0677) and the National Alliance for Eating Disorders, permanently in Settings. The pattern-based triggers are a Phase 3 gate and are explicitly out of scope here.
+
+Acceptance criteria
+* test_signposting_always_available_in_settings
+* test_signposting_copy_contains_no_diagnostic_language
+* The ""not a medical device"" footer appears wherever it fits",High,2,phase-1,safety,gate,
+Story,"Calibration window state: 14 days, no rank shown",,P1-D Pre-Season: onboarding & the SS10 safety gates,"PRODUCT.md: the first 14 days are a calibration window, shown as ""CALIBRATING - N days to go"", with no rank displayed.
+
+Acceptance criteria
+* profiles.calibration_completed_at set and honoured
+* The Table tab shows the calibrating state, not an empty leaderboard
+* Countdown is correct across a date change and a timezone change",Medium,3,phase-1,onboarding,design,
+Task,"HealthKit entitlement, usage strings and authorisation",,P1-E HealthKit sync,"Types: bodyMass, stepCount, activeEnergyBurned, appleExerciseTime, HKWorkoutType.
+
+Acceptance criteria
+* Entitlement and Info.plist usage descriptions in place; the sheet appears on first run
+* Authorisation requested once, not on every launch
+* authorizationStatus(for:) is not used to infer read access anywhere - it reports write permission only, and using it to infer reads is a trap (measured, Spike A)",High,2,phase-1,healthkit,,
+Story,Daily buckets via HKStatisticsCollectionQuery,,P1-E HealthKit sync,"Hard rule from Spike A: never iterate raw samples to build a daily total. Measured ~1,830 step samples and ~3,000 active-energy samples per day; the naive version has the Today screen chewing through ~123,000 objects per launch.
+
+Acceptance criteria
+* All daily totals come from HKStatisticsCollectionQuery, bucketed at local midnight
+* Cumulative vs discrete mapping is correct - bodyMass is averaged, never summed. Getting this wrong produces plausible nonsense
+* No code path enumerates raw samples for a total; a review checklist item or a lint rule enforces it",Highest,5,phase-1,healthkit,gate,
+Story,Anchored sync with the anchor persisted to health_samples,,P1-E HealthKit sync,"Brief SS1.4 calls the persisted anchor ""the entire trick"". Spike A measured it: 56,764 samples on the first read, 0 on the second, and the anchor survived a force-quit.
+
+Acceptance criteria
+* HKAnchoredObjectQuery with the anchor stored in health_samples.hk_anchor, not UserDefaults (that was the spike's shortcut)
+* result.deletedObjects is handled - it is not optional to handle
+* A cold launch after a previous sync reads approximately nothing
+* Written against the async descriptor API, not the callback form every tutorial online shows",Highest,5,phase-1,healthkit,exit-criterion,
+Story,HKObserverQuery + background delivery,,P1-E HealthKit sync,"What the spike deliberately skipped: updates while the app is backgrounded.
+
+Acceptance criteria
+* enableBackgroundDelivery(for:frequency:) registered for the read types
+* A weight written by a scale while the app is backgrounded appears without a manual refresh
+* Background wakeups do not re-read full history",Medium,5,phase-1,healthkit,,
+Story,Empty states that do not guess why they are empty,,P1-E HealthKit sync,"Spike A's most useful finding: a denied read is indistinguishable from no data, and there is no permission-denied branch to write. The spike's own empty state got this wrong in front of its author - it read 40 workouts and then printed ""either there is nothing recorded, or read access was declined"". Both halves were false.
+
+Acceptance criteria
+* Every data surface has a designed empty state whose wording covers both causes without claiming either
+* ""No daily totals for this type"" and stop - no speculation about permissions
+* Repositories return empty, never throw, when there is no data",High,3,phase-1,healthkit,design,safety
+Task,"Read workouts passively, build no workout UI",,P1-E HealthKit sync,"ADR 0009. Workouts give the ranking engine training signal without any workout UI, which is exactly how the v1 scope stays sane.
+
+Acceptance criteria
+* workout_count lands in health_samples
+* No workout screen, no workout logging, nothing in the tab bar",Low,2,phase-1,healthkit,,
+Story,"Sub On screen: four routes, the Squad and the Bench",,"P1-F Sub On: food logging, four routes","design/redesign/screens/3-sub-on.png. Most people rotate through roughly thirty distinct foods; surfacing frequent (The Squad) and recent (On the Bench) first makes search feel dramatically faster than the incumbents' without any clever algorithm.
+
+Acceptance criteria
+* Four routes visible: manual, search, barcode, photo
+* The Squad (frequent) and On the Bench (recent) populated from the user's own history
+* First Half / Second Half meal periods assign correctly across a date boundary",High,5,phase-1,logging,design,
+Story,Path 0: manual entry,,"P1-F Sub On: food logging, four routes","The fourth route in the redesign, and the one that starts the 21-day clock. It works offline by construction and depends on nothing external.
+
+Acceptance criteria
+* Log a food by name, grams and macros with no network
+* entry_method = manual
+* Fast enough to use daily without irritation - this is the path that will carry the first week",Highest,3,phase-1,logging,dogfood-blocker,
+Story,Path 1: text search against the mirrored database,,"P1-F Sub On: food logging, four routes","Brief SS1.3. Search hits your own Postgres, never a third-party API on a keystroke.
+
+Acceptance criteria
+* Debounced query against the tsvector index; results feel instant
+* Recent and frequent foods surface above raw search results
+* Works with no signal against a local cache of the user's own food set
+* entry_method = search",High,5,phase-1,logging,,
+Story,Path 2: barcode via VisionKit DataScannerViewController,,"P1-F Sub On: food logging, four routes","""The fastest logging path that exists for packaged food and it is close to free to implement. Prioritise it."" Roughly twenty lines - do not hand-roll AVFoundation.
+
+Acceptance criteria
+* Scan resolves against the mirrored Open Food Facts data
+* Unknown barcode falls back to manual search rather than dead-ending, and offers to save as a custom food
+* entry_method = barcode",High,3,phase-1,logging,,
+Story,Path 3: photo estimate via a Supabase Edge Function,,"P1-F Sub On: food logging, four routes","Capture or pick, downscale to ~1024 px on the longest edge before upload (materially cuts cost and latency, accuracy barely moves), upload to Storage, Edge Function calls the vision model with a structured-output prompt, returns items with ranges and a confidence level.
+
+Never call the AI API from the app - keys in a client binary are extractable in minutes.
+
+Acceptance criteria
+* End-to-end round trip on a real photo, on a real device
+* Provider sits behind an interface (ADR 0010), so swapping arms costs nothing
+* Structured output validated before it reaches the UI; a malformed response degrades to manual entry
+* Measured latency recorded (the spike saw 1.9-3.1 s)",Medium,8,phase-1,logging,backend,
+Story,Under Review: the mandatory confirm-and-correct screen,,"P1-F Sub On: food logging, four routes","design/redesign/screens/4-under-review.png. Nothing logs until the user gives the decision. Trained dietitians misestimate by 20-30% and the models do worse; owning that loudly is better product design than pretending otherwise.
+
+Acceptance criteria
+* No estimate can reach food_logs without an explicit confirmation
+* Range and confidence are both visible; the range renders as figure plus tolerance, never two numbers joined by a dash
+* Correction is one tap
+* was_corrected and correction_delta written to photo_estimates on every pass - that dataset is how the prompt improves later",Highest,5,phase-1,logging,safety,gate
+Task,Per-user daily photo cap in the Edge Function,,"P1-F Sub On: food logging, four routes","SS10: add the cap before you hand the app to anyone, not after a surprise bill. Measured cost is $0.000862/image, so this is an abuse control rather than a cost control - 20-30 photos/day is generous enough that no honest user reaches it while still bounding a runaway client loop.
+
+Acceptance criteria
+* Cap enforced server-side, not in the client
+* Hitting it produces calm copy and an intact manual path, not an error",Medium,2,phase-1,backend,safety,
+Task,Keep the photo alongside the confirmed values,,"P1-F Sub On: food logging, four routes","Phase 0 folded the photo-accuracy benchmark into Phase 1 (ADR 0010) on one condition: that Phase 1's logging keeps the photo alongside the confirmed values, so the 21 days produce the dataset instead of a separate evening's collection.
+
+Acceptance criteria
+* storage_path, model_output, confidence and the user's confirmed values all persist together
+* The set is exportable in a shape spikes/vision-accuracy can score",High,2,phase-1,logging,benchmark,
+Story,Weight entry: manual plus HealthKit,,P1-G The Run: weight & trend,"Smart scales write to HealthKit automatically; manual entry covers everyone else.
+
+Acceptance criteria
+* Both sources land in weight_logs with source set correctly
+* No duplicate when the same reading arrives both ways
+* Works offline",High,3,phase-1,weight,dogfood-blocker,
+Story,7-day EWMA trend in Swift Charts,,P1-G The Run: weight & trend,"Brief SS1.5: never display raw daily weight. Daily weight is mostly water, glycogen and gut content; showing it raw produces a jagged line that makes a genuinely successful week look like failure, and it is one of the main reasons people abandon weight-loss apps in the first fortnight.
+
+Acceptance criteria
+* 7-day exponentially weighted moving average, rendered with Swift Charts
+* Raw daily values are never the primary series
+* Trend is correct across gaps in the data",High,5,phase-1,weight,exit-criterion,
+Story,One-point and no-point trend states,,P1-G The Run: weight & trend,"Measured in Spike A: bodyweight read 120.00 kg from a single same-day entry, so the 30-day trend had exactly one point. Nothing was wrong - there was simply no back-history. The trend view needs ""one data point"" as a real designed state, not a sparse-data edge case.
+
+Acceptance criteria
+* Zero points, one point and two points each render deliberately
+* Wording does not speculate about why data is missing (see the HealthKit empty-state ticket)",Medium,2,phase-1,weight,design,
+Story,Pace against the rate chosen at onboarding,,P1-G The Run: weight & trend,"design/redesign/screens/5-the-run.png - weight and trend against the pace you chose.
+
+Acceptance criteria
+* Target pace line derived from the S3-filtered rate on the profile
+* Being ahead of pace is not celebrated - the engine caps rate of loss for safety and celebration of speed would fight it (PRODUCT.md, S3)
+* Being behind pace uses copy-deck wording, never punishment framing",Medium,3,phase-1,weight,design,
+Story,"Band and remaining, on the pitch",,P1-H Matchday: the Today dashboard,"design/redesign/screens/2-matchday.png. The daily driver: band, pitch, team sheet.
+
+Acceptance criteria
+* Remaining renders as a figure plus tolerance
+* Going over the band uses no error colour - the token set deliberately has none for this, and critical is destructive-confirm only
+* Real evidence values from PRODUCT.md during development, never lorem or round numbers",High,5,phase-1,dashboard,design,
+Story,Macro split,,P1-H Matchday: the Today dashboard,"Acceptance criteria
+* Protein / carbs / fat from the day's logs
+* Renders sensibly at zero logs, one log and twenty",Medium,3,phase-1,dashboard,,
+Story,Weight sparkline on Matchday,,P1-H Matchday: the Today dashboard,"The EWMA series from The Run, compressed to a glance.
+
+Acceptance criteria
+* Shares the trend calculation with The Run - one implementation, not two
+* Degrades to the one-point state",Medium,2,phase-1,dashboard,,
+Story,Form: the 7-day consistency ring,,P1-H Matchday: the Today dashboard,"Form is the redesign's name for 7-day consistency. Consistency is 0.50 of the eventual score, so this is the surface the whole thesis leans on.
+
+Acceptance criteria
+* A missed day renders empty, never crossed out; no streak-loss animation (S5)
+* No confetti or speed-rewarding celebration anywhere (PRODUCT.md)
+* The ring is legible without colour alone",High,3,phase-1,dashboard,safety,
+Task,Division badge placeholder for Phase 2,,P1-H Matchday: the Today dashboard,"Brief SS1.6 asks for a placeholder where the tier badge sits in Phase 2.
+
+Acceptance criteria
+* A reserved, honest placeholder - no invented tier, no sample rank, no other user's name or number anywhere in v1",Low,1,phase-1,dashboard,design,
+Story,Outbox and the sync service,,P1-I Offline-first sync,"ADR 0005. An outbox table holds pending mutations; a sync service drains it when connectivity returns. Last-write-wins on server timestamps for v1 - document the limitation rather than building CRDTs.
+
+Acceptance criteria
+* Every mutation enqueues to sync_outbox with entity, operation, payload and attempts
+* Drain is idempotent; a replayed payload does not duplicate a row
+* Backoff on repeated failure; attempts is honoured rather than looping
+* The last-write-wins limitation is written down where a future reader will find it",High,5,phase-1,sync,,
+Story,Airplane-mode verification,,P1-I Offline-first sync,"Phase 1 exit criterion: ""Outbox sync verified by using the app in airplane mode.""
+
+Acceptance criteria
+* A full day logged in airplane mode: food, weight, corrections
+* Nothing blocks on the network; no spinner waits on a request
+* Everything reconciles correctly on reconnect, in order, with no duplicates and no loss
+* Gyms and restaurant basements have no signal - this is the scenario, not a synthetic one",High,3,phase-1,sync,exit-criterion,
+Task,Start the 21-day clock,,P1-J Dogfood: 21 consecutive days,"The clock cannot start until the app can be used daily on the real device. The minimum set is: onboarding produces a band, manual entry works, weight entry works, and it all persists locally.
+
+Everything else in the phase - barcode, photo, background HealthKit delivery, the Matchday polish - can land while the 21 days run, provided a change never breaks a day's logging.
+
+Acceptance criteria
+* Day 0 date recorded on this ticket
+* Dev build installed on the phone and surviving a rebuild without wiping the local store",Highest,1,phase-1,dogfood,gate,
+Story,Log 21 consecutive days of real data,,P1-J Dogfood: 21 consecutive days,"Non-negotiable, and the phase's actual purpose. Your own three weeks of logs are the test set for the entire crown jewel of this project - Phase 2 cannot design a fair ranking system without them.
+
+Acceptance criteria
+* 21 consecutive days, real food, real weight, no synthetic backfill
+* A broken day breaks the streak - be honest about it in the tracker rather than quietly ticking it (repo convention)
+* Data survives every app update shipped during the window",Highest,13,phase-1,dogfood,exit-criterion,
+Story,Photo-accuracy benchmark from the 21 days,,P1-J Dogfood: 21 consecutive days,"Moved out of Phase 0's exit criteria and folded into Phase 1 (ADR 0010): it is a benchmark, not a spike - it calibrates a feature rather than killing one. The meals arrive from real use.
+
+Acceptance criteria
+* At least 20 photo-logged meals with the model's estimate and the confirmed value both retained
+* Scored through spikes/vision-accuracy and written into docs/phase-0/07-spike-findings.md
+* No invented baseline before the data exists - ""do not invent one"" (PRODUCT.md)",Medium,5,phase-1,benchmark,,
+Task,Bug intake from daily use,,P1-J Dogfood: 21 consecutive days,"Everything found while actually using the app lands here and gets triaged, rather than being fixed in place and forgotten.
+
+Acceptance criteria
+* A running list, triaged weekly into fix-now / fix-in-phase-2 / won't-fix
+* Anything that breaks a day's logging is fix-now by definition",Medium,3,phase-1,dogfood,,
+Task,EXIT: 21 consecutive days of real data logged,,P1-X Phase 1 exit criteria,Non-negotiable. This is the phase's actual purpose. Closed by the dogfood epic.,Highest,,phase-1,exit-criterion,,
+Task,"EXIT: all four logging routes work, offline included",,P1-X Phase 1 exit criteria,"Brief says three paths; the redesign adds manual as a fourth. Offline is part of the criterion, not a follow-up.",Highest,,phase-1,exit-criterion,,
+Task,EXIT: HealthKit incremental sync with a persisted anchor,,P1-X Phase 1 exit criteria,Proven the way Spike A proved it: a cold launch after a sync reads approximately nothing.,Highest,,phase-1,exit-criterion,,
+Task,EXIT: weight trend rendering as a moving average,,P1-X Phase 1 exit criteria,"7-day EWMA, never raw daily weight.",Highest,,phase-1,exit-criterion,,
+Task,EXIT: outbox sync verified in airplane mode,,P1-X Phase 1 exit criteria,"A real day of use with the radio off, reconciled on reconnect.",Highest,,phase-1,exit-criterion,,
+Task,"EXIT: RLS policies on every table, tested with two accounts",,P1-X Phase 1 exit criteria,"Account A cannot touch account B's rows. Proven with two real accounts, repeatably.",Highest,,phase-1,exit-criterion,,
+Task,EXIT: the seven SS10 Phase 1 safety gates all built in,,P1-X Phase 1 exit criteria,"Not in the brief's original list, but docs/safety/safety-requirements.md's phase-gate checklist makes S1-S7 Phase 1 requirements rather than Phase 3 polish. Adding it here so the phase cannot close with a gate quietly deferred.
+
+S1 floor - S2 BMI rejection - S3 onboarding ceiling - S4 age gate - S5 lint rule active - S6 opt-out - S7 signposting in Settings.",Highest,,phase-1,exit-criterion,safety,
