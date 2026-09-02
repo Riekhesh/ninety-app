@@ -19,7 +19,8 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | What is this project, what's the pitch | `README.md` |
 | The brief itself (§ references resolve here) | `docs/brief/` — but read the ADR or safety rule first; only §2.2's maths and §2.3's anti-gaming live nowhere else |
 | What Phase 0 proved, and the measured numbers | `docs/phase-0/07-spike-findings.md` |
-| What Phase 1 has to do | `docs/phase-0/README.md` (closed tracker) + `PRODUCT.md` |
+| What Phase 1 has to do, and what closes it | `docs/phase-1/README.md` — the live tracker |
+| What Phase 0 closed on, and the product state | `docs/phase-0/README.md` (closed) + `PRODUCT.md` |
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |
@@ -41,7 +42,9 @@ open only the one that matters.
 
 ```
 docs/
-  phase-0/     the live tracker + exit criteria. accounts.md is a runbook, not reading
+  phase-1/     the LIVE tracker. Exit criteria, the running order, the 21-day clock.
+               jira-import.csv seeded the board — 11 epics, 60 issues
+  phase-0/     closed tracker. accounts.md is a runbook, not reading
   decisions/   13 ADRs. Index first, then one file. Never renumber
   safety/      §10 as numbered rules S1-S7 with test names. Load-bearing for Phase 1
   security/    secrets policy. The anon key is public; RLS is the security boundary
@@ -107,3 +110,7 @@ scripts/verify-accounts.sh                     # reads .env, never prints a valu
   information changed it. "I changed my mind" is not new information.
 - **`TO BE MEASURED`** marks a real outstanding placeholder. CI prints them; don't
   invent values to clear one.
+- **The 21-day clock is calendar, not work.** Phase 1 cannot close fewer than 21 days
+  after the app first becomes daily-usable, so the running order exists to start that
+  clock early — see `docs/phase-1/README.md`. Once it runs, anything that breaks a
+  day's logging is fix-now.
