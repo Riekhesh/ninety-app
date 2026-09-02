@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       swift: ${{ steps.filter.outputs.swift }}
+      sql: ${{ steps.filter.outputs.sql }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,6 +60,14 @@ jobs:
           else
             echo "swift=false" >> "$GITHUB_OUTPUT"
             echo "Docs or design only — skipping the macOS job (200 real minutes/month)."
+          fi
+
+          # The RLS proof needs a Postgres, not a Mac, so it is gated
+          # separately and runs on Ubuntu.
+          if echo "$changed" | grep -qE '^(supabase/|scripts/verify-rls\.sh|\.github/workflows/)'; then
+            echo "sql=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "sql=false" >> "$GITHUB_OUTPUT"
           fi
 
   # ───────────────────────────────────────────────────────────────────────────
@@ -104,6 +113,27 @@ jobs:
         run: |
           echo "Outstanding Phase 0 placeholders:"
           grep -rn "TO BE MEASURED\|TBD" docs/ || echo "  none"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  # RLS is the security boundary for special category health data (ADR 0003),
+  # so "we tested it once in the dashboard" is not a control. This runs the
+  # two-account proof against a real Postgres on every change to the schema.
+  # ───────────────────────────────────────────────────────────────────────────
+  rls:
+    name: RLS, proven with two accounts
+    runs-on: ubuntu-latest
+    needs: triage
+    if: needs.triage.outputs.sql == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PostgreSQL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends postgresql-16
+
+      - name: Apply the migrations and try to breach them
+        run: scripts/verify-rls.sh
 
   # ───────────────────────────────────────────────────────────────────────────
   # Expensive macOS job. Skipped entirely until there is Swift code to check.
