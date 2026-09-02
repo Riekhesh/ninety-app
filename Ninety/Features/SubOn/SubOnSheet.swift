@@ -19,7 +19,7 @@ struct SubOnSheet: View {
             Screen(title: "Sub On") {
                 HoldingNote(
                     eyebrow: "Four routes",
-                    headline: "Logging lands with P1-F.",
+                    headline: "Logging lands with P1‑F.",
                     detail: """
                         Manual, search, barcode and photo. Manual comes first because it \
                         works offline by construction, and it is the route that starts \

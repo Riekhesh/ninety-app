@@ -41,7 +41,7 @@ struct SafetyCopyTests {
             "Weight", "No weight yet.", "Division",
             "Ranking arrives in the next update.", "How it will be scored",
             "Consistency", "Adherence", "Progress", "Four routes",
-            "Logging lands with P1-F.",
+            "Logging lands with P1‑F.",
         ]
     }
 
