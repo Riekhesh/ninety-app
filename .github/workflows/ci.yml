@@ -91,6 +91,11 @@ jobs:
           python3 -m pip install --quiet -r spikes/vision-accuracy/requirements.txt
           python3 -m pytest spikes/vision-accuracy/tests -q
 
+      - name: Check the app bundle's plist
+        # Needs no Mac, and catches a class of failure that otherwise only
+        # appears at install time on a device or simulator.
+        run: python3 scripts/check_bundle.py .
+
       - name: Check for TODO markers in shipped docs
         # Phase 0 deliverables have placeholders you are meant to fill in by
         # hand (competitor numbers, the measured baseline). This does not fail

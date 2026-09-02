@@ -156,6 +156,21 @@ SWIFT
   fi
 fi
 
+# ─── 4. The app bundle's own plist ───────────────────────────────────────────
+# Xcode injects six CFBundle keys when it generates the plist, and stops the
+# moment you supply one. The app then builds cleanly and fails at install with
+# "Missing bundle ID" — a message that names the symptom, not the cause. This
+# is the cheap check that catches it before a Mac ever sees the build.
+
+head_ "App bundle"
+
+while IFS= read -r line; do
+  case "$line" in
+    "OK "*)  ok "${line#OK }" ;;
+    "BAD "*) bad "${line#BAD }" ;;
+  esac
+done < <(python3 "$ROOT/scripts/check_bundle.py" "$ROOT")
+
 head_ "Result"
 printf '  %d passed, %d failed\n\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]
