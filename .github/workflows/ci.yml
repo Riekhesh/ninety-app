@@ -17,6 +17,51 @@ concurrency:
 
 jobs:
   # ───────────────────────────────────────────────────────────────────────────
+  # Does this change need a Mac? Two seconds on Ubuntu to decide, so that a
+  # docs or design commit never starts a macOS runner at all. The probe inside
+  # the swift job below could only skip its *steps* — by which point the
+  # expensive runner has already been billed.
+  # ───────────────────────────────────────────────────────────────────────────
+  triage:
+    name: Does this touch Swift?
+    runs-on: ubuntu-latest
+    outputs:
+      swift: ${{ steps.filter.outputs.swift }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compare against the base
+        id: filter
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          # workflow_dispatch, a new branch, or a force-push leaves no usable
+          # base. Run the Mac rather than guess — a false negative here means a
+          # broken build merges, which costs far more than one macOS minute.
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "No usable base commit — running the macOS job."
+            echo "swift=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed=$(git diff --name-only "$BASE" "${{ github.sha }}")
+          echo "Changed files:"; echo "$changed" | sed 's/^/  /'
+
+          # The paths that can change what the app compiles to. The generated
+          # Swift is in here because a token edit regenerates it, and the
+          # workflow is in here because a change to this filter must be able to
+          # test itself.
+          if echo "$changed" | grep -qE '^(Ninety/|NinetyTests/|Packages/|Config/|Ninety\.xcodeproj/|design/generated/.*\.swift|\.swiftlint\.yml|\.github/workflows/)'; then
+            echo "swift=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "swift=false" >> "$GITHUB_OUTPUT"
+            echo "Docs or design only — skipping the macOS job (200 real minutes/month)."
+          fi
+
+  # ───────────────────────────────────────────────────────────────────────────
   # Cheap Ubuntu checks. These run on every push and are the ones that will
   # actually catch things during Phase 0, when there is no Swift code yet.
   # ───────────────────────────────────────────────────────────────────────────
@@ -61,21 +106,12 @@ jobs:
   swift:
     name: SwiftLint and tests
     runs-on: macos-15
+    needs: triage
+    if: needs.triage.outputs.swift == 'true'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Is there any Swift yet?
-        id: probe
-        run: |
-          if [ -d Ninety ] || [ -d Packages ]; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "found=false" >> "$GITHUB_OUTPUT"
-            echo "No Swift sources yet — Phase 0 is de-risking, not building (§0.7)."
-          fi
-
       - name: Select toolchain
-        if: steps.probe.outputs.found == 'true'
         # Xcode 26+ against the iOS 26 SDK is the App Store submission floor
         # since 28 April 2026 (§0.1). Pin it rather than trusting the runner
         # default, which moves without warning.
@@ -89,20 +125,27 @@ jobs:
           swift --version
 
       - name: SwiftLint
-        if: steps.probe.outputs.found == 'true'
         run: |
           brew install swiftlint
           swiftlint --strict --reporter github-actions-logging
+
+      - name: Prove the guardrails fire
+        # The custom rules in .swiftlint.yml are how ADR 0006's engine purity and
+        # S5's copy ban are enforced rather than remembered. This runs each of
+        # them against a deliberate violation and fails if one gets through — a
+        # lint rule that has silently stopped matching looks exactly like a
+        # codebase with no violations.
+        run: scripts/verify-guardrails.sh
 
       - name: Test RankingEngine
         # The engine is a standalone SPM package with no UI dependencies, so it
         # tests on the command line without a simulator — which is exactly why
         # §2.1 wants it isolated. This job stays fast for the whole project.
-        if: steps.probe.outputs.found == 'true' && hashFiles('Packages/RankingEngine/Package.swift') != ''
+        if: hashFiles('Packages/RankingEngine/Package.swift') != ''
         run: swift test --package-path Packages/RankingEngine
 
       - name: Build app
-        if: steps.probe.outputs.found == 'true' && hashFiles('Ninety.xcodeproj/project.pbxproj', 'Ninety.xcworkspace/contents.xcworkspacedata') != ''
+        if: hashFiles('Ninety.xcodeproj/project.pbxproj') != ''
         run: |
           xcodebuild build \
             -scheme Ninety \
