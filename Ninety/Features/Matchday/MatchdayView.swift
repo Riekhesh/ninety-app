@@ -27,19 +27,10 @@ struct MatchdayView: View {
         }
     }
 
-    /// The one primary action on the screen, and the only gold-filled control
-    /// in the app: gold is the division's colour, so spending it anywhere else
-    /// would cost the rank reveal its meaning.
     private var subOnButton: some View {
-        Button(action: subOn) {
-            Text("Sub on")
-                .ninetyType(.label)
-                .foregroundStyle(Ninety.Colour.textInverse)
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .background(Ninety.Colour.accent)
-                .ninetyCorners(Ninety.Radius.full)
-        }
-        .accessibilityLabel("Sub on. Log food.")
+        Button("Sub on", action: subOn)
+            .buttonStyle(.primary)
+            .accessibilityLabel("Sub on. Log food.")
     }
 }
 

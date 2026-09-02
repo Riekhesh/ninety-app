@@ -134,6 +134,7 @@ public extension Ninety {
         case caption
         case label
         case masthead
+        case button
         case metricXL
         case metricL
         case metricM
@@ -154,6 +155,7 @@ public extension Ninety {
             case .caption: 12
             case .label: 11
             case .masthead: 21
+            case .button: 17
             case .metricXL: 56
             case .metricL: 40
             case .metricM: 28
@@ -179,6 +181,7 @@ public extension Ninety {
             case .caption: .regular
             case .label: .semibold
             case .masthead: .regular
+            case .button: .regular
             case .metricXL: .semibold
             case .metricL: .semibold
             case .metricM: .semibold
@@ -202,6 +205,7 @@ public extension Ninety {
             case .caption: .caption1
             case .label: .caption2
             case .masthead: .title3
+            case .button: .headline
             case .metricXL: .largeTitle
             case .metricL: .title1
             case .metricM: .title2
@@ -234,6 +238,7 @@ public extension Ninety {
             case .caption: "Saira-Regular"
             case .label: "SairaCondensed-SemiBold"
             case .masthead: "SairaCondensed-ExtraBold"
+            case .button: "SairaCondensed-ExtraBold"
             case .metricXL: "Saira-SemiBold"
             case .metricL: "Saira-SemiBold"
             case .metricM: "Saira-SemiBold"
@@ -260,6 +265,7 @@ public extension Ninety {
             case .caption: .caption
             case .label: .caption2
             case .masthead: .title3
+            case .button: .headline
             case .metricXL: .largeTitle
             case .metricL: .title
             case .metricM: .title2
@@ -286,6 +292,7 @@ public extension Ninety {
             case .caption: 16
             case .label: 14
             case .masthead: 26
+            case .button: 22
             case .metricXL: 58
             case .metricL: 44
             case .metricM: 32
@@ -307,6 +314,7 @@ public extension Ninety {
             case .caption: 0
             case .label: 1.6
             case .masthead: 2.5
+            case .button: 2.5
             case .metricXL: -1.5
             case .metricL: -0.8
             case .metricM: -0.3
@@ -316,7 +324,7 @@ public extension Ninety {
 
         /// Labels are set in caps; nothing else is.
         public var isUppercased: Bool {
-            switch self { case .label, .masthead: true; default: false }
+            switch self { case .label, .masthead, .button: true; default: false }
         }
     }
 }

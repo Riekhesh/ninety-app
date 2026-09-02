@@ -77,6 +77,7 @@ SF Pro (`system-ui`). Numbers that update in place use **tabular figures**.
 | caption | 12/16 | 400 |  |
 | label | 11/14 | 600 | Condensed micro-labels — the broadcast caption voice. Tracked out for caps at 11pt. |
 | masthead | 21/26 | 800 | The screen masthead beside the kit stripes: MATCHDAY, THE RUN, THE TABLE. |
+| button | 17/22 | 800 | The primary button: KICK OFF, GIVE THE DECISION, SUB ON. One per screen. |
 | metricXL | 56/58 | 600 | The composite score on the rank screen. One per screen, maximum. |
 | metricL | 40/44 | 600 | Calories remaining. |
 | metricM | 28/32 | 600 |  |

@@ -420,6 +420,21 @@
         "ninety.usage": "The screen masthead beside the kit stripes: MATCHDAY, THE RUN, THE TABLE."
       }
     },
+    "button": {
+      "$type": "typography",
+      "$value": {
+        "fontSize": "17",
+        "lineHeight": "22",
+        "fontWeight": "800",
+        "letterSpacing": "2.5"
+      },
+      "$extensions": {
+        "ninety.iosTextStyle": "headline",
+        "ninety.transform": "uppercase",
+        "ninety.fontRole": "broadcast",
+        "ninety.usage": "The primary button: KICK OFF, GIVE THE DECISION, SUB ON. One per screen."
+      }
+    },
     "metricXL": {
       "$type": "typography",
       "$value": {

@@ -102,6 +102,7 @@ CONTRAST_RULES: list[tuple[str, str, float, str]] = [
     ("textTertiary", "surface", 4.5, "least-emphasis labels on cards"),
     ("accent", "canvas", 4.5, "accent used as link/label text"),
     ("accent", "surface", 4.5, "accent text on cards"),
+    ("textInverse", "accent", 4.5, "the primary button — the app's loudest control"),
     ("positive", "surface", 3.0, "in-band indicator — non-text UI"),
     ("safety", "surface", 3.0, "safety intervention indicator"),
     ("critical", "surface", 3.0, "destructive-action indicator"),
