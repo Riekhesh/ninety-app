@@ -18,7 +18,7 @@ bad()  { printf '  \033[31m✗\033[0m %s\n' "$1"; FAILED=1; }
 info() { printf '    \033[2m%s\033[0m\n' "$1"; }
 
 FAILED=0
-printf '\n\033[1mNinety — Phase 0 accounts check\033[0m\n\n'
+printf '\n\033[1mNotch — Phase 0 accounts check\033[0m\n\n'
 
 repo_root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 env_file="$repo_root/.env"
@@ -77,14 +77,26 @@ if [ -n "$anon" ] && [ "$anon" = "$service" ]; then
   info "the service_role key bypasses RLS; shipping it as the anon key would expose everything"
 fi
 
-# ── PostHog ─────────────────────────────────────────────────────────────────
-printf '\n\033[1m  PostHog\033[0m\n'
-check POSTHOG_PROJECT_API_KEY "write-only ingest key from Project Settings" '^phc_'
+# ── PostHog — deliberately deferred to Phase 3 ──────────────────────────────
+# Not needed until there are real testers to measure, and it blocks nothing
+# before then. Blank is the expected state, so it is a note rather than a
+# failure; a value that is present still has to be the right shape.
+printf '\n\033[1m  PostHog\033[0m \033[2m(deferred to Phase 3)\033[0m\n'
+posthog_key=$(val POSTHOG_PROJECT_API_KEY)
+if [ -z "$posthog_key" ]; then
+  warn "not set up yet — deferred to Phase 3, on purpose. Nothing to do."
+  info "when you do: docs/phase-0/accounts.md, and turn session replay and autocapture OFF"
+elif printf '%s' "$posthog_key" | grep -qE '^phc_'; then
+  ok "POSTHOG_PROJECT_API_KEY set (${#posthog_key} chars)"
+else
+  bad "POSTHOG_PROJECT_API_KEY does not start with phc_ — that is the project key"
+  info "phx_ is a personal API key and the project ID is a number; neither is this"
+fi
 
 host=$(val POSTHOG_HOST)
 case "$host" in
   https://eu.i.posthog.com*) ok "POSTHOG_HOST is the EU cloud" ;;
-  "")   bad "POSTHOG_HOST is blank — expected https://eu.i.posthog.com" ;;
+  "")   warn "POSTHOG_HOST is blank — set it to https://eu.i.posthog.com when you sign up" ;;
   *eu*) warn "POSTHOG_HOST is '$host' — EU-ish, but not the documented endpoint" ;;
   *)    bad "POSTHOG_HOST is '$host' — not the EU cloud"
         info "UK GDPR Article 9 health data. Region is fixed at signup; a US project needs recreating." ;;
@@ -102,10 +114,9 @@ fi
 printf '\n\033[1mConfirm these by eye — one-way doors\033[0m\n'
 printf '  \033[2m·\033[0m Supabase region is EU/London. Fixed at creation; changing it means\n'
 printf '    a dump, a new project, and reissuing every key above.\n'
-printf '  \033[2m·\033[0m PostHog session replay is OFF. It records the screen, and on this app\n'
-printf '    the screen is someone'"'"'s weight and food.\n'
-printf '  \033[2m·\033[0m PostHog autocapture is OFF. It captures element text, which on a food\n'
-printf '    log is the food.\n'
+printf '  \033[2m·\033[0m WHEN you create PostHog in Phase 3: session replay OFF (it records the\n'
+printf '    screen, and here the screen is someone'"'"'s weight and food) and autocapture\n'
+printf '    OFF (it captures element text, which on a food log is the food).\n'
 printf '  \033[2m·\033[0m GitHub secret scanning WITH push protection is on for this repo.\n'
 printf '  \033[2m·\033[0m No tables created yet — Phase 1 creates them as migrations with RLS.\n\n'
 
