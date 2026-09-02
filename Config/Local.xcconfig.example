@@ -1,0 +1,18 @@
+// Copy to Config/Local.xcconfig (gitignored) and fill in.
+//
+// This file is included LAST by Config/Ninety.xcconfig, so anything set here
+// overrides the committed defaults. Set the real build settings directly —
+// there is no indirection through a NINETY_* variable to get wrong.
+//
+// DEVELOPMENT_TEAM — your Apple Developer team id, 10 characters.
+//                    developer.apple.com/account, under Membership details.
+//                    Only a device build needs it; the Simulator does not.
+//
+// PRODUCT_BUNDLE_IDENTIFIER — only if app.ninety.Ninety is already taken on
+//                    your account. It must match the App ID you register.
+//
+// Neither is a secret, but both identify an individual account, and this
+// repository is read by other people.
+
+DEVELOPMENT_TEAM =
+// PRODUCT_BUNDLE_IDENTIFIER = com.yourname.ninety

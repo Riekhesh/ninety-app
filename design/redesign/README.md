@@ -77,7 +77,18 @@ to come, on top: a real crest, motion (a score flapping over, the ball settling)
 texture on the pitch, the promotion moment as an event rather than a line, and an App
 Store hero.
 
-**One thing a 393×852 artboard could not settle:** fixed type scale vs **Dynamic Type**.
-iOS wants system text styles and no hard-coded point sizes; these mockups use the fixed
-scale because a static frame cannot express the alternative. It is Phase 1's first
-design task and it changes how the type tokens are structured.
+**Settled, 2026-09-02.** Fixed type scale vs Dynamic Type was the one thing a 393×852
+artboard could not express. [ADR 0015](../../docs/decisions/0015-dynamic-type-with-a-bundled-face.md)
+takes Dynamic Type at every style, and bundles the two faces these artboards are set in
+(Saira and Saira Condensed) so the lettering survives the move to SwiftUI.
+
+The consequence for these files: **the sizes here are the Large baseline, not the
+layout.** Each artboard is correct at the default reading size and correct at no other,
+which is now a property of the design rather than a defect in it. A screen that holds a
+metric owes a reflow at accessibility sizes; the mockup cannot show you what it is.
+
+**One deviation, recorded in [DESIGN.md](../../DESIGN.md).** `Main.dc.html` draws the tab
+bar as MATCHDAY / SUB ON / TABLE. The build uses Matchday / The Run / The Table, with Sub
+On as a sheet: tabs are sections rather than actions, and the artboard's version spends
+one of three on a control while leaving weight without a home. Same three-tab cap, every
+tab a destination.

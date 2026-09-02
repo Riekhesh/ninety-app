@@ -222,6 +222,38 @@
       }
     }
   },
+  "font": {
+    "$description": "The Matchday world is set in two faces, both SIL OFL 1.1 and bundled in the app (Ninety/Resources/Fonts). Saira carries data and body; Saira Condensed carries the broadcast captions — mastheads, eyebrows, tab labels. Styles select a face by role, and the PostScript name is what SwiftUI must ask for: the static builds' family names are inconsistent (\"Saira Condensed Condensed\"), the PostScript names are not.",
+    "ui": {
+      "$type": "fontFamily",
+      "$value": "Saira",
+      "$description": "Data, body and controls. Has tnum, which is what makes the metric styles' tabular figures real.",
+      "$extensions": {
+        "ninety.postScriptNames": {
+          "400": "Saira-Regular",
+          "500": "Saira-Medium",
+          "600": "Saira-SemiBold",
+          "700": "Saira-Bold"
+        },
+        "ninety.licence": "SIL Open Font License 1.1",
+        "ninety.source": "https://fonts.google.com/specimen/Saira — Omnibus-Type"
+      }
+    },
+    "broadcast": {
+      "$type": "fontFamily",
+      "$value": "Saira Condensed",
+      "$description": "The caption voice: mastheads, eyebrows, tab labels. No tnum — so no metric style may use this role.",
+      "$extensions": {
+        "ninety.postScriptNames": {
+          "600": "SairaCondensed-SemiBold",
+          "700": "SairaCondensed-Bold",
+          "800": "SairaCondensed-ExtraBold"
+        },
+        "ninety.licence": "SIL Open Font License 1.1",
+        "ninety.source": "https://fonts.google.com/specimen/Saira+Condensed — Omnibus-Type"
+      }
+    }
+  },
   "type": {
     "$description": "Every style maps to an iOS text style so Dynamic Type works without extra code — non-negotiable for a health app. Sizes are the default (Large) sizes; they scale. Metric styles use tabular figures so digits do not jitter as values change.",
     "display": {
@@ -234,7 +266,8 @@
       },
       "$extensions": {
         "ninety.iosTextStyle": "largeTitle",
-        "ninety.usage": "Onboarding step headings, rank tier name."
+        "ninety.usage": "Onboarding step headings, rank tier name.",
+        "ninety.fontRole": "ui"
       }
     },
     "title1": {
@@ -246,7 +279,8 @@
         "letterSpacing": "-0.3"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "title"
+        "ninety.iosTextStyle": "title",
+        "ninety.fontRole": "ui"
       }
     },
     "title2": {
@@ -258,7 +292,8 @@
         "letterSpacing": "-0.2"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "title2"
+        "ninety.iosTextStyle": "title2",
+        "ninety.fontRole": "ui"
       }
     },
     "title3": {
@@ -270,7 +305,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "title3"
+        "ninety.iosTextStyle": "title3",
+        "ninety.fontRole": "ui"
       }
     },
     "headline": {
@@ -283,7 +319,8 @@
       },
       "$extensions": {
         "ninety.iosTextStyle": "headline",
-        "ninety.usage": "Food name in a row, card titles."
+        "ninety.usage": "Food name in a row, card titles.",
+        "ninety.fontRole": "ui"
       }
     },
     "body": {
@@ -295,7 +332,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "body"
+        "ninety.iosTextStyle": "body",
+        "ninety.fontRole": "ui"
       }
     },
     "callout": {
@@ -307,7 +345,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "callout"
+        "ninety.iosTextStyle": "callout",
+        "ninety.fontRole": "ui"
       }
     },
     "subhead": {
@@ -320,7 +359,8 @@
       },
       "$extensions": {
         "ninety.iosTextStyle": "subheadline",
-        "ninety.usage": "Brand and portion under a food name."
+        "ninety.usage": "Brand and portion under a food name.",
+        "ninety.fontRole": "ui"
       }
     },
     "footnote": {
@@ -332,7 +372,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "footnote"
+        "ninety.iosTextStyle": "footnote",
+        "ninety.fontRole": "ui"
       }
     },
     "caption": {
@@ -344,7 +385,8 @@
         "letterSpacing": "0"
       },
       "$extensions": {
-        "ninety.iosTextStyle": "caption"
+        "ninety.iosTextStyle": "caption",
+        "ninety.fontRole": "ui"
       }
     },
     "label": {
@@ -353,12 +395,44 @@
         "fontSize": "11",
         "lineHeight": "14",
         "fontWeight": "600",
-        "letterSpacing": "0.6"
+        "letterSpacing": "1.6"
       },
       "$extensions": {
         "ninety.iosTextStyle": "caption2",
         "ninety.transform": "uppercase",
-        "ninety.usage": "Section eyebrows, stat card labels."
+        "ninety.usage": "Section eyebrows, stat card labels.",
+        "ninety.fontRole": "broadcast"
+      },
+      "$description": "Condensed micro-labels — the broadcast caption voice. Tracked out for caps at 11pt."
+    },
+    "masthead": {
+      "$type": "typography",
+      "$value": {
+        "fontSize": "21",
+        "lineHeight": "26",
+        "fontWeight": "800",
+        "letterSpacing": "2.5"
+      },
+      "$extensions": {
+        "ninety.iosTextStyle": "title3",
+        "ninety.transform": "uppercase",
+        "ninety.fontRole": "broadcast",
+        "ninety.usage": "The screen masthead beside the kit stripes: MATCHDAY, THE RUN, THE TABLE."
+      }
+    },
+    "button": {
+      "$type": "typography",
+      "$value": {
+        "fontSize": "17",
+        "lineHeight": "22",
+        "fontWeight": "800",
+        "letterSpacing": "2.5"
+      },
+      "$extensions": {
+        "ninety.iosTextStyle": "headline",
+        "ninety.transform": "uppercase",
+        "ninety.fontRole": "broadcast",
+        "ninety.usage": "The primary button: KICK OFF, GIVE THE DECISION, SUB ON. One per screen."
       }
     },
     "metricXL": {
@@ -372,7 +446,8 @@
       "$extensions": {
         "ninety.iosTextStyle": "largeTitle",
         "ninety.tabularFigures": true,
-        "ninety.usage": "The composite score on the rank screen. One per screen, maximum."
+        "ninety.usage": "The composite score on the rank screen. One per screen, maximum.",
+        "ninety.fontRole": "ui"
       }
     },
     "metricL": {
@@ -386,7 +461,8 @@
       "$extensions": {
         "ninety.iosTextStyle": "title",
         "ninety.tabularFigures": true,
-        "ninety.usage": "Calories remaining."
+        "ninety.usage": "Calories remaining.",
+        "ninety.fontRole": "ui"
       }
     },
     "metricM": {
@@ -399,7 +475,8 @@
       },
       "$extensions": {
         "ninety.iosTextStyle": "title2",
-        "ninety.tabularFigures": true
+        "ninety.tabularFigures": true,
+        "ninety.fontRole": "ui"
       }
     },
     "metricS": {
@@ -413,7 +490,8 @@
       "$extensions": {
         "ninety.iosTextStyle": "headline",
         "ninety.tabularFigures": true,
-        "ninety.usage": "kcal on a food row."
+        "ninety.usage": "kcal on a food row.",
+        "ninety.fontRole": "ui"
       }
     }
   },

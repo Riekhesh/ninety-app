@@ -1,0 +1,52 @@
+// Ninety — shared build settings.
+//
+// Committed, and deliberately free of anything tied to one Apple account: this
+// repository is a portfolio artifact that people read. Your own team id goes in
+// Config/Local.xcconfig, which is gitignored — copy Local.xcconfig.example to
+// start. Without it the app still builds for the Simulator; only a device build
+// needs the team.
+//
+// The override include is at the BOTTOM of this file, not the top. xcconfig is
+// last-assignment-wins, so an include at the top is one the local file can
+// never actually override.
+
+PRODUCT_NAME = Ninety
+PRODUCT_BUNDLE_IDENTIFIER = app.ninety.Ninety
+DEVELOPMENT_TEAM =
+CURRENT_PROJECT_VERSION = 1
+MARKETING_VERSION = 0.1.0
+
+// ADR 0002 — iOS 18.0 deployment target, built against the iOS 26 SDK.
+IPHONEOS_DEPLOYMENT_TARGET = 18.0
+TARGETED_DEVICE_FAMILY = 1
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator
+SUPPORTS_MACCATALYST = NO
+
+// Swift 6 strict concurrency, on properly rather than as warnings. Turning it
+// on later means retrofitting actor isolation across a finished app; turning it
+// on now means never writing the code that would have needed it.
+SWIFT_VERSION = 6.0
+SWIFT_STRICT_CONCURRENCY = complete
+SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES
+
+// Not warnings-as-errors: SwiftUI deprecations arrive with every SDK and a
+// red build on the morning of an Xcode update costs a day's logging, which
+// once the 21-day clock runs is the most expensive thing in the project.
+// CI runs `swiftlint --strict`, so lint warnings still fail the PR.
+GCC_TREAT_WARNINGS_AS_ERRORS = NO
+SWIFT_TREAT_WARNINGS_AS_ERRORS = NO
+
+// An explicit plist, not a generated one. GENERATE_INFOPLIST_FILE is NO on
+// both targets, which means Xcode stops injecting CFBundleIdentifier and the
+// other five standard keys — Config/Info.plist carries them itself.
+INFOPLIST_FILE = Config/Info.plist
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+// Off because the SwiftLint build phase has to read the whole source tree,
+// and the sandbox blocks exactly that. The trade is deliberate: a lint pass
+// on every build is worth more here than sandboxing one script we wrote
+// ourselves and can read in full.
+ENABLE_USER_SCRIPT_SANDBOXING = NO
+
+// Last, so your machine wins. Anything set here overrides everything above.
+#include? "Local.xcconfig"

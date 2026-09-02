@@ -74,7 +74,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 
 | Epic | What it covers | Pri |
 |---|---|---|
-| **P1-A** Foundations & app skeleton | Xcode project, `Packages/`, tokens wired in, macOS CI on, and the open type decision settled | Highest |
+| **P1-A** Foundations & app skeleton | **Built 2 Sep, not yet compiled.** Xcode project, `Packages/`, tokens wired in, macOS CI gated, type decision settled. Closes when a Mac builds it | Highest |
 | **P1-B** Data layer, schema & RLS | Migration 001 with RLS from the first line, SwiftData, repositories, the food mirror | Highest |
 | **P1-C** Authentication | Sign in with Apple, and Article 9 consent separate from ToS | High |
 | **P1-D** Pre-Season: onboarding & the §10 gates | Mifflin-St Jeor as a band, S1–S7, the calibration window | Highest |
@@ -95,9 +95,11 @@ order laid out visually, is published at
 
 ## Running order
 
-1. **Settle the type decision, then make a project exist.** ADR 0015 blocks every view
-   ticket and nothing at all can start before `Ninety/` exists. Resist starting anything
-   else beside these two.
+1. ~~**Settle the type decision, then make a project exist.**~~ **P1-A, 2 Sep.**
+   ADR 0015 is written and `Ninety/` exists. It has not been compiled — the work was
+   done in a Linux container with no Xcode — so P1-A closes on the
+   [first Mac session](#first-mac-session), not on the commit. See
+   [what P1-A landed](#p1-a--what-landed).
 2. **Schema and RLS before a single row exists.** RLS goes on in migration 001. By week
    three that database holds your own health data, and retrofitting it then is §1.1's
    *"genuinely bad afternoon"*.
@@ -110,16 +112,25 @@ order laid out visually, is published at
 
 ---
 
-## The first design task
+## The first design task — closed 2 September 2026
 
-**Fixed type scale vs Dynamic Type**, unresolved since the redesign and the one thing a
-393×852 artboard could not settle. iOS wants system text styles and no hard-coded point
-sizes; the mockups use the fixed scale because a static frame cannot express the
-alternative. Whichever wins changes how the type tokens are structured, so it blocks
-every view ticket.
+**Fixed type scale vs Dynamic Type.** Settled in
+[ADR 0015](../decisions/0015-dynamic-type-with-a-bundled-face.md): Dynamic Type at every
+style, no exceptions, carried by two bundled faces rather than by San Francisco.
 
-Write it up as **ADR 0015** with a pre-written reversal trigger, and add the row to the
-index in `docs/decisions/README.md`. Do not renumber.
+The third thing the framing hid: neither option was what the generated Swift actually
+did. It emitted `Font.system(...)`, so shipping it would have resolved the question in
+favour of *neither* — rendering a world built on Saira Condensed lettering entirely in
+the platform sans. The tokens now carry the faces, and `generate.py` fails the build on a
+style the bundled families cannot render.
+
+**Consequence for the artboards:** their sizes are the Large baseline, not the layout.
+Every screen holding a metric owes a reflow at accessibility sizes.
+
+**Still outstanding:** Matchday captured at `.xSmall` and `.accessibility5`. Matchday is
+P1-H, so there is no dashboard to photograph yet — the mechanism and the harness exist
+(every view ships an `.accessibility5` preview; `DesignSystemTests.typeScales` asserts
+all sixteen styles respond to the content size category). Carried into P1-H.
 
 ---
 
@@ -138,6 +149,41 @@ Numbers and the full write-up: [`../phase-0/07-spike-findings.md`](../phase-0/07
 
 ---
 
+## P1-A — what landed
+
+Seven tickets, 16 points, on branch `p1-a`. **Written, not yet built:** every line of
+this was produced in a Linux container with no Xcode, Swift toolchain or simulator, so
+the epic is not closed until a Mac has compiled it. Everything that *could* be checked
+without a toolchain has been, and is marked as such below.
+
+| Ticket | Outcome |
+|---|---|
+| DECIDE: type scale (ADR 0015) | Dynamic Type everywhere, plus two bundled faces. ✔ font tables parsed and verified; accessibility-size capture carried to P1-H |
+| Create the `Ninety/` Xcode project | iOS 18.0, Swift 6 strict concurrency, synchronized folders, SwiftLint build phase. ✔ pbxproj reference-checked; ✗ never opened |
+| Wire `DesignTokens.generated.swift` in | In the app target's Sources phase; `generate.py` now also emits the two asset-catalogue colorsets. ✔ `--check` green |
+| Scaffold `Packages/RankingEngine` | Pure SPM package, zero dependencies, Swift Testing target. ✗ `swift test` not run |
+| Switch on the gated macOS CI job | Ubuntu `triage` job decides before a macOS runner starts. ✔ filter tested against 14 real paths |
+| Enable the hooks, prove the lint fires | `scripts/verify-guardrails.sh`. ✔ all four hook checks fire; ✗ lint half needs swiftlint |
+| App shell: three tabs, no more | Matchday · The Run · The Table, Sub On as a sheet. ✗ never rendered |
+
+**Three things found while building it, each of which would have cost more later:**
+
+- **`.gitignore` had a bare `Packages/`.** Standard in Swift gitignores, where it means
+  the old Xcode checkout directory. Here it would have silently excluded the entire
+  ranking engine from git — no error, nothing to notice.
+- **The generated Swift named no font.** The whole Matchday lettering decision was
+  about to be resolved by omission. See ADR 0015.
+- **The macOS job's guard was inside the job.** Its per-step probe could skip the
+  *steps*, but the runner was already billed. The gate is now a separate Ubuntu job.
+
+**Not verified here, and honestly outstanding.** This work was done in a Linux
+container: no Xcode, no Swift toolchain, no simulator. Nothing has been compiled. The
+first Mac session should run `scripts/verify-guardrails.sh`, open the project, build to
+the device, and record the result on the P1-A ticket. See
+[the handover](#first-mac-session) below.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
@@ -151,6 +197,34 @@ Numbers and the full write-up: [`../phase-0/07-spike-findings.md`](../phase-0/07
 
 ---
 
+## First Mac session
+
+In order, and stop at the first failure — each step is the precondition for the next.
+
+```bash
+git config core.hooksPath .githooks          # once per clone
+brew install swiftlint xcbeautify
+cp Config/Local.xcconfig.example Config/Local.xcconfig   # then add your team id
+
+python3 design/tokens/generate.py --check    # tokens, contrast, fonts
+scripts/verify-guardrails.sh                 # now runs the SwiftLint half too
+swift test --package-path Packages/RankingEngine
+
+open Ninety.xcodeproj                        # ⌘B, then ⌘U, then run on the phone
+```
+
+**What to look at, specifically.** Console should carry
+`Bundled faces registered: 7` from `BrandFont.verify()`. If it says they did *not*
+register, the text is silently San Francisco and the Matchday world is gone — check
+`UIAppFonts` in `Config/Info.plist` against the target's Copy Bundle Resources phase.
+Then Settings → Display & Text Size → Larger Text, drag it to the maximum, and come back:
+nothing should truncate or overlap.
+
+**Then record it.** Tick the P1-A ticket with what actually built rather than what was
+meant to, per the repo convention on closing criteria on different evidence.
+
+---
+
 ## Handoff prompt for a fresh session
 
 > I'm on Phase 1 (Single-Player Core) of Ninety. Building food logging, weight tracking,
@@ -158,7 +232,9 @@ Numbers and the full write-up: [`../phase-0/07-spike-findings.md`](../phase-0/07
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **[ticket]**.
+> Currently working on: **[ticket]**. P1-A is closed: the project builds, the type
+> decision is ADR 0015 (Dynamic Type, two bundled faces), the shell is three tabs with
+> Sub On as a sheet, and `DESIGN.md` is the authority on how the world is built.
 >
 > Requirements: offline-first (the UI never waits on network), RLS on every table, photo
 > estimates always show ranges + confidence and require user confirmation. The safety

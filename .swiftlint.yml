@@ -61,6 +61,7 @@ opt_in_rules:
   - fatal_error_message
   - first_where
   - flatmap_over_map_reduce
+  - force_unwrapping
   - identical_operands
   - implicitly_unwrapped_optional
   - joined_default_parameter
@@ -160,9 +161,15 @@ large_tuple:
 # Force-unwrapping in a health app means a crash mid-log, which means a lost
 # entry, which means a churned user. Warning during Phase 1, tighten to error
 # before the first external tester (Phase 3).
+#
+# Two things were wrong with this in Phase 0, and each hid the other. The
+# identifier is `force_unwrapping`, not `force_unwrap` — and it is opt-in, so
+# a severity here does nothing unless the rule is also in opt_in_rules above.
+# The one rule standing between a force-unwrap and a crash mid-log has never
+# actually run. It runs from here.
 force_cast: error
 force_try: error
-force_unwrap:
+force_unwrapping:
   severity: warning
 
 implicitly_unwrapped_optional:

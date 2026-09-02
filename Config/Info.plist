@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The six keys Xcode injects for you when GENERATE_INFOPLIST_FILE is YES,
+	     and stops injecting the moment you supply an explicit plist. Without
+	     CFBundleIdentifier the app builds cleanly and then fails to install
+	     with "Missing bundle ID", which names the symptom and not the cause. -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+
+	<key>CFBundleDisplayName</key>
+	<string>Ninety</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+
+	<!-- Dark first (ADR 0011). Light mode is full parity and both are tested;
+	     this only sets which one the app opens in. -->
+	<key>UIUserInterfaceStyle</key>
+	<string>Dark</string>
+
+	<!-- Portrait only. Every artboard is 393x852 and the spine is designed to
+	     land inside it; landscape would be a second layout nobody has drawn. -->
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+
+	<!-- The two bundled faces (SIL OFL 1.1). generate.py refuses to emit a
+	     type token naming a .ttf that is not in the repo; BrandFont.verify()
+	     checks at launch that the .ttf actually registered under the name the
+	     tokens promised. Both halves are needed: a font that fails to register
+	     has no error path on iOS, it just silently becomes San Francisco. -->
+	<key>UIAppFonts</key>
+	<array>
+		<string>Saira-Regular.ttf</string>
+		<string>Saira-Medium.ttf</string>
+		<string>Saira-SemiBold.ttf</string>
+		<string>Saira-Bold.ttf</string>
+		<string>SairaCondensed-SemiBold.ttf</string>
+		<string>SairaCondensed-Bold.ttf</string>
+		<string>SairaCondensed-ExtraBold.ttf</string>
+	</array>
+
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchCanvas</string>
+	</dict>
+</dict>
+</plist>

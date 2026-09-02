@@ -4,8 +4,10 @@ Native iOS health app that ranks on **normalised improvement and consistency**, 
 absolute numbers. Swift 6.3 / SwiftUI / iOS 18+ / Supabase.
 
 **Phase 0 closed 31 Aug 2026** — every exit criterion met, HealthKit proven on a real
-device. **Phase 1 (single-player core) is live**, and is the first phase that builds:
-no `Ninety/` or `Packages/` exists yet, and creating them is Phase 1's job.
+device. **Phase 1 (single-player core) is live** and is the first phase that builds.
+P1-A landed the foundations: `Ninety/` (the app), `Packages/RankingEngine` (the Phase 2
+boundary, scaffolded so the purity lint has something to police), and ADR 0015 settling
+the type decision that blocked every view ticket.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -25,6 +27,7 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |
 | What a screen should look like | `design/redesign/README.md` → the six PNGs in `screens/` |
+| How the world is built in SwiftUI | `DESIGN.md` — type, colour, structure, and the recorded deviations |
 | Why the app looks like a football broadcast | `design/redesign/README.md`, and `PRODUCT.md` §Brand Commitments |
 | Component/copy rules behind a screen | `design/spec/` + `design/preview/design-system.html` |
 | What a colour or spacing value is | `design/tokens/ninety.tokens.json` — **generated, never hand-edit the Swift/CSS** |
@@ -65,8 +68,16 @@ scripts/       verify-toolchain.sh (the Mac) · verify-accounts.sh (the .env)
                git config core.hooksPath .githooks
 ```
 
-No `Ninety/` or `Packages/` yet. CI probes for them and skips the expensive macOS job
-until they exist.
+```
+Ninety/          the app. App/ · DesignSystem/ · Features/ · Resources/Fonts/
+                 A synchronized folder in Xcode — new files need no .pbxproj edit
+NinetyTests/     unit tests (Swift Testing)
+Packages/        RankingEngine. Pure, no dependencies, three lint rules guard it
+Config/          xcconfig + Info.plist. Local.xcconfig (gitignored) holds your team id
+```
+
+CI decides on Ubuntu whether a change touches Swift before starting a macOS runner —
+docs and design commits never spend the 200-minute budget.
 
 ---
 
