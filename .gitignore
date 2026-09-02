@@ -47,8 +47,14 @@ playground.xcworkspace
 ## libraries. Ninety is an app, so it stays tracked — hence no ignore line.
 .build/
 .swiftpm/
-Packages/
 *.xcodeproj/project.xcworkspace/xcuserdata/
+
+## NOT `Packages/`. That line is in most Swift .gitignores because it was the
+## old Xcode-managed checkout directory — but Packages/RankingEngine is source
+## we write and must commit (ADR 0006). Ignoring the directory wholesale hides
+## the entire ranking engine from git, silently, with no error anywhere.
+Packages/*/.build/
+Packages/*/.swiftpm/
 
 ## CocoaPods / Carthage — not used, but ignore in case a dependency drags one in
 Pods/
@@ -77,6 +83,11 @@ fastlane/test_output
 *.certSigningRequest
 Secrets.swift
 Secrets.xcconfig
+
+## Your Apple team id and bundle id. Neither is a secret, but both identify an
+## individual account and this repository is read by other people.
+## Copy Config/Local.xcconfig.example to start.
+Config/Local.xcconfig
 **/GoogleService-Info.plist
 supabase/.env
 supabase/.branches/

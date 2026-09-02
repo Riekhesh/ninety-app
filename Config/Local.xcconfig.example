@@ -1,0 +1,12 @@
+// Copy to Config/Local.xcconfig (gitignored) and fill in.
+//
+//   NINETY_TEAM_ID     — Apple Developer team id, 10 characters.
+//                        developer.apple.com/account → Membership details.
+//   NINETY_BUNDLE_ID   — only if app.ninety.Ninety is already taken on your
+//                        account. It must match the App ID you register.
+//
+// Neither is a secret, but both identify an individual account, and this
+// repository is public-facing.
+
+NINETY_TEAM_ID =
+NINETY_BUNDLE_ID = app.ninety.Ninety

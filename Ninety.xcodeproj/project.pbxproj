@@ -1,0 +1,428 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9000000000000000000000D1 /* DesignTokens.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9000000000000000000000C6 /* DesignTokens.generated.swift */; };
+		9000000000000000000000D2 /* RankingEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 900000000000000000000122 /* RankingEngine */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		900000000000000000000132 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9000000000000000000000A1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9000000000000000000000E1;
+			remoteInfo = Ninety;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		9000000000000000000000C1 /* Ninety.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Ninety.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9000000000000000000000C2 /* NinetyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NinetyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9000000000000000000000C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9000000000000000000000C4 /* Ninety.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Ninety.xcconfig; sourceTree = "<group>"; };
+		9000000000000000000000C5 /* Local.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text; path = Local.xcconfig.example; sourceTree = "<group>"; };
+		9000000000000000000000C6 /* DesignTokens.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.generated.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		9000000000000000000000B1 /* Ninety */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Ninety;
+			sourceTree = "<group>";
+		};
+		9000000000000000000000B2 /* NinetyTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NinetyTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9000000000000000000000F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9000000000000000000000D2 /* RankingEngine in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9000000000000000000000F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9000000000000000000000A2 = {
+			isa = PBXGroup;
+			children = (
+				9000000000000000000000B1 /* Ninety */,
+				9000000000000000000000B2 /* NinetyTests */,
+				9000000000000000000000A4 /* Config */,
+				9000000000000000000000A5 /* design */,
+				9000000000000000000000A3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9000000000000000000000A3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9000000000000000000000C1 /* Ninety.app */,
+				9000000000000000000000C2 /* NinetyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9000000000000000000000A4 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				9000000000000000000000C4 /* Ninety.xcconfig */,
+				9000000000000000000000C5 /* Local.xcconfig.example */,
+				9000000000000000000000C3 /* Info.plist */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		9000000000000000000000A5 /* design */ = {
+			isa = PBXGroup;
+			children = (
+				9000000000000000000000A6 /* generated */,
+			);
+			path = design;
+			sourceTree = "<group>";
+		};
+		9000000000000000000000A6 /* generated */ = {
+			isa = PBXGroup;
+			children = (
+				9000000000000000000000C6 /* DesignTokens.generated.swift */,
+			);
+			path = generated;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9000000000000000000000E1 /* Ninety */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000102 /* Build configuration list for PBXNativeTarget "Ninety" */;
+			buildPhases = (
+				9000000000000000000000F1 /* Sources */,
+				9000000000000000000000F2 /* Frameworks */,
+				9000000000000000000000F3 /* Resources */,
+				9000000000000000000000F4 /* SwiftLint */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				9000000000000000000000B1 /* Ninety */,
+			);
+			name = Ninety;
+			packageProductDependencies = (
+				900000000000000000000122 /* RankingEngine */,
+			);
+			productName = Ninety;
+			productReference = 9000000000000000000000C1 /* Ninety.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9000000000000000000000E2 /* NinetyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 900000000000000000000103 /* Build configuration list for PBXNativeTarget "NinetyTests" */;
+			buildPhases = (
+				9000000000000000000000F5 /* Sources */,
+				9000000000000000000000F6 /* Frameworks */,
+				9000000000000000000000F7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				900000000000000000000131 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				9000000000000000000000B2 /* NinetyTests */,
+			);
+			name = NinetyTests;
+			packageProductDependencies = (
+			);
+			productName = NinetyTests;
+			productReference = 9000000000000000000000C2 /* NinetyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9000000000000000000000A1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					9000000000000000000000E1 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					9000000000000000000000E2 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 9000000000000000000000E1;
+					};
+				};
+			};
+			buildConfigurationList = 900000000000000000000101 /* Build configuration list for PBXProject "Ninety" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9000000000000000000000A2;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				900000000000000000000121 /* XCLocalSwiftPackageReference "Packages/RankingEngine" */,
+			);
+			preferredProjectObjectVersion = 70;
+			productRefGroup = 9000000000000000000000A3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9000000000000000000000E1 /* Ninety */,
+				9000000000000000000000E2 /* NinetyTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9000000000000000000000F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9000000000000000000000F7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9000000000000000000000F4 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The lint rules are not style preferences: they are how ADR 0006's engine\n# purity, the token system and the S5 copy ban are enforced rather than\n# remembered. Run them on every build, not only in CI.\nif command -v swiftlint >/dev/null 2>&1; then\n  swiftlint lint --config \"$SRCROOT/.swiftlint.yml\"\nelif [ -x /opt/homebrew/bin/swiftlint ]; then\n  /opt/homebrew/bin/swiftlint lint --config \"$SRCROOT/.swiftlint.yml\"\nelse\n  echo \"warning: SwiftLint not installed. brew install swiftlint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9000000000000000000000F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9000000000000000000000D1 /* DesignTokens.generated.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9000000000000000000000F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		900000000000000000000131 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9000000000000000000000E1 /* Ninety */;
+			targetProxy = 900000000000000000000132 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		900000000000000000000111 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9000000000000000000000C4 /* Ninety.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		900000000000000000000112 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9000000000000000000000C4 /* Ninety.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		900000000000000000000113 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		900000000000000000000114 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		900000000000000000000115 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.ninety.Ninety.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Ninety.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Ninety";
+			};
+			name = Debug;
+		};
+		900000000000000000000116 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.ninety.Ninety.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Ninety.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Ninety";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		900000000000000000000101 /* Build configuration list for PBXProject "Ninety" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900000000000000000000111 /* Debug */,
+				900000000000000000000112 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000102 /* Build configuration list for PBXNativeTarget "Ninety" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900000000000000000000113 /* Debug */,
+				900000000000000000000114 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		900000000000000000000103 /* Build configuration list for PBXNativeTarget "NinetyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				900000000000000000000115 /* Debug */,
+				900000000000000000000116 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		900000000000000000000121 /* XCLocalSwiftPackageReference "Packages/RankingEngine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/RankingEngine;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		900000000000000000000122 /* RankingEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RankingEngine;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 9000000000000000000000A1 /* Project object */;
+}

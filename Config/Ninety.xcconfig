@@ -1,0 +1,46 @@
+// Ninety — shared build settings.
+//
+// Committed, and deliberately free of anything tied to one Apple account: this
+// repository is a portfolio artifact that people read. Put your own team id in
+// Config/Local.xcconfig, which is gitignored — copy Local.xcconfig.example to
+// start. Without it the app still builds for the Simulator; a device build
+// needs the team.
+
+#include? "Local.xcconfig"
+
+PRODUCT_NAME = Ninety
+PRODUCT_BUNDLE_IDENTIFIER = $(NINETY_BUNDLE_ID:default=app.ninety.Ninety)
+DEVELOPMENT_TEAM = $(NINETY_TEAM_ID)
+CURRENT_PROJECT_VERSION = 1
+MARKETING_VERSION = 0.1.0
+
+// ADR 0002 — iOS 18.0 deployment target, built against the iOS 26 SDK.
+IPHONEOS_DEPLOYMENT_TARGET = 18.0
+TARGETED_DEVICE_FAMILY = 1
+SUPPORTED_PLATFORMS = iphoneos iphonesimulator
+SUPPORTS_MACCATALYST = NO
+
+// Swift 6 strict concurrency, on properly rather than as warnings. Turning it
+// on later means retrofitting actor isolation across a finished app; turning it
+// on now means never writing the code that would have needed it.
+SWIFT_VERSION = 6.0
+SWIFT_STRICT_CONCURRENCY = complete
+SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES
+
+// Not warnings-as-errors: SwiftUI deprecations arrive with every SDK and a
+// red build on the morning of an Xcode update costs a day's logging, which
+// once the 21-day clock runs is the most expensive thing in the project.
+// CI runs `swiftlint --strict`, so lint warnings still fail the PR.
+GCC_TREAT_WARNINGS_AS_ERRORS = NO
+SWIFT_TREAT_WARNINGS_AS_ERRORS = NO
+
+// Dark first (ADR 0011). Light is full parity and both are tested, but the
+// world is a lit pitch at night and that is the default appearance.
+INFOPLIST_FILE = Config/Info.plist
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+// Off because the SwiftLint build phase has to read the whole source tree,
+// and the sandbox blocks exactly that. The trade is deliberate: a lint pass
+// on every build is worth more here than sandboxing one script we wrote
+// ourselves and can read in full.
+ENABLE_USER_SCRIPT_SANDBOXING = NO
