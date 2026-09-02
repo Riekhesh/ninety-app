@@ -35,7 +35,9 @@ enum TabBarStyle {
     }
 
     private static func attributes(_ colour: Color) -> [NSAttributedString.Key: Any] {
-        var result: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(colour),]
+        var result: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor(colour),
+        ]
         let style = Ninety.TypeStyle.label
         // Falls through to the system font rather than trapping: a tab label in
         // San Francisco is a cosmetic regression, and BrandFont.verify() has

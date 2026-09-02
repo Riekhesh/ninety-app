@@ -9,16 +9,18 @@ import Testing
 /// — and it keeps working when copy moves into a strings file in Phase 3.
 @Suite("Safety copy (S5)")
 struct SafetyCopyTests {
+    // Disabled for exactly these six lines, and nowhere else in the app. A test
+    // that checks for banned phrases has to be able to name them; the
+    // alternatives are excluding this whole file from the rule — which would
+    // let a real violation in alongside the list — or splitting the strings so
+    // the linter cannot see them, which is dodging a control, not satisfying it.
+    //
+    // Above the doc comment rather than below it: a plain comment between a doc
+    // comment and its declaration orphans the doc comment.
+    // swiftlint:disable no_punishment_framing
+
     /// The 17 phrases banned at lint-error severity, from
     /// `docs/safety/safety-requirements.md`.
-    ///
-    /// The rule is disabled for exactly these six lines, and nowhere else in
-    /// the app. A test that checks for banned phrases has to be able to name
-    /// them; the alternatives are excluding this whole file from the rule —
-    /// which would let a real violation in alongside the list — or splitting
-    /// the strings so the linter cannot see them, which is dodging a control
-    /// rather than satisfying it.
-    // swiftlint:disable no_punishment_framing
     static let banned = [
         "you failed", "you lost", "lost your streak", "streak lost",
         "broke your streak", "streak broken", "you missed", "over budget",

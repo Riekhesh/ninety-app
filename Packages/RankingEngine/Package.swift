@@ -7,19 +7,33 @@ import PackageDescription
 // at all. Data in, score out.
 let package = Package(
     name: "RankingEngine",
-    platforms: [.iOS(.v18), .macOS(.v14),],
+    platforms: [
+        .iOS(.v18),
+        .macOS(.v14),
+    ],
     products: [
-        .library(name: "RankingEngine", targets: ["RankingEngine",]),
+        .library(
+            name: "RankingEngine",
+            targets: [
+                "RankingEngine",
+            ]
+        ),
     ],
     targets: [
         .target(
             name: "RankingEngine",
-            swiftSettings: [.swiftLanguageMode(.v6),]
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .testTarget(
             name: "RankingEngineTests",
-            dependencies: ["RankingEngine",],
-            swiftSettings: [.swiftLanguageMode(.v6),]
+            dependencies: [
+                "RankingEngine",
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
     ]
 )
