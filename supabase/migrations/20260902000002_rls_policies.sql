@@ -40,8 +40,15 @@
 -- RLS still denies it — there is no anon policy anywhere in this file — but a
 -- grant that is only ever load-bearing if a policy is wrong is a grant worth
 -- not having.
+--
+-- Named tables rather than ALL TABLES IN SCHEMA public: this runs against a
+-- live project, and a blanket revoke would also strip anything else that ever
+-- ends up in `public`, including tables Supabase or a later migration adds.
 
-revoke all on all tables in schema public from anon;
+revoke all on
+  profiles, foods, food_logs, photo_estimates, weight_logs,
+  health_samples, weekly_scores, sync_outbox, friendships, leaderboard_entries
+  from anon;
 
 grant select, insert, update, delete on
   profiles, food_logs, photo_estimates, weight_logs,
@@ -226,49 +233,3 @@ create policy friendships_delete on friendships
 
 create policy leaderboard_entries_select on leaderboard_entries
   for select to authenticated using (user_id = auth.uid());
-
--- ─── Storage: meal photos ──────────────────────────────────────────────────
--- Private bucket, signed URLs with a short expiry, never public. A meal photo
--- is Article 9 health data; a public bucket URL is a permanent, unauthenticated
--- link to it.
---
--- Objects are keyed <user-uuid>/<filename>, so the first path segment is the
--- owner and every policy checks it.
-
-insert into storage.buckets (id, name, public)
-values ('meal-photos', 'meal-photos', false)
-on conflict (id) do nothing;
-
-create policy meal_photos_select on storage.objects
-  for select to authenticated
-  using (
-    bucket_id = 'meal-photos'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
-
-create policy meal_photos_insert on storage.objects
-  for insert to authenticated
-  with check (
-    bucket_id = 'meal-photos'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
-
-create policy meal_photos_update on storage.objects
-  for update to authenticated
-  using (
-    bucket_id = 'meal-photos'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  )
-  with check (
-    bucket_id = 'meal-photos'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
-
--- Deletion has to work for the Article 9 right to erasure: account deletion
--- must remove the Storage objects too, not only the rows that point at them.
-create policy meal_photos_delete on storage.objects
-  for delete to authenticated
-  using (
-    bucket_id = 'meal-photos'
-    and (storage.foldername(name))[1] = auth.uid()::text
-  );
