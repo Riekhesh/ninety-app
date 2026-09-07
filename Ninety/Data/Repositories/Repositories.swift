@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 /// The four data domains, as protocols.
 ///
@@ -167,11 +168,30 @@ struct Repositories {
     var health: any HealthRepositoryProtocol
 }
 
-// Deliberately no `EnvironmentValues` entry yet.
+extension Repositories {
+    /// The real set, for one signed-in user.
+    ///
+    /// The user id is a parameter and not a lookup on purpose: every repository
+    /// here scopes its reads and writes to it, and it comes from the auth
+    /// session, so there is no path by which a repository can be built before
+    /// anybody is signed in. It is the same id as `profiles.id` and as the
+    /// `user_id` every RLS policy compares against, which is what makes the
+    /// local store and Postgres agree about ownership without a mapping table.
+    static func live(context: ModelContext, userID: UUID) -> Repositories {
+        Repositories(
+            profile: SwiftDataProfileRepository(context: context, userID: userID),
+            food: SwiftDataFoodRepository(context: context, userID: userID),
+            weight: SwiftDataWeightRepository(context: context, userID: userID),
+            health: SwiftDataHealthRepository(context: context, userID: userID)
+        )
+    }
+}
+
+// Still deliberately no `EnvironmentValues` entry.
 //
 // `Repositories` holds MainActor-isolated existentials, so putting it in the
-// environment needs care under Swift 6 strict concurrency — and nothing
-// consumes it until P1-D brings the first ViewModel. Tests build one directly
-// with `Repositories.mock()`, which is all the injection the ticket asks for.
-// The wiring lands with the first screen that needs it, where it can be
-// compiled against a real call site rather than guessed at.
+// environment needs care under Swift 6 strict concurrency. P1-C's consent gate
+// is the first real consumer and it takes the one repository it needs as an
+// init parameter, which is both simpler to test and honest about its
+// dependencies. The environment entry can land with P1-D, when there is a
+// ViewModel that wants all four.
