@@ -40,8 +40,13 @@ struct RepositoryContractTests {
         let food = MockFoodRepository()
         let loggedAt = Date(timeIntervalSince1970: 1_800_000_000)
         let entry = try food.log(
-            food: nil, grams: 100, kcal: 100,
-            name: "Flat white", entryMethod: .manual, at: loggedAt
+            FoodLogDraft(
+                grams: 100,
+                kcal: 100,
+                name: "Flat white",
+                entryMethod: .manual,
+                loggedAt: loggedAt
+            )
         )
 
         #expect(throws: RepositoryError.self) {

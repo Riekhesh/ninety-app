@@ -23,6 +23,45 @@ import Foundation
 /// enqueued, and the caller gets its object back. Nothing here is async for the
 /// sake of the network, because nothing here touches it.
 
+/// A meal about to be logged.
+///
+/// A value rather than six parameters, and the reason is P1-F rather than the
+/// argument count. All four logging routes converge on one of these, and the
+/// photo route builds it up over two screens — the estimate arrives, the user
+/// corrects the portion on Under Review, and only then does anything get
+/// written. A struct can be held and edited between those steps; an argument
+/// list cannot.
+struct FoodLogDraft {
+    /// Nil for manual entry, which is the route that works offline by
+    /// construction and the one that starts the 21-day clock.
+    var food: Food?
+    var grams: Double
+    /// Carried rather than derived: a photo estimate's kcal comes from the
+    /// model and the user's correction, not from a catalogue row.
+    var kcal: Double
+    /// Snapshotted onto the log, so a logged day survives its food being
+    /// deleted or a catalogue refresh rewriting it.
+    var name: String
+    var entryMethod: EntryMethod
+    var loggedAt: Date
+
+    init(
+        food: Food? = nil,
+        grams: Double,
+        kcal: Double,
+        name: String,
+        entryMethod: EntryMethod,
+        loggedAt: Date
+    ) {
+        self.food = food
+        self.grams = grams
+        self.kcal = kcal
+        self.name = name
+        self.entryMethod = entryMethod
+        self.loggedAt = loggedAt
+    }
+}
+
 /// Everything about the profile, including the values the §10 gates read.
 @MainActor
 protocol ProfileRepositoryProtocol {
@@ -52,14 +91,7 @@ protocol FoodRepositoryProtocol {
     /// Writes locally and returns. §2.3's lock is set from `loggedAt` here and
     /// never moved afterwards.
     @discardableResult
-    func log(
-        food: Food?,
-        grams: Double,
-        kcal: Double,
-        name: String,
-        entryMethod: EntryMethod,
-        at loggedAt: Date
-    ) throws -> FoodLog
+    func log(_ draft: FoodLogDraft) throws -> FoodLog
 
     /// Refuses after the 48-hour window. The moment is a parameter so the rule
     /// can be tested without waiting two days or moving the device clock.

@@ -113,11 +113,27 @@ reconstruct *why* — and it is how a fresh session picks up where you left off
 ## Before you commit
 
 ```bash
-swiftlint                 # zero warnings on main. It was configured in Phase 0
-                          # while there were none — keep it that way.
-swift test                # once Packages/RankingEngine exists
-scripts/check-tokens.sh   # design tokens and generated Swift agree
+swiftlint --strict        # zero warnings on main. It was configured in Phase 0
+                          # while there were none — keep it that way. CI runs
+                          # --strict, so a warning there is a failed build.
+swift test --package-path Packages/RankingEngine
+python3 design/tokens/generate.py --check   # tokens and generated Swift agree
+scripts/verify-guardrails.sh                # the hooks and lint rules still bite
+scripts/verify-rls.sh                       # RLS holds, two accounts, real Postgres
 ```
+
+**Linting without a Mac.** SwiftLint's release zip contains a `swiftlint-static`
+binary that runs on Linux with no Swift toolchain and no SourceKit. It skips the
+`custom_rules` block — those need SourceKit — but it runs every structural rule,
+which is where the violations that actually break CI come from:
+
+```bash
+curl -sSL -o sl.zip https://github.com/realm/SwiftLint/releases/download/0.65.1/swiftlint_linux_amd64.zip
+unzip -o sl.zip && ./swiftlint-static lint --strict
+```
+
+Worth knowing because it is otherwise possible to write a lot of Swift on a
+machine that cannot check any of it, and find out one CI run at a time.
 
 `git commit` runs these via `.githooks/pre-commit`. Enable the hooks once per
 clone:

@@ -99,25 +99,18 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
     }
 
     @discardableResult
-    func log(
-        food: Food?,
-        grams: Double,
-        kcal: Double,
-        name: String,
-        entryMethod: EntryMethod,
-        at loggedAt: Date
-    ) throws -> FoodLog {
+    func log(_ draft: FoodLogDraft) throws -> FoodLog {
         let now = Date()
         let entry = FoodLog(
             userID: userID,
             createdAt: now,
             updatedAt: now,
-            loggedAt: loggedAt,
-            grams: grams,
-            entryMethod: entryMethod,
-            kcal: kcal,
-            nameSnapshot: name,
-            food: food
+            loggedAt: draft.loggedAt,
+            grams: draft.grams,
+            entryMethod: draft.entryMethod,
+            kcal: draft.kcal,
+            nameSnapshot: draft.name,
+            food: draft.food
         )
         context.insert(entry)
         Outbox(context: context, userID: userID)

@@ -64,22 +64,15 @@ final class MockFoodRepository: FoodRepositoryProtocol {
     }
 
     @discardableResult
-    func log(
-        food: Food?,
-        grams: Double,
-        kcal: Double,
-        name: String,
-        entryMethod: EntryMethod,
-        at loggedAt: Date
-    ) throws -> FoodLog {
+    func log(_ draft: FoodLogDraft) throws -> FoodLog {
         let entry = FoodLog(
             userID: UUID(),
-            loggedAt: loggedAt,
-            grams: grams,
-            entryMethod: entryMethod,
-            kcal: kcal,
-            nameSnapshot: name,
-            food: food
+            loggedAt: draft.loggedAt,
+            grams: draft.grams,
+            entryMethod: draft.entryMethod,
+            kcal: draft.kcal,
+            nameSnapshot: draft.name,
+            food: draft.food
         )
         storedLogs.append(entry)
         loggedCount += 1

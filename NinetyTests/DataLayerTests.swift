@@ -30,8 +30,13 @@ struct DataLayerTests {
         let noon = Date(timeIntervalSince1970: 1_800_000_000)
 
         try food.log(
-            food: nil, grams: 250, kcal: 450,
-            name: "Chicken salad bowl", entryMethod: .manual, at: noon
+            FoodLogDraft(
+                grams: 250,
+                kcal: 450,
+                name: "Chicken salad bowl",
+                entryMethod: .manual,
+                loggedAt: noon
+            )
         )
 
         let logs = food.logs(on: noon, calendar: .current)
@@ -46,7 +51,8 @@ struct DataLayerTests {
         let food = SwiftDataFoodRepository(context: context, userID: user)
         let weight = SwiftDataWeightRepository(context: context, userID: user)
 
-        try food.log(food: nil, grams: 100, kcal: 120, name: "Flat white", entryMethod: .manual, at: .now)
+        let draft = FoodLogDraft(grams: 100, kcal: 120, name: "Flat white", entryMethod: .manual, loggedAt: .now)
+        try food.log(draft)
         try weight.record(kg: 78.4, at: .now, source: .manual)
 
         let queued = try context.fetch(FetchDescriptor<OutboxEntry>())
@@ -62,8 +68,13 @@ struct DataLayerTests {
         let loggedAt = Date(timeIntervalSince1970: 1_800_000_000)
 
         let entry = try food.log(
-            food: nil, grams: 100, kcal: 200,
-            name: "Greek yogurt & berries", entryMethod: .manual, at: loggedAt
+            FoodLogDraft(
+                grams: 100,
+                kcal: 200,
+                name: "Greek yogurt & berries",
+                entryMethod: .manual,
+                loggedAt: loggedAt
+            )
         )
 
         #expect(entry.isEditable(at: loggedAt.addingTimeInterval(47 * 3_600)))
@@ -82,7 +93,8 @@ struct DataLayerTests {
         let (context, user) = try store()
         let food = SwiftDataFoodRepository(context: context, userID: user)
         let loggedAt = Date(timeIntervalSince1970: 1_800_000_000)
-        let entry = try food.log(food: nil, grams: 10, kcal: 10, name: "x", entryMethod: .manual, at: loggedAt)
+        let draft = FoodLogDraft(grams: 10, kcal: 10, name: "x", entryMethod: .manual, loggedAt: loggedAt)
+        let entry = try food.log(draft)
 
         #expect(throws: RepositoryError.self) {
             try food.delete(entry, at: loggedAt.addingTimeInterval(72 * 3_600))
@@ -121,7 +133,14 @@ struct DataLayerTests {
         let bob = SwiftDataFoodRepository(context: context, userID: UUID())
         let noon = Date(timeIntervalSince1970: 1_800_000_000)
 
-        try alice.log(food: nil, grams: 100, kcal: 500, name: "Alice's lunch", entryMethod: .manual, at: noon)
+        let lunch = FoodLogDraft(
+            grams: 100,
+            kcal: 500,
+            name: "Alice's lunch",
+            entryMethod: .manual,
+            loggedAt: noon
+        )
+        try alice.log(lunch)
 
         #expect(alice.logs(on: noon, calendar: .current).count == 1)
         #expect(bob.logs(on: noon, calendar: .current).isEmpty)
