@@ -320,15 +320,36 @@ swift test --package-path Packages/RankingEngine
 open Ninety.xcodeproj                        # resolve packages, ⌘B, ⌘U, run on the phone
 ```
 
-**Two things specific to P1-C, in this order.** Xcode resolves `supabase-swift`
-on first open — commit the `Package.resolved` it writes, because
-`.gitignore` says an app pins its dependencies. Then turn on **Sign in with
-Apple** for the App ID in the Apple Developer account: the entitlement is in
-`Config/Ninety.entitlements` and the capability has to exist on the profile, or
-the build signs and then fails at the sheet with `ASAuthorizationError 1000`.
+**Four things specific to P1-C, in this order.** Each is a precondition for the
+next and three of them are outside the repo, so none of them can be checked from
+a commit.
 
-**Then sign in.** Console should carry `Signed in with Apple.` under the `auth`
-category. Force-quit and reopen: it should go straight past the sign-in screen
+1. **Xcode resolves `supabase-swift`** on first open. Commit the
+   `Package.resolved` it writes — `.gitignore` says an app pins its dependencies.
+2. **Turn on Sign in with Apple for the App ID** at
+   developer.apple.com → Certificates, Identifiers & Profiles → Identifiers →
+   `app.ninety.Ninety` → Capabilities. `Config/Ninety.entitlements` asks for it;
+   the capability has to exist on the identifier or signing fails.
+3. **Enable the Apple provider in Supabase** — Authentication → Sign In / Providers
+   → Apple → on, and put the **bundle id** `app.ninety.Ninety` in the *Client IDs*
+   field. This is the step with no error message worth reading: without it the
+   token exchange is rejected for an unacceptable audience, and the app shows
+   "Ninety couldn't finish signing you in", which points at the app rather than at
+   a dashboard toggle. A native-only flow needs nothing else there — no Services
+   ID, no key, no secret. Those are for the web flow.
+4. **Fill in `Config/Local.xcconfig`** — Supabase dashboard → Project Settings →
+   Data API for the host (drop the `https://`), and the *publishable*
+   `sb_publishable_…` key, never the secret one.
+
+**`DEVELOPMENT_TEAM` is now required for a Simulator build too.** It was
+previously only needed for a device. An entitlements file asks the signing
+machinery for a capability, and automatic signing resolves that against a real
+team whichever destination you build for.
+
+**Then sign in.** On a real device rather than the Simulator the first time —
+Simulator sign-in works but needs an Apple Account signed in under its own
+Settings, and it fails in ways that look like app bugs. Console should carry
+`Signed in with Apple.` under the `auth` category. Force-quit and reopen: it should go straight past the sign-in screen
 (`Session restored; refresh handled by the SDK.`), which is the cold-launch
 restore the ticket asks for. Then check `profiles` in the Supabase dashboard —
 two timestamps, and they are not equal unless you tapped both switches inside the

@@ -3,8 +3,13 @@
 // Committed, and deliberately free of anything tied to one Apple account: this
 // repository is a portfolio artifact that people read. Your own team id goes in
 // Config/Local.xcconfig, which is gitignored — copy Local.xcconfig.example to
-// start. Without it the app still builds for the Simulator; only a device build
-// needs the team.
+// start.
+//
+// It used to be true that only a device build needed the team. P1-C added
+// Config/Ninety.entitlements for Sign in with Apple, and an entitlement asks the
+// signing machinery for a capability that automatic signing resolves against a
+// real team whichever destination you build for. CI is unaffected: it passes
+// CODE_SIGNING_ALLOWED=NO.
 //
 // The override include is at the BOTTOM of this file, not the top. xcconfig is
 // last-assignment-wins, so an include at the top is one the local file can
