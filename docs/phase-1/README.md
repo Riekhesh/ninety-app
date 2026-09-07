@@ -76,7 +76,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 |---|---|---|
 | **P1-A** Foundations & app skeleton | **Built 2 Sep, not yet compiled.** Xcode project, `Packages/`, tokens wired in, macOS CI gated, type decision settled. Closes when a Mac builds it | Highest |
 | **P1-B** Data layer, schema & RLS | **4 of 5 done, 2 Sep.** Migrations applied to the live project, RLS proven with two accounts, SwiftData models, repositories. Food mirror deferred | Highest |
-| **P1-C** Authentication | Sign in with Apple, and Article 9 consent separate from ToS | High |
+| **P1-C** Authentication | **Both stories done, 7 Sep.** Sign in with Apple through Supabase's id-token exchange, and Article 9 consent recorded separately from ToS. Not compiled | High |
 | **P1-D** Pre-Season: onboarding & the §10 gates | Mifflin-St Jeor as a band, S1–S7, the calibration window | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
 | **P1-F** Sub On: food logging, four routes | Manual, search, barcode, photo, and the mandatory Under Review screen | High |
@@ -100,14 +100,21 @@ order laid out visually, is published at
    done in a Linux container with no Xcode — so P1-A closes on the
    [first Mac session](#first-mac-session), not on the commit. See
    [what P1-A landed](#p1-a--what-landed).
-2. **Schema and RLS before a single row exists.** RLS goes on in migration 001. By week
-   three that database holds your own health data, and retrofitting it then is §1.1's
-   *"genuinely bad afternoon"*.
-3. **Onboarding, with the safety gates wired in as it is built.** S1–S4 are onboarding
+2. ~~**Schema and RLS before a single row exists.**~~ **P1-B, 2 Sep.** RLS goes on in
+   migration 001. By week three that database holds your own health data, and retrofitting
+   it then is §1.1's *"genuinely bad afternoon"*.
+3. ~~**A signed-in user, because every row is keyed on one.**~~ **P1-C, 7 Sep.** Every
+   table references `auth.users.id` and every policy compares `auth.uid()`, so there is
+   nowhere to put a food log until this exists. It brings the Article 9 consent screen
+   with it — the screen belongs to onboarding, but the consent is what makes the logging
+   lawful, so it cannot land after the thing it authorises. See
+   [what P1-C landed](#p1-c--what-landed).
+4. **Onboarding, with the safety gates wired in as it is built.** S1–S4 are onboarding
    logic, not a review pass over finished screens. Each arrives with its test names
-   already written in `docs/safety/`.
-4. **Kick off.** The minimum set above. Record day 1.
-5. **Everything else, underneath a running clock.** Barcode, photo, HealthKit, sync,
+   already written in `docs/safety/`. It also carries the first Settings surface, which
+   is where S6's opt-out, S7's signposting and P1-C's consent withdrawal all live.
+5. **Kick off.** The minimum set above. Record day 1.
+6. **Everything else, underneath a running clock.** Barcode, photo, HealthKit, sync,
    Matchday polish.
 
 ---
@@ -220,6 +227,68 @@ repositories and their tests have never been built. First Mac session: ⌘U.
 
 ---
 
+## P1-C — what landed
+
+Both stories, 8 points, on branch `p1-c-lmapdw`. Two ADRs, because two questions
+turned out to be real decisions rather than implementation details.
+
+| Story | Outcome |
+|---|---|
+| Sign in with Apple via Supabase Auth | ✔ Id-token exchange, no scopes requested, Keychain-backed session restored on cold launch, refresh left to the SDK. Failure states in the copy deck's words |
+| Health consent, separate from terms acceptance | ✔ Two columns, two calls, two timestamps, no API that writes both. `ConsentTests.healthConsentIsSeparateFromTermsAcceptance` is the named test |
+
+**Three decisions worth reading, all in the ADRs:**
+
+- **[ADR 0016](../decisions/0016-sign-in-with-apple-only.md) — Apple only, and no
+  anonymous sessions.** Anonymous sessions would have started the 21-day clock
+  sooner and charged it back later: upgrading one to a real identity is a data
+  migration on a live device holding health data, and the days most at risk are
+  the first ones, which are the calibration window. The measured cost of not
+  doing it is one screen with one button, shown once.
+- **[ADR 0017](../decisions/0017-health-consent-separate-from-terms.md) — a
+  partial consent does not start the app.** The S6 opt-out *must* leave a fully
+  useful tracker, because an opt-out that cripples the app is a threat. Health
+  consent is the opposite case: there is no version of Ninety that is not
+  processing health data, so a "limited mode" would be a tracker quietly logging
+  food without the consent that makes logging it lawful. The screen offers the
+  honest alternative instead — sign out.
+- **No name, no email, no Apple user identifier.** `requestedScopes = []`. Apple
+  offers all three exactly once and Ninety takes none of them; a field never
+  collected cannot go stale behind Hide My Email, cannot leak, and does not have
+  to appear on an Article 9 export or in the App Privacy labels.
+
+**Two things found while building it, each cheap now and expensive later:**
+
+- **xcconfig eats everything after `//`.** Putting `SUPABASE_URL = https://x.supabase.co`
+  in a build setting silently yields `https:` — no warning, and the failure
+  surfaces as a sign-in that does not work. The setting is `SUPABASE_HOST`, the
+  host alone, and Swift puts the scheme back. It also means the setting cannot
+  point the app at a plaintext endpoint.
+- **The two Supabase values had nowhere safe to live.** Neither is a secret
+  (`docs/security/secrets.md` puts both in the "ships in the bundle" row, because
+  RLS is the boundary) but both name one person's project, and this repository is
+  read by other people. They now follow `DEVELOPMENT_TEAM` exactly: declared empty
+  in `Config/Ninety.xcconfig`, filled in from the gitignored `Local.xcconfig`, and
+  `scripts/check_bundle.py` fails CI if a literal ever reaches `Info.plist`.
+
+**The gap, named rather than buried.** Consent can be withdrawn on the consent
+screen, and `ConsentRecorder` supports withdrawing either at any time — but once
+both are given the shell moves on, and Ninety has no Settings screen to withdraw
+from yet. The copy therefore describes what withdrawal *does* and does not
+promise where to find it. **P1-D closes this**: the screen carrying S6's opt-out
+switch and S7's signposting carries this too.
+
+**Not verified here, and honestly outstanding.** Same caveat as P1-A and P1-B,
+plus one more that is new. This was written in a Linux container with no Xcode,
+so nothing is compiled — and P1-C is the first epic to take a **remote** Swift
+package (`supabase-swift`, pinned to 2.x). It has never been resolved, so
+`Package.resolved` does not exist and the SDK call sites have never seen a
+compiler. If any of them have moved, they are all in
+`Ninety/Auth/SupabaseAuthService.swift` and nowhere else — which is the whole
+reason `AuthServiceProtocol` exists.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
@@ -241,14 +310,29 @@ In order, and stop at the first failure — each step is the precondition for th
 ```bash
 git config core.hooksPath .githooks          # once per clone
 brew install swiftlint xcbeautify
-cp Config/Local.xcconfig.example Config/Local.xcconfig   # then add your team id
+cp Config/Local.xcconfig.example Config/Local.xcconfig   # then add your team id,
+                                             # SUPABASE_HOST and SUPABASE_ANON_KEY
 
 python3 design/tokens/generate.py --check    # tokens, contrast, fonts
 scripts/verify-guardrails.sh                 # now runs the SwiftLint half too
 swift test --package-path Packages/RankingEngine
 
-open Ninety.xcodeproj                        # ⌘B, then ⌘U, then run on the phone
+open Ninety.xcodeproj                        # resolve packages, ⌘B, ⌘U, run on the phone
 ```
+
+**Two things specific to P1-C, in this order.** Xcode resolves `supabase-swift`
+on first open — commit the `Package.resolved` it writes, because
+`.gitignore` says an app pins its dependencies. Then turn on **Sign in with
+Apple** for the App ID in the Apple Developer account: the entitlement is in
+`Config/Ninety.entitlements` and the capability has to exist on the profile, or
+the build signs and then fails at the sheet with `ASAuthorizationError 1000`.
+
+**Then sign in.** Console should carry `Signed in with Apple.` under the `auth`
+category. Force-quit and reopen: it should go straight past the sign-in screen
+(`Session restored; refresh handled by the SDK.`), which is the cold-launch
+restore the ticket asks for. Then check `profiles` in the Supabase dashboard —
+two timestamps, and they are not equal unless you tapped both switches inside the
+same second.
 
 **What to look at, specifically.** Console should carry
 `Bundled faces registered: 7` from `BrandFont.verify()`. If it says they did *not*
@@ -272,6 +356,9 @@ meant to, per the repo convention on closing criteria on different evidence.
 > Currently working on: **[ticket]**. P1-A is closed: the project builds, the type
 > decision is ADR 0015 (Dynamic Type, two bundled faces), the shell is three tabs with
 > Sub On as a sheet, and `DESIGN.md` is the authority on how the world is built.
+> P1-C is closed: Sign in with Apple is the only identity route (ADR 0016), and the app
+> will not start until Article 9 health consent is recorded separately from terms
+> acceptance (ADR 0017). Every repository is built from the signed-in user's id.
 >
 > Requirements: offline-first (the UI never waits on network), RLS on every table, photo
 > estimates always show ranges + confidence and require user confirmation. The safety

@@ -101,6 +101,14 @@ was designed as a website.
 > on a control and leaves weight with no home; this keeps the same three-tab cap
 > and gives every tab a destination.
 
+> **Deviation from the world.** The sign-in screen's only control is
+> `SignInWithAppleButton`, drawn in Apple's own style rather than the gold
+> primary. Its appearance is fixed by the Human Interface Guidelines, and an app
+> that draws its own "Continue with Apple" is a rejection waiting to happen.
+> Everything around it — masthead, kit stripes, pitch — is the world; the button
+> is Apple's. It is also the one screen with no gold-filled control on it, which
+> costs nothing: the division has not been earned yet.
+
 **The system tab bar stays the system tab bar.** It is themed through the layer
 UIKit leaves open — sunken ground, gold selection, the broadcast face on the
 labels — and keeps scroll-to-top, the sidebar adaptation, VoiceOver's tab
@@ -139,6 +147,12 @@ names the gap is incomplete.
 **A missed day renders empty, never crossed out.** Regression is a reset. Losing
 a division always names the way back.
 
+**A failure the user chose is not a failure.** Dismissing Sign in with Apple's
+sheet shows nothing at all — no banner, no retry prompt. What *is* shown uses
+`safety`, never `critical`: the token set has no error colour for a state the
+user did not cause, and a red banner over a network blip trains people to ignore
+the one that matters.
+
 Seventeen phrases fail the build at error severity (S5), and
 `SafetyCopyTests` checks the strings the app actually renders — not only the
 literals in source — so the guarantee survives copy moving into a strings file.
@@ -155,6 +169,12 @@ covers both without claiming either.
 Never a spinner or a skeleton where the answer is "there is nothing yet" — those
 promise content is a moment away. `HoldingNote` states what the surface will
 hold and what has to land first. **Never lorem, never an invented number.**
+
+**Launch is the one genuine wait**, and it still gets no spinner. `LaunchHold`
+draws the masthead and the pitch and nothing else while the session is read back
+from the Keychain, so it reads as the launch screen continuing rather than as a
+new screen arriving. In the common case — nobody signed in — it is gone before
+it draws.
 
 ---
 
