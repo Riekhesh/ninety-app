@@ -99,6 +99,10 @@ head_ "SwiftLint custom rules"
 if ! command -v swiftlint >/dev/null 2>&1; then
   skip "swiftlint not installed — brew install swiftlint. Rules unverified."
   skip "CI runs these on macOS; this half is skipped here, not passed."
+  skip "On Linux: the release zip ships a self-contained swiftlint-static that"
+  skip "runs every structural rule without SourceKit. It cannot run custom_rules"
+  skip "(those need SourceKit) but it does catch the ordinary ones, which is"
+  skip "what a machine with no Xcode otherwise finds out from a red CI run."
 else
   LINT="$SCRATCH/lint"
   # The engine rules key off the path, so the fixture has to live at the path
@@ -118,6 +122,9 @@ enum Impure {
 }
 SWIFT
 
+  # `.cornerRadius(12)` would NOT trip no_magic_corner_radius: the rule matches
+  # `cornerRadius:` with a colon, which is the RoundedRectangle form. CI caught
+  # that this fixture had been testing nothing.
   cat > "$LINT/Ninety/Bad.swift" <<'SWIFT'
 import SwiftUI
 
@@ -125,7 +132,7 @@ struct Bad: View {
     var body: some View {
         Text("You missed 3 days")
             .foregroundStyle(Color(red: 1, green: 0, blue: 0))
-            .cornerRadius(12)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 SWIFT

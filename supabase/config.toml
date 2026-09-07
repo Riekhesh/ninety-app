@@ -1,0 +1,21 @@
+# Supabase CLI project config.
+#
+# Committed so `supabase link` works straight after a clone — without this file
+# the CLI does not consider the directory a project and refuses to link.
+#
+# Deliberately minimal. The CLI's `supabase init` writes ~200 lines covering
+# local Studio ports, inbucket, realtime and analytics, none of which this
+# project uses: migrations are applied to the hosted project with `db push`, and
+# the RLS proof boots its own throwaway Postgres (scripts/verify-rls.sh).
+
+project_id = "ninety"
+
+[db]
+# The port the local `supabase start` stack would use. Only relevant if you run
+# the full local stack; nothing in this repo requires it.
+port = 54322
+
+# Match this to your hosted project's Postgres version, which is shown in the
+# dashboard under Settings → Database → Infrastructure. It only affects a local
+# `supabase start`; `db push` uses whatever the hosted project runs.
+major_version = 17

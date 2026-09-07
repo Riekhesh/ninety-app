@@ -40,7 +40,7 @@ project**.
 | Setting | Value | Why this one |
 |---|---|---|
 | Organisation | new, free tier | — |
-| Name | `ninety` | matches the repo |
+| Name | `notch` | matches the repo |
 | **Region** | **London / `eu-west-2`** (any EU region if London is unavailable) | **The decision that is expensive to change.** This is special category health data under UK GDPR Article 9. Region is fixed at creation — moving it later means a dump, a new project, and reissuing every key. |
 | Database password | generate a long random one | goes straight into `.env` as `SUPABASE_DB_PASSWORD`; you will need it for migrations, and it is not retrievable afterwards |
 | Plan | Free | comfortably covers Phases 0–3 ([ADR 0003](../decisions/0003-supabase-backend.md)) |
@@ -70,14 +70,27 @@ nothing to do today.
 
 ---
 
-## 2 · PostHog (~10 min)
+## 2 · PostHog — **deferred to Phase 3** (decided 2026-08-30)
+
+> **Not done, on purpose.** PostHog is not needed until there are real testers
+> generating behaviour worth measuring, and it blocks nothing before then. §0.2's
+> argument for doing it in Phase 0 was only that admin is cheaper when batched — which
+> is a weak reason to sign up for a third service today. `verify-accounts.sh` treats a
+> blank PostHog key as a note rather than a failure, so this does not sit in the output
+> looking like an outstanding task.
+>
+> **What changes when you do come back to it:** the two toggles below are the whole
+> point, and they have to be off *before* the first event, not after. Everything else
+> here is ten minutes of clicking.
+
+### The instructions, for when you get to Phase 3
 
 [eu.posthog.com](https://eu.posthog.com) — **note the `eu.`**. Same Article 9 reasoning
 as the Supabase region, and `.env.example` already points `POSTHOG_HOST` at
 `https://eu.i.posthog.com`. Signing up on the US cloud puts UK health-app telemetry in
 the wrong jurisdiction and, like the Supabase region, is not movable afterwards.
 
-Create a project named `ninety`. **Project Settings**, and copy:
+Create a project named `notch`. **Project Settings**, and copy:
 
 ```
 POSTHOG_PROJECT_API_KEY=phc_...    # write-only ingest key; safe in the app bundle
