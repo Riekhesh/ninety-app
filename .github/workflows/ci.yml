@@ -105,6 +105,13 @@ jobs:
         # appears at install time on a device or simulator.
         run: python3 scripts/check_bundle.py .
 
+      - name: Check Swift and Postgres still agree
+        # Both sides store these enums as the same bare strings, so a value in
+        # one and not the other is a row that writes fine and fails to read
+        # back. Swift cannot catch it — the mapping is a string, and a string
+        # always compiles.
+        run: python3 scripts/check_schema_parity.py
+
       - name: Check for TODO markers in shipped docs
         # Phase 0 deliverables have placeholders you are meant to fill in by
         # hand (competitor numbers, the measured baseline). This does not fail
