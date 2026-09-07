@@ -54,6 +54,20 @@
 		<string>SairaCondensed-ExtraBold.ttf</string>
 	</array>
 
+	<!-- Which Supabase project this build talks to. Substituted from the build
+	     settings of the same name, which are empty in Config/Ninety.xcconfig and
+	     filled in from the gitignored Config/Local.xcconfig — so a literal value
+	     must never appear here. scripts/check_bundle.py fails the build if one
+	     does. Neither is a secret (docs/security/secrets.md), but both name one
+	     person's project and this repository is read by other people.
+
+	     HOST ONLY on NinetySupabaseHost: xcconfig reads `//` as a comment, so a
+	     full URL truncates to `https:` in silence. Swift adds the scheme. -->
+	<key>NinetySupabaseHost</key>
+	<string>$(SUPABASE_HOST)</string>
+	<key>NinetySupabaseAnonKey</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

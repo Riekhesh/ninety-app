@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Sign in with Apple. A paid-programme entitlement, and the only identity
+	     route Ninety offers (ADR 0016) — Apple's rule is that an app offering
+	     any third-party login must also offer this one, so shipping it alone
+	     means every provider added later is added beside it rather than needing
+	     an account-linking migration.
+
+	     `Default` is the primary app; `Default ProxyEnabled` is for an app that
+	     shares an Apple ID relationship with a website, which Ninety does not.
+
+	     This file is on the APP target only. Attaching it to NinetyTests too —
+	     which is what setting CODE_SIGN_ENTITLEMENTS in the shared xcconfig
+	     would do — asks the signing machinery for a capability the test bundle
+	     has no provisioning profile for. -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+</dict>
+</plist>

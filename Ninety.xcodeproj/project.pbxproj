@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9000000000000000000000D1 /* DesignTokens.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9000000000000000000000C6 /* DesignTokens.generated.swift */; };
 		9000000000000000000000D2 /* RankingEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 900000000000000000000122 /* RankingEngine */; };
+		9000000000000000000000D3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 900000000000000000000124 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +29,7 @@
 		9000000000000000000000C4 /* Ninety.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Ninety.xcconfig; sourceTree = "<group>"; };
 		9000000000000000000000C5 /* Local.xcconfig.example */ = {isa = PBXFileReference; lastKnownFileType = text; path = Local.xcconfig.example; sourceTree = "<group>"; };
 		9000000000000000000000C6 /* DesignTokens.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.generated.swift; sourceTree = "<group>"; };
+		9000000000000000000000C7 /* Ninety.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Ninety.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -49,6 +51,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9000000000000000000000D2 /* RankingEngine in Frameworks */,
+				9000000000000000000000D3 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +91,7 @@
 				9000000000000000000000C4 /* Ninety.xcconfig */,
 				9000000000000000000000C5 /* Local.xcconfig.example */,
 				9000000000000000000000C3 /* Info.plist */,
+				9000000000000000000000C7 /* Ninety.entitlements */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -130,6 +134,7 @@
 			name = Ninety;
 			packageProductDependencies = (
 				900000000000000000000122 /* RankingEngine */,
+				900000000000000000000124 /* Supabase */,
 			);
 			productName = Ninety;
 			productReference = 9000000000000000000000C1 /* Ninety.app */;
@@ -188,6 +193,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				900000000000000000000121 /* XCLocalSwiftPackageReference "Packages/RankingEngine" */,
+				900000000000000000000123 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 70;
 			productRefGroup = 9000000000000000000000A3 /* Products */;
@@ -317,6 +323,7 @@
 		900000000000000000000113 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/Ninety.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -331,6 +338,7 @@
 		900000000000000000000114 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/Ninety.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -415,10 +423,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		900000000000000000000123 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.20.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		900000000000000000000122 /* RankingEngine */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RankingEngine;
+		};
+		900000000000000000000124 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 900000000000000000000123 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

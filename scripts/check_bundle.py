@@ -16,6 +16,18 @@ import plistlib
 import sys
 from pathlib import Path
 
+# Settings that must reach the bundle as a build-setting reference and never as
+# a literal. Both name one person's Supabase project: neither is a secret
+# (docs/security/secrets.md puts the project URL and the publishable key in the
+# "ships in the bundle" row, because RLS is the security boundary), but this
+# repository is read by other people, and the moment a real value is pasted in
+# here it is committed. They live in the gitignored Config/Local.xcconfig, like
+# DEVELOPMENT_TEAM.
+SUBSTITUTED = {
+    "NinetySupabaseHost": "SUPABASE_HOST",
+    "NinetySupabaseAnonKey": "SUPABASE_ANON_KEY",
+}
+
 # The keys Xcode injects for you, and stops injecting the moment you supply
 # your own plist. Plus the two version keys the App Store requires.
 REQUIRED = [
@@ -47,6 +59,17 @@ def main() -> int:
         print(f"BAD Info.plist is missing {', '.join(missing)} — the app will fail to install")
     else:
         print(f"OK all {len(REQUIRED)} standard CFBundle keys present")
+
+    for key, setting in SUBSTITUTED.items():
+        value = info.get(key)
+        if value is None:
+            print(f"BAD Info.plist is missing {key} — the app cannot find its Supabase project")
+        elif value != f"$({setting})":
+            # Deliberately does not print the value: if this has failed, the
+            # value is the thing you do not want in a CI log either.
+            print(f"BAD {key} holds a literal, not $({setting}) — that value is now committed")
+        else:
+            print(f"OK {key} is substituted from {setting}, not committed")
 
     declared = info.get("UIAppFonts", [])
     absent = [name for name in declared if not (fonts / name).exists()]

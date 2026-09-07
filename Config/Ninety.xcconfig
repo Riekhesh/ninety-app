@@ -48,5 +48,23 @@ ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
 // ourselves and can read in full.
 ENABLE_USER_SCRIPT_SANDBOXING = NO
 
+// ─── Supabase ────────────────────────────────────────────────────────────────
+// Both of these reach the app through Config/Info.plist and are read by
+// SupabaseConfiguration. Neither is a secret — docs/security/secrets.md puts
+// the project URL and the publishable (anon) key in the "ships in the bundle"
+// row, because RLS and not the key is the security boundary — but both identify
+// one person's project, and this repository is read by other people. So they
+// are declared empty here and filled in from Config/Local.xcconfig, exactly
+// like DEVELOPMENT_TEAM. A clone without them still builds and still runs; the
+// sign-in screen says what is missing.
+//
+// SUPABASE_HOST is the HOST ONLY — `abcdefgh.supabase.co`, no scheme, no
+// trailing slash. xcconfig treats `//` as the start of a comment, so a value of
+// `https://abcdefgh.supabase.co` silently becomes `https:` with no warning
+// anywhere. The scheme is put back in Swift, which also means this setting can
+// never point the app at a plaintext endpoint.
+SUPABASE_HOST =
+SUPABASE_ANON_KEY =
+
 // Last, so your machine wins. Anything set here overrides everything above.
 #include? "Local.xcconfig"
