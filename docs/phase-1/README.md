@@ -75,7 +75,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | Epic | What it covers | Pri |
 |---|---|---|
 | **P1-A** Foundations & app skeleton | **Built 2 Sep, not yet compiled.** Xcode project, `Packages/`, tokens wired in, macOS CI gated, type decision settled. Closes when a Mac builds it | Highest |
-| **P1-B** Data layer, schema & RLS | Migration 001 with RLS from the first line, SwiftData, repositories, the food mirror | Highest |
+| **P1-B** Data layer, schema & RLS | **4 of 5 done, 2 Sep.** Migrations applied to the live project, RLS proven with two accounts, SwiftData models, repositories. Food mirror deferred | Highest |
 | **P1-C** Authentication | Sign in with Apple, and Article 9 consent separate from ToS | High |
 | **P1-D** Pre-Season: onboarding & the §10 gates | Mifflin-St Jeor as a band, S1–S7, the calibration window | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
@@ -184,10 +184,47 @@ the device, and record the result on the P1-A ticket. See
 
 ---
 
+## P1-B — what landed, and the one thing deferred
+
+Four of five stories, 20 of 28 points. Migrations 001–003 are applied to the
+live project (`sxaewrpojdadywuybzhz`, London, Postgres 17).
+
+| Story | Outcome |
+|---|---|
+| Migration 001: every table, RLS from the first line | ✔ Ten tables, RLS enabled in the same migration that creates them |
+| RLS policies, tested with two real accounts | ✔ 27 assertions, `scripts/verify-rls.sh`, in CI on every schema change |
+| SwiftData models as the local source of truth | ✔ Eight `@Model` types, versioned schema, migration plan |
+| Protocol-based repositories with mocks | ✔ Four protocols, SwiftData and mock implementations |
+| Mirror Open Food Facts + USDA | **Deferred** — see below |
+
+**The mirror is deferred to sit alongside P1-F.** It is 8 of the epic's 28
+points and nothing in the minimum daily-usable set needs it: manual entry is
+what starts the clock, and text search is P1-F's Path 1, which is where the
+data is first actually read. The `foods` table already carries its
+`search_vector` column and GIN index, so the import is a data job rather than a
+schema change when it lands. Twenty-one days is the one thing in this phase no
+effort compresses, so anything that can start the clock sooner does.
+
+**Two bugs the RLS proof caught before they shipped.** The forged-insert
+assertions were passing because a UNIQUE constraint rejected the row, not a
+policy — with the insert policy deliberately replaced by `with check (true)`
+the test still passed. And a comment in 002 claimed an UPDATE policy with only
+`using` lets a row be reassigned to another user; it does not, and the
+correction is now an assertion rather than a sentence. Both are in the commit
+history with the experiments that established them.
+
+**Still not compiled.** Same caveat as P1-A: the Swift in this epic was written
+in a Linux container with no Xcode. The SQL *is* verified — against a real
+Postgres 16 locally and applied to the live project — but the models,
+repositories and their tests have never been built. First Mac session: ⌘U.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
 |---|---|
+| Open Food Facts + USDA mirror | Moved out of P1-B to land with P1-F's search route. The `foods` table and its index ship now; the import is a data job |
 | Ranking maths, tiers, anti-gaming | Phase 2. `Packages/RankingEngine` is scaffolded now only so the lint purity rules have a boundary to police |
 | The scoring half of S3 | Phase 2 — progress score peaking at target rate |
 | Privacy policy, export, deletion, S7 triggers | Phase 3, before the first external tester |
