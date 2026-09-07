@@ -94,6 +94,62 @@ policies on most tables, one on `leaderboard_entries`.
 
 ---
 
+### If Homebrew will not install the CLI
+
+`Error: Your Command Line Tools are too outdated.` is Homebrew checking the
+standalone Command Line Tools package, which is versioned separately from
+Xcode. Having Xcode 26.6 does not update it.
+
+**Fix it properly** (worth doing — it will block other `brew install`s too):
+
+```bash
+sudo rm -rf /Library/Developer/CommandLineTools
+sudo xcode-select --install
+```
+
+~1 GB and several minutes. While it downloads, point the toolchain at Xcode so
+nothing else breaks in the meantime:
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+```
+
+Then `brew install supabase/tap/supabase` and carry on from step 2.
+
+**Or skip the CLI entirely** — see below. The CLI is only needed to apply
+migrations and to keep the migration history in step; nothing in the app uses
+it.
+
+---
+
+## Applying the migrations without the CLI
+
+The dashboard's SQL Editor runs as `postgres`, so it can do everything `db
+push` does. It just does not record what it ran, which the last step fixes.
+
+1. Dashboard → **SQL Editor** → **New query**.
+2. Paste the entire contents of `supabase/migrations/20260902000001_initial_schema.sql`
+   and press **Run**. Expect `Success. No rows returned`.
+3. Repeat for `..._20260902000002_rls_policies.sql`.
+4. Repeat for `..._20260902000003_storage_meal_photos.sql`. If this one errors on
+   permissions, see the section below — it is the expected one to fail and
+   nothing needs it until P1-F.
+5. Check: **Database → Tables** shows ten tables, each with a green
+   **RLS enabled** badge.
+
+**Then tell the CLI they are already applied**, so that when you do install it,
+the next `db push` does not try to run them again and fail on
+`type "food_source" already exists`:
+
+```bash
+supabase migration repair --status applied 20260902000001
+supabase migration repair --status applied 20260902000002
+supabase migration repair --status applied 20260902000003   # only if step 4 worked
+```
+
+Do this whenever you get round to installing the CLI. Until then the database
+is correct and the app is unblocked; only the bookkeeping is outstanding.
+
 ### If step 6 fails on `20260902000003_storage_meal_photos.sql`
 
 That one is separated from the others precisely because it is the step that can
