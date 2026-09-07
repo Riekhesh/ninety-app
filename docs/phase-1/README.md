@@ -351,9 +351,14 @@ Simulator sign-in works but needs an Apple Account signed in under its own
 Settings, and it fails in ways that look like app bugs. Console should carry
 `Signed in with Apple.` under the `auth` category. Force-quit and reopen: it should go straight past the sign-in screen
 (`Session restored; refresh handled by the SDK.`), which is the cold-launch
-restore the ticket asks for. Then check `profiles` in the Supabase dashboard —
-two timestamps, and they are not equal unless you tapped both switches inside the
-same second.
+restore the ticket asks for.
+
+**The consent row will not be in the Supabase dashboard, and that is correct.**
+It is written to SwiftData and enqueued in `sync_outbox`, and nothing drains
+that outbox until P1-I. Check it locally instead — a `Profile` fetch in the
+debugger, or delete and reinstall the app: a reinstall should ask for consent
+again, because the row went with the store. Two timestamps, and they are not
+equal unless you tapped both switches inside the same second.
 
 **What to look at, specifically.** Console should carry
 `Bundled faces registered: 7` from `BrandFont.verify()`. If it says they did *not*

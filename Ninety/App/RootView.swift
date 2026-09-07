@@ -42,9 +42,16 @@ struct LaunchHold: View {
 /// Signed in, and gated on consent.
 ///
 /// The gate reads the profile row rather than anything carried over from the
-/// sign-in, because a reinstall is a returning user: their consent is on the
-/// server, their phone is empty, and asking again would record a second
-/// timestamp for a decision they already made.
+/// sign-in. A reinstall is a returning user with an empty phone, and once P1-I
+/// drains the outbox their consent comes back from the server rather than being
+/// asked for a second time — a second timestamp for a decision already made is
+/// a worse record than one.
+///
+/// **Until P1-I, that is a design and not yet a behaviour.** The consent write
+/// lands in SwiftData and in `sync_outbox`, and nothing sends it anywhere, so a
+/// reinstall today does ask again. Recorded here rather than in a commit
+/// message because the comment above would otherwise read as a claim about what
+/// the code does.
 private struct SignedInView: View {
     let userID: UUID
     let session: SessionController

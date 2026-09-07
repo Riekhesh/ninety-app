@@ -85,6 +85,13 @@ withdrawal *does* rather than promising where to find it. **This is a gap, not a
 subtlety**, and P1-D closes it: the same screen that carries the S6 switch and
 S7's signposting carries this.
 
+**The record is local until P1-I.** Consent is written to SwiftData and enqueued
+in `sync_outbox` like every other write (ADR 0005), and nothing drains that
+outbox yet — so today a reinstall asks again, and the second timestamp replaces
+the first. Right by construction once sync lands, and worth knowing until it
+does: the consent that authorises Phase 1's processing is currently evidenced on
+one device only.
+
 **A record of consent, not a record of what was consented to.** There is no
 consent *version*, so a materially changed privacy policy cannot be told apart
 from the original by looking at the row. Fine for one user who wrote the policy;
