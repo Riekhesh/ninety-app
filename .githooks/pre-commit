@@ -34,6 +34,18 @@ if echo "$staged" | grep -qE '(^|/)\.env$|\.p8$|\.p12$|\.pem$|\.mobileprovision$
   bad "credential file staged — it should be matched by .gitignore"
 fi
 
+# The template is committed and the real file is not, so the two are one typo
+# apart — and the mistake is silent in both directions: the build reads nothing
+# and says it is unconfigured, while your project's coordinates sit in a tracked
+# file waiting for the next `git add`. Every value here must still be blank.
+if echo "$staged" | grep -q '^Config/Local\.xcconfig\.example$'; then
+  if git show ":Config/Local.xcconfig.example" | grep -Eq '^[[:space:]]*(DEVELOPMENT_TEAM|SUPABASE_HOST|SUPABASE_ANON_KEY|PRODUCT_BUNDLE_IDENTIFIER)[[:space:]]*=[[:space:]]*[^[:space:]]'; then
+    bad "Config/Local.xcconfig.example has a real value in it — that is the template, not your copy"
+    say "cp Config/Local.xcconfig.example Config/Local.xcconfig   # keeps what you typed"
+    say "git checkout -- Config/Local.xcconfig.example            # restores the template"
+  fi
+fi
+
 # ── 2. Personal health data ─────────────────────────────────────────────────
 # Meal photos and HealthKit exports are Article 9 special category data (§10).
 # The .gitkeep placeholders that keep these directories in the tree are fine;

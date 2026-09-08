@@ -44,6 +44,53 @@ fact. "Over budget" is a judgement, and it frames food as money you have spent.
 - Button: `Continue with Apple`
 - Footnote: `We ask for your date of birth, height and sex because the scoring engine needs them. Nothing else.`
 
+**Sign in — when it doesn't work**
+
+Failure states use these, never a raw error string. `cancelled` deliberately has no copy:
+dismissing Apple's sheet is a decision, and answering a decision with a banner is arguing
+with the user about something they did on purpose.
+
+| State | Line | Second line |
+|---|---|---|
+| Cancelled at Apple's sheet | *nothing shown* | — |
+| Apple returned no token | `Apple didn't hand back a sign-in token. Worth another go.` | — |
+| No network | `Can't reach Ninety right now. Check your connection and try again.` | `Anything already on this phone stays where it is.` |
+| Server declined | `Ninety couldn't finish signing you in. Try again in a moment.` | — |
+| Build has no project (developer only) | `This build isn't connected to a Ninety project yet.` | `Config/Local.xcconfig needs SUPABASE_HOST and SUPABASE_ANON_KEY. See docs/security/secrets.md.` |
+| Sign-out not confirmed | `Signed out on this phone. The server hasn't confirmed it yet.` | — |
+
+Only a real network error gets the offline wording. Mapping every failure to "check your
+connection" states a cause the app does not know, which is the same class of mistake as
+inventing a number.
+
+**Consent** (Article 9 — ADR 0017)
+
+Two decisions on one screen, each with its own switch, each recorded separately. The screen
+is a gate on the app starting, so it has to offer the honest alternative rather than a dead
+end.
+
+- Masthead: `Pre-Season` · meta `Consent`
+- Title: `Before Ninety holds anything`
+- Terms heading: `Terms of use`
+- Terms body: `What Ninety does, what it doesn't promise, and that it isn't a medical device and makes no medical claims.`
+- Terms switch: `I accept the terms`
+- Health heading: `Health data`
+- Health body: `What you log — food, weight, and what Ninety reads from Apple Health — is special category data under UK GDPR. Processing it needs your explicit consent, given separately from the terms above.`
+- Health detail: `It stays on your phone and in Ninety's database. It isn't sold, and it isn't shared with anyone. Withdrawing consent stops Ninety processing anything new; it doesn't delete what's already logged, which is a separate request.`
+- Health switch: `I consent to Ninety processing my health data`
+- Footnote: `Ninety needs both to start. Health data is what the app is made of.`
+- Button: `Kick off` — disabled until both switches are on
+- Way out: `Sign out instead`
+- Write failed: `That didn't save. Try the switch again.`
+
+Three things the wording is doing deliberately. It **names** health data, the law and the
+word "explicit", because a consent screen that never says what is being consented to is not
+explicit consent whatever the timestamps say. It says *"given separately from the terms
+above"* in the copy as well as in the schema, so the separation is visible to the user and
+not only to the database. And it describes what withdrawal **does** rather than promising
+where to find it — there is no Settings screen until S6's opt-out lands in P1-D, and copy
+that points at a screen which does not exist is the same failure as an invented number.
+
 **About you**
 - Title: `A few things the engine needs`
 - Fields: `Date of birth` · `Height` · `Sex` · `Activity level`

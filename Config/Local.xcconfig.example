@@ -14,5 +14,29 @@
 // Neither is a secret, but both identify an individual account, and this
 // repository is read by other people.
 
+// SUPABASE_HOST — your project's host, WITHOUT the scheme. Supabase dashboard,
+//                    Project Settings -> Data API -> Project URL, with the
+//                    leading `https://` removed.
+//
+//                    The scheme is removed because xcconfig reads `//` as the
+//                    start of a comment: paste the full URL and the value
+//                    silently truncates to `https:` with no warning. Swift puts
+//                    the scheme back.
+//
+// SUPABASE_ANON_KEY — the PUBLISHABLE key (`sb_publishable_...`), from the same
+//                    page under "Publishable and secret API keys". Never the
+//                    secret key: it bypasses Row-Level Security and must not go
+//                    near the client. See docs/security/secrets.md.
+//
+//                    This one is public by design and ships in the app bundle.
+//                    It is here rather than committed because it names one
+//                    person's project, not because it is a secret.
+//
+// Without these two the app builds and runs; the sign-in screen says the build
+// is not connected to a project. With the wrong ones, sign-in fails.
+
 DEVELOPMENT_TEAM =
 // PRODUCT_BUNDLE_IDENTIFIER = com.yourname.ninety
+
+SUPABASE_HOST =
+SUPABASE_ANON_KEY =

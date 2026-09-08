@@ -48,5 +48,7 @@ Re-litigating settled decisions is the most expensive habit in solo projects.
 | [0013](0013-narrowed-thesis-claim.md) | Thesis narrowed: consistency is the rank, not absent elsewhere | Locked | 0 |
 | [0014](0014-rename-to-ninety.md) | Renamed from Notch to Ninety | Locked | 0→1 |
 | [0015](0015-dynamic-type-with-a-bundled-face.md) | Dynamic Type, carried by a bundled face | Locked | 1 |
+| [0016](0016-sign-in-with-apple-only.md) | Sign in with Apple is the only way in | Locked | 1 |
+| [0017](0017-health-consent-separate-from-terms.md) | Health consent is a separate record, and gates the app | Locked | 1 |
 
 New decisions get the next number. Do not renumber; a stale link is worse than a gap.

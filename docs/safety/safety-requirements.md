@@ -295,7 +295,7 @@ launch.
 | Requirement | Where |
 |---|---|
 | Privacy policy live | GitHub Pages, free and adequate |
-| Explicit consent for health data | Onboarding, separate from ToS acceptance |
+| Explicit consent for health data | **Built, P1-C.** Two columns, two calls, two timestamps, and no API that writes both — [ADR 0017](../decisions/0017-health-consent-separate-from-terms.md). A partial consent does not start the app; the honest alternative on offer is signing out |
 | Working data export | Settings → Export. JSON: profile, food logs, weights, health samples, weekly scores |
 | Genuine account deletion | Settings → Delete. Actually deletes, including Storage objects. Not a soft-delete flag. |
 | Accurate App Privacy labels | App Store Connect. Under-declaring health collection is a fast rejection (§3.2) |
@@ -307,6 +307,13 @@ test_deletion_removes_storage_objects_for_meal_photos
 test_deletion_is_not_a_soft_delete_flag
 test_health_consent_is_separate_from_terms_acceptance
 ```
+
+**One thing P1-C left open, deliberately.** Consent can be withdrawn on the consent
+screen, and `ConsentRecorder` supports withdrawing either at any time — but there is no
+Settings screen to withdraw from once the app has started, because Ninety has no Settings
+screen yet. The copy therefore says what withdrawal *does* rather than where to find it.
+S6's opt-out switch is the first Settings surface and P1-D builds it; this goes on the
+same screen.
 
 The deletion test is the one that will actually catch something. Add a table in Phase
 2 and forget to add it to the delete path, and the test fails — which is the entire

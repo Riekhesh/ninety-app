@@ -19,7 +19,16 @@ final class OutboxEntry {
     var createdAt: Date
 
     /// The table this belongs to, by its Postgres name.
-    var entity: String
+    ///
+    /// **Not `entity`.** `@Model` is backed by `NSManagedObject`, which already
+    /// owns a property of that name holding an `NSEntityDescription`. A stored
+    /// attribute called `entity` shadows it, compiles perfectly, and then traps
+    /// inside `ModelContext.save()` with "Could not cast value of type
+    /// 'NSEntityDescription' to 'NSString'" — a message that names neither the
+    /// property nor the model. The Postgres column is still `entity`; the
+    /// mapping is the sync service's job (P1-I), and a column name is a cheaper
+    /// thing to translate than a crash is to find.
+    var tableName: String
     var entityID: UUID
     var operationRaw: String
     var payload: Data
@@ -32,7 +41,7 @@ final class OutboxEntry {
         id: UUID = UUID(),
         userID: UUID,
         createdAt: Date,
-        entity: String,
+        tableName: String,
         entityID: UUID,
         operation: OutboxOperation,
         payload: Data,
@@ -41,7 +50,7 @@ final class OutboxEntry {
         self.id = id
         self.userID = userID
         self.createdAt = createdAt
-        self.entity = entity
+        self.tableName = tableName
         self.entityID = entityID
         self.operationRaw = operation.rawValue
         self.payload = payload

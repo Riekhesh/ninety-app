@@ -3,8 +3,13 @@
 // Committed, and deliberately free of anything tied to one Apple account: this
 // repository is a portfolio artifact that people read. Your own team id goes in
 // Config/Local.xcconfig, which is gitignored — copy Local.xcconfig.example to
-// start. Without it the app still builds for the Simulator; only a device build
-// needs the team.
+// start.
+//
+// It used to be true that only a device build needed the team. P1-C added
+// Config/Ninety.entitlements for Sign in with Apple, and an entitlement asks the
+// signing machinery for a capability that automatic signing resolves against a
+// real team whichever destination you build for. CI is unaffected: it passes
+// CODE_SIGNING_ALLOWED=NO.
 //
 // The override include is at the BOTTOM of this file, not the top. xcconfig is
 // last-assignment-wins, so an include at the top is one the local file can
@@ -47,6 +52,24 @@ ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
 // on every build is worth more here than sandboxing one script we wrote
 // ourselves and can read in full.
 ENABLE_USER_SCRIPT_SANDBOXING = NO
+
+// ─── Supabase ────────────────────────────────────────────────────────────────
+// Both of these reach the app through Config/Info.plist and are read by
+// SupabaseConfiguration. Neither is a secret — docs/security/secrets.md puts
+// the project URL and the publishable (anon) key in the "ships in the bundle"
+// row, because RLS and not the key is the security boundary — but both identify
+// one person's project, and this repository is read by other people. So they
+// are declared empty here and filled in from Config/Local.xcconfig, exactly
+// like DEVELOPMENT_TEAM. A clone without them still builds and still runs; the
+// sign-in screen says what is missing.
+//
+// SUPABASE_HOST is the HOST ONLY — `abcdefgh.supabase.co`, no scheme, no
+// trailing slash. xcconfig treats `//` as the start of a comment, so a value of
+// `https://abcdefgh.supabase.co` silently becomes `https:` with no warning
+// anywhere. The scheme is put back in Swift, which also means this setting can
+// never point the app at a plaintext endpoint.
+SUPABASE_HOST =
+SUPABASE_ANON_KEY =
 
 // Last, so your machine wins. Anything set here overrides everything above.
 #include? "Local.xcconfig"
