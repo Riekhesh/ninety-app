@@ -57,7 +57,7 @@ struct DataLayerTests {
 
         let queued = try context.fetch(FetchDescriptor<OutboxEntry>())
         #expect(queued.count == 2)
-        #expect(Set(queued.map(\.entity)) == ["food_logs", "weight_logs"])
+        #expect(Set(queued.map(\.tableName)) == ["food_logs", "weight_logs"])
         #expect(queued.allSatisfy { $0.operation == .insert })
     }
 

@@ -22,12 +22,12 @@ struct Outbox {
     /// offline syncs once, in its final state, rather than replaying three
     /// versions at the server in an order that last-write-wins would then have
     /// to arbitrate.
-    func enqueue(_ operation: OutboxOperation, entity: String, id: UUID, at moment: Date) {
+    func enqueue(_ operation: OutboxOperation, tableName: String, id: UUID, at moment: Date) {
         context.insert(
             OutboxEntry(
                 userID: userID,
                 createdAt: moment,
-                entity: entity,
+                tableName: tableName,
                 entityID: id,
                 operation: operation,
                 payload: Data("{}".utf8)
@@ -59,7 +59,7 @@ struct SwiftDataProfileRepository: ProfileRepositoryProtocol {
             context.insert(profile)
         }
         Outbox(context: context, userID: userID)
-            .enqueue(.update, entity: "profiles", id: profile.id, at: now)
+            .enqueue(.update, tableName: "profiles", id: profile.id, at: now)
         try context.save()
         return profile
     }
@@ -114,7 +114,7 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
         )
         context.insert(entry)
         Outbox(context: context, userID: userID)
-            .enqueue(.insert, entity: "food_logs", id: entry.id, at: now)
+            .enqueue(.insert, tableName: "food_logs", id: entry.id, at: now)
         try context.save()
         return entry
     }
@@ -125,7 +125,7 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
         log.kcal = kcal
         log.updatedAt = moment
         Outbox(context: context, userID: userID)
-            .enqueue(.update, entity: "food_logs", id: log.id, at: moment)
+            .enqueue(.update, tableName: "food_logs", id: log.id, at: moment)
         try context.save()
     }
 
@@ -134,7 +134,7 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
         let id = log.id
         context.delete(log)
         Outbox(context: context, userID: userID)
-            .enqueue(.delete, entity: "food_logs", id: id, at: moment)
+            .enqueue(.delete, tableName: "food_logs", id: id, at: moment)
         try context.save()
     }
 }
@@ -169,7 +169,7 @@ struct SwiftDataWeightRepository: WeightRepositoryProtocol {
         )
         context.insert(entry)
         Outbox(context: context, userID: userID)
-            .enqueue(.insert, entity: "weight_logs", id: entry.id, at: now)
+            .enqueue(.insert, tableName: "weight_logs", id: entry.id, at: now)
         try context.save()
         return entry
     }
@@ -179,7 +179,7 @@ struct SwiftDataWeightRepository: WeightRepositoryProtocol {
         let id = log.id
         context.delete(log)
         Outbox(context: context, userID: userID)
-            .enqueue(.delete, entity: "weight_logs", id: id, at: now)
+            .enqueue(.delete, tableName: "weight_logs", id: id, at: now)
         try context.save()
     }
 }
@@ -222,7 +222,7 @@ struct SwiftDataHealthRepository: HealthRepositoryProtocol {
         if existing == nil { context.insert(sample) }
 
         Outbox(context: context, userID: userID)
-            .enqueue(existing == nil ? .insert : .update, entity: "health_samples", id: sample.id, at: now)
+            .enqueue(existing == nil ? .insert : .update, tableName: "health_samples", id: sample.id, at: now)
         try context.save()
         return sample
     }

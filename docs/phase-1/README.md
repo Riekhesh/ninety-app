@@ -220,6 +220,20 @@ the test still passed. And a comment in 002 claimed an UPDATE policy with only
 correction is now an assertion rather than a sentence. Both are in the commit
 history with the experiments that established them.
 
+**One bug the first ⌘U found, and it was P1-B's.** `OutboxEntry` stored a
+property called `entity`. `@Model` is backed by `NSManagedObject`, which already
+owns a property of that name holding an `NSEntityDescription`, so the attribute
+shadowed it — compiling perfectly and then trapping inside
+`ModelContext.save()` with *"Could not cast value of type 'NSEntityDescription'
+to 'NSString'"*, a message naming neither the property nor the model. Every
+write in the app goes through the outbox, so it broke all four repositories at
+once; it surfaced in a different test on each run only because tests run
+concurrently and whichever reached an outbox save first crashed the process.
+Renamed to `tableName`, and `scripts/check_schema_parity.py` now refuses any
+model property that shadows an `NSManagedObject` one. The Postgres column is
+still `entity` — mapping a column name is P1-I's job and is cheaper than this
+was to find.
+
 **Still not compiled.** Same caveat as P1-A: the Swift in this epic was written
 in a Linux container with no Xcode. The SQL *is* verified — against a real
 Postgres 16 locally and applied to the live project — but the models,

@@ -56,6 +56,52 @@ TABLES = {
 }
 
 
+# Names NSManagedObject and NSObject already own. SwiftData @Model types are
+# backed by NSManagedObject, so a stored property with one of these shadows the
+# real thing: it compiles, it runs, and it traps inside ModelContext.save() with
+# a message naming neither the property nor the model.
+#
+# This is here rather than in SwiftLint because it is a fact about the models,
+# and this is the script that reads them. It was added after `OutboxEntry.entity`
+# cost an afternoon — the first time anything ever executed that save path.
+RESERVED_PROPERTY_NAMES = {
+    "entity",
+    "objectID",
+    "managedObjectContext",
+    "isDeleted",
+    "isFault",
+    "isInserted",
+    "isUpdated",
+    "hasChanges",
+    "hasPersistentChangedValues",
+    "faultingState",
+    "description",
+    "debugDescription",
+    "hash",
+    "superclass",
+    "classForCoder",
+}
+
+
+def check_reserved_property_names() -> bool:
+    """No @Model stores a property NSManagedObject already defines."""
+    clean = True
+    for path in sorted(MODELS.glob("*.swift")):
+        source = path.read_text()
+        for match in re.finditer(r"^\s*var\s+([A-Za-z_][A-Za-z0-9_]*)\s*:", source, re.M):
+            name = match.group(1)
+            if name in RESERVED_PROPERTY_NAMES:
+                line = source[: match.start()].count("\n") + 1
+                print(
+                    f"BAD {path.name}:{line} `var {name}` shadows NSManagedObject.{name} — "
+                    f"it will trap inside ModelContext.save(), not at compile time"
+                )
+                clean = False
+    if clean:
+        print("OK  no model property shadows an NSManagedObject one")
+    return clean
+
+
 def postgres_enum_values(sql: str, name: str) -> list[str] | None:
     match = re.search(rf"create type {name} as enum \(([^)]*)\)", sql, re.S)
     if not match:
@@ -113,6 +159,9 @@ def main() -> int:
             failures += 1
     if not failures:
         print(f"OK  all {len(TABLES)} live tables have a local model")
+
+    if not check_reserved_property_names():
+        failures += 1
 
     return 1 if failures else 0
 
