@@ -40,7 +40,7 @@ struct HoldingNote: View {
     HoldingNote(
         eyebrow: "Division",
         headline: "Ranking arrives in the next update.",
-        detail: "There is no division yet because there is no fortnight of logs to work one out from."
+        detail: "There is no division yet because there is no week of logs to work one out from."
     )
     .padding(Ninety.Space.xl)
     .frame(maxHeight: .infinity, alignment: .top)

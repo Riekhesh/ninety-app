@@ -33,21 +33,20 @@ struct ConsentView: View {
                     Text(PreSeasonCopy.consentTitle)
                         .ninetyType(.title2)
 
-                    ConsentRow(
+                    SwitchPanel(
                         heading: PreSeasonCopy.termsHeading,
                         explainer: PreSeasonCopy.termsBody,
-                        detail: nil,
                         action: PreSeasonCopy.termsAction,
-                        isGiven: status.hasTerms,
+                        isOn: status.hasTerms,
                         toggle: toggleTerms
                     )
 
-                    ConsentRow(
+                    SwitchPanel(
                         heading: PreSeasonCopy.healthHeading,
                         explainer: PreSeasonCopy.healthBody,
                         detail: PreSeasonCopy.healthDetail,
                         action: PreSeasonCopy.healthAction,
-                        isGiven: status.hasHealthConsent,
+                        isOn: status.hasHealthConsent,
                         toggle: toggleHealthData
                     )
 
@@ -106,41 +105,14 @@ struct ConsentView: View {
     }
 }
 
-/// One decision: what it is, and a switch that records it on the spot.
-private struct ConsentRow: View {
-    let heading: String
-    /// Not `body`: `View` already owns that name on this type.
-    let explainer: String
-    let detail: String?
-    let action: String
-    let isGiven: Bool
-    let toggle: () -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: Ninety.Space.md) {
-            Text(heading)
-                .ninetyType(.label)
-                .foregroundStyle(Ninety.Colour.accent)
-
-            Text(explainer)
-                .ninetyType(.subhead)
-                .foregroundStyle(Ninety.Colour.textSecondary)
-
-            if let detail {
-                Text(detail)
-                    .ninetyType(.footnote)
-                    .foregroundStyle(Ninety.Colour.textTertiary)
-            }
-
-            Toggle(action, isOn: Binding(get: { isGiven }, set: { _ in toggle() }))
-                .ninetyType(.callout)
-                .tint(Ninety.Colour.accent)
-        }
-        .chalkPanel(padding: Ninety.Space.lg)
-    }
-}
-
-private extension ConsentStatus {
+/// Which switch is on, for the two screens that show them.
+///
+/// `ConsentStatus` reports the pair as one value on purpose — the app's own
+/// question is "may I process health data", which needs both — so the screens
+/// that draw two switches need this to take it back apart. Internal rather than
+/// private because Settings shows the same two switches as the consent screen,
+/// and withdrawal has to be the same act as giving.
+extension ConsentStatus {
     var hasTerms: Bool {
         switch self {
         case .complete: true

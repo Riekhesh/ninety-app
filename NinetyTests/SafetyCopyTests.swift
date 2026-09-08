@@ -37,15 +37,24 @@ struct SafetyCopyTests {
     static var shipped: [String] {
         Destination.allCases.map(\.title)
             + PreSeasonCopy.all
+            + OnboardingCopy.all
+            + SettingsCopy.all
+            + Signposting.all
             + AuthFailure.allCases.compactMap(\.errorDescription)
             + AuthFailure.allCases.compactMap(\.recoveryDescription)
+            // S5's structural half has copy too: the words on the states that
+            // are not allowed to be punitive.
+            + BandState.allCases.map(\.label)
+            + BandState.allCases.compactMap(\.note)
+            + LossRate.selectable.map { LossRate.label(for: $0) }
             + [
-                "Sub On", "Sub on", "Close",
+                "Sub On", "Sub on", "Sub on. Log food.", "Close",
                 "No day started", "No readings", "Today", "Nothing logged yet.",
                 "Weight", "No weight yet.", "Division",
                 "Ranking arrives in the next update.", "How it will be scored",
                 "Consistency", "Adherence", "Progress", "Four routes",
                 "Logging lands with P1‑F.",
+                "Settings, support and your consent",
             ]
     }
 
@@ -83,6 +92,46 @@ struct SafetyCopyTests {
                 #expect(!lowered.contains(phrase), "\"\(copy)\" makes a medical claim: \"\(phrase)\"")
             }
         }
+    }
+
+    /// §10 S5's structural half, which is the half normally missed because it
+    /// is not made of words.
+    ///
+    /// The token set has no error colour for logged intake, and `Tone` is why:
+    /// it has no `critical` case, so a screen cannot reach for one without
+    /// adding a case to an enum — a diff somebody reads, rather than a colour
+    /// name somebody types.
+    @Test("no state a user's own logging can reach is painted as an error")
+    func loggedIntakeHasNoErrorState() {
+        // Three tones and no fourth. There is deliberately no assertion that
+        // `critical` is absent, because there is no way to write one: the case
+        // does not exist, so the check is the compiler's rather than this
+        // suite's — which is the stronger version of the same guarantee.
+        #expect(Tone.allCases.count == 3)
+        #expect(Tone.allCases == [.neutral, .positive, .safety])
+
+        // Landing above the band is a normal outcome of a normal day. Anything
+        // else is the app editorialising about a meal.
+        #expect(BandState.above.tone == .neutral)
+        #expect(BandState.above.label == "Above your band")
+        #expect(BandState.inBand.tone == .positive)
+
+        // A missed day is absent, not negative: an empty segment, no cross, no
+        // colour of its own.
+        #expect(DayMark.allCases.count == 2)
+        #expect(!DayMark.missed.isFilled)
+    }
+
+    /// ADR 0018 halved the calibration window, and the number appears in copy as
+    /// well as in `CalibrationWindow.days`. The two have to agree, or the app
+    /// counts down from one number while promising another.
+    @Test("the calibration copy says the same number of days the window is")
+    func calibrationCopyMatchesTheWindow() {
+        #expect(CalibrationWindow.days == 7)
+        #expect(OnboardingCopy.calibrationBody.contains("7 days"))
+        #expect(OnboardingCopy.calibrationTitle.contains("first week"))
+        #expect(!OnboardingCopy.calibrationBody.contains("14"))
+        #expect(!OnboardingCopy.calibrationTitle.contains("two weeks"))
     }
 
     /// The Article 9 copy has one job beyond being kind: it has to say what is

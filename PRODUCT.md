@@ -58,7 +58,9 @@ photo-accuracy benchmark's data comes from.
 
 - Weekly score computed from logged food, weight trend (HealthKit), and consistency.
 - Tiers: bronze → silver → gold → platinum → diamond, fixed thresholds in v1 (ADR 0007).
-- First 14 days = calibration window ("CALIBRATING · N days to go"), no rank shown.
+- First 7 days = calibration window ("CALIBRATING · N days to go"), no rank shown.
+  Was 14 in the brief; halved in [ADR 0018](docs/decisions/0018-seven-day-calibration-window.md),
+  which also records what a thinner baseline costs.
 - Photo → calorie estimation is a helper with mandatory confirm/correct — never
   silently accepted (ADR 0010).
 - MVP surface set (6 screens): Onboarding (goal & rate), Today, Log food, Photo

@@ -174,7 +174,7 @@ Also avoid: "cheat meal", "guilt-free", "earn it", "burn off", "budget" for calo
    "Your band: 1,750–1,950 kcal — a band, not a number."
 2. **Today** — calories remaining vs band · consistency ring 5/7 · weight
    `78.4 kg / −1.2 kg vs 4 wks` · trend sparkline with baseline · tier slot (shows
-   "CALIBRATING · 6 days to go" for the first 14 days) · today's logged rows.
+   "CALIBRATING · 6 days to go" for the first 7 days — ADR 0018) · today's logged rows.
 3. **Log food** — search field, barcode and camera as peers at the top, then
    FREQUENT (log on tap) and RECENT.
 4. **Photo confirm & correct** — mandatory, never silently accept. Honest header:

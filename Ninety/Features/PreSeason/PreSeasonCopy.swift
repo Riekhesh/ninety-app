@@ -40,10 +40,18 @@ enum PreSeasonCopy {
         category data under UK GDPR. Processing it needs your explicit consent, given \
         separately from the terms above.
         """
+    /// The last sentence arrived with P1-D and is not decoration.
+    ///
+    /// Until Settings existed, this said what withdrawal *does* and pointedly not
+    /// where to find it — copy naming a screen that does not exist is the same
+    /// failure as an invented number. Both switches are now in Settings, so the
+    /// sentence is true, and saying it is what makes withdrawal as easy as
+    /// giving. Consent that is not is not freely given.
     static let healthDetail = """
         It stays on your phone and in Ninety's database. It isn't sold, and it isn't shared \
         with anyone. Withdrawing consent stops Ninety processing anything new; it doesn't \
-        delete what's already logged, which is a separate request.
+        delete what's already logged, which is a separate request. Both switches are in \
+        Settings whenever you want them.
         """
     static let healthAction = "I consent to Ninety processing my health data"
 

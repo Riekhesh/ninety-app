@@ -31,8 +31,13 @@ final class Profile {
     /// with the user; this is the rate they chose within it.
     var targetRateKgPerWeek: Double
 
-    /// Null while the first 14 days are still establishing a baseline. No rank
-    /// is shown until it closes.
+    /// Null while the calibration window is still establishing a baseline; the
+    /// moment it closed afterwards. No rank is shown until it does.
+    ///
+    /// Seven days from the day this row was created (ADR 0018 — the brief said
+    /// fourteen). The length is not stored: it is a product decision, it has
+    /// already moved once, and a column holding it would be a second place for
+    /// it to disagree with `CalibrationWindow.days`.
     var calibrationCompletedAt: Date?
 
     /// §10 S6. Off by default; when on, every competitive surface goes away and
@@ -102,13 +107,37 @@ extension Profile {
     }
 
     /// §10 S4. Computed on the actual date, never by subtracting years.
+    ///
+    /// Delegates rather than repeating the arithmetic: a second implementation
+    /// of an age check is a second place for the off-by-a-day to live, and the
+    /// off-by-a-day is the whole of S4. `AgeGate` is where the rule and its
+    /// named tests are.
     func isAdult(on day: Date, calendar: Calendar) -> Bool {
         guard let dob else { return false }
-        guard let years = calendar.dateComponents([.year], from: dob, to: day).year else { return false }
-        return years >= 18
+        return AgeGate.outcome(dob: dob, on: day, calendar: calendar) == .allowed
     }
 
-    /// True once the 14-day calibration window has closed. Until then the app
-    /// shows "CALIBRATING · N days to go" and no rank at all.
+    /// True once the calibration window has closed. Until then the app shows
+    /// "CALIBRATING · N days to go" and no rank at all.
+    ///
+    /// Reads the stamp rather than recomputing the window, so it is only true
+    /// after something wrote it — `CalibrationRecorder` is what does, and it is
+    /// the type to ask when the answer needs to be current.
     var isCalibrated: Bool { calibrationCompletedAt != nil }
+
+    /// Whether Pre-Season collected everything the engine and the §10 gates
+    /// need. The shell gates the tabs on it.
+    ///
+    /// **Derived, not a flag.** A `hasOnboarded` boolean can be true while the
+    /// values behind it are nil — a force-quit between the write and the flag,
+    /// a migration that adds a field, a later epic that clears one — and then
+    /// the app is past its own gate with no date of birth, which is S4 silently
+    /// not applying. Asking the values directly cannot drift from them.
+    ///
+    /// The starting weight is deliberately not here: it lives in `weight_logs`,
+    /// not on this row, so completeness is `hasCompletedPreSeason` **and** a
+    /// weight reading existing. `Onboarding` owns that pairing.
+    var hasCompletedPreSeason: Bool {
+        dob != nil && heightCm != nil && goalWeightKg != nil
+    }
 }

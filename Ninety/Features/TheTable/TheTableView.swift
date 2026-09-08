@@ -8,21 +8,46 @@ import SwiftUI
 /// principles rule out. `Packages/RankingEngine` is scaffolded now only so the
 /// purity lint rules have a boundary to police from day one.
 struct TheTableView: View {
+    /// Where the calibration window stands, or nil before there is a profile to
+    /// ask about. Passed in rather than read here: the recorder writes when the
+    /// window closes, and a view that fetches and writes on every render is a
+    /// view that writes more than once.
+    var calibration: CalibrationState?
+
     var body: some View {
-        Screen(title: Destination.theTable.title) {
+        Screen(title: Destination.theTable.title, meta: calibration?.chip) {
             VStack(alignment: .leading, spacing: Ninety.Space.lg) {
                 HoldingNote(
                     eyebrow: "Division",
                     headline: "Ranking arrives in the next update.",
-                    detail: """
-                        There is no division yet because there is no fortnight of logs \
-                        to work one out from. Ninety ranks on how much you improve \
-                        against your own baseline, so it needs a baseline first.
-                        """
+                    detail: detail
                 )
                 weights
             }
         }
+    }
+
+    /// Two honest sentences, and which one is true depends on the window.
+    ///
+    /// **The calibrating state is not an empty leaderboard**, which is the
+    /// story's acceptance criterion: an empty table implies a table that could
+    /// have had rows in it. During calibration there is a countdown and a reason;
+    /// afterwards there is still no rank in Phase 1, and the screen says that
+    /// instead of inventing one (ADR 0006 — the maths is Phase 2).
+    private var detail: String {
+        if let calibration, case .calibrating(let remaining) = calibration {
+            let days = remaining == 1 ? "day" : "days"
+            return """
+                Ninety is learning your baseline. \(remaining) \(days) of the first week \
+                to go, and no division is assigned until it closes — a rank built on two \
+                days of data would be meaningless.
+                """
+        }
+        return """
+            There is no division yet because the ranking maths lands in the next update. \
+            Ninety ranks on how much you improve against your own baseline, so it needs a \
+            baseline first.
+            """
     }
 
     /// The weights are published from day one even though nothing computes
@@ -73,14 +98,15 @@ struct TheTableView: View {
     ]
 }
 
-#Preview("The Table") {
-    TheTableView()
+#Preview("The Table · calibrating") {
+    TheTableView(calibration: .calibrating(daysRemaining: 6))
 }
 
-#Preview("The Table · light") {
-    TheTableView().preferredColorScheme(.light)
+#Preview("The Table · calibration closed") {
+    TheTableView(calibration: .closed(on: .now)).preferredColorScheme(.light)
 }
 
 #Preview("The Table · accessibility 5") {
-    TheTableView().dynamicTypeSize(.accessibility5)
+    TheTableView(calibration: .calibrating(daysRemaining: 1))
+        .dynamicTypeSize(.accessibility5)
 }

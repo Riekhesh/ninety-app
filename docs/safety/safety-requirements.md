@@ -175,7 +175,17 @@ The rejection screen signposts Beat's youth helpline. A user turned away should 
 leave with nothing.
 
 **Computed on the actual date**, not a year subtraction — someone turning 18 tomorrow
-is 17 today.
+is 17 today. `AgeGate` delegates to `Calendar.dateComponents` rather than doing the
+arithmetic itself, because hand-rolled versions are what get the boundary wrong.
+
+> **One open question for the review, found by running the tests.** For a birthday on
+> **29 February**, `Calendar` treats 28 February as the anniversary in a non-leap year,
+> so the gate opens on 28 February rather than 1 March — the date more commonly used for
+> attaining an age. It affects one birthday in four years and it errs a day **early**,
+> which is the direction §10 would rather it did not. Making it late needs a leap-day
+> special case, which is the hand-rolled arithmetic this rule avoids everywhere else.
+> Left as the calendar's answer, recorded here, and worth a sentence to whoever reviews
+> these numbers. `leapDayBirthdayIsHandledByTheCalendar` is the test that pins it.
 
 ```
 test_under_18_is_blocked
@@ -238,6 +248,13 @@ which is the outcome this requirement exists to prevent.
 Reachable in **at most two taps** from the Today screen. Not buried. History is
 preserved and the switch is reversible.
 
+**Built in P1-D.** The two taps are Matchday's masthead control and the switch itself, and
+the switch is the first panel in Settings — which is the part that can regress, so
+`SettingsSection` declares the order and `CompetitiveOptOutTests` asserts it. The
+right-hand column above is `CompetitiveFeatures`' unconditional half: each promise is a
+separate property returning a constant, so a later epic that starts gating logging on the
+opt-out has to edit a line whose comment says why it must not.
+
 ```
 test_opt_out_hides_rank_tab
 test_opt_out_stops_score_computation
@@ -258,8 +275,14 @@ test_opt_out_is_reversible_and_preserves_history
 | Beat | 0808 801 0677 · beateatingdisorders.org.uk |
 | National Alliance for Eating Disorders | eatingdisorderinfo.org |
 
-**Always available** in Settings. **Additionally surfaced** — once, non-modally,
-dismissible — when any of these hold:
+**Always available** in Settings. **Built in P1-D**: a permanent `Support` section, never
+behind a disclosure and never conditional on anything the app thinks it has noticed. The
+age-gate screen carries Beat's youth helpline too, because that is the one screen a user
+leaves because Ninety turned them away.
+
+**Additionally surfaced** — once, non-modally, dismissible — when any of these hold. **None
+of this is built**; it is a Phase 3 gate and the four triggers below have no code behind
+them:
 
 | Trigger | Threshold |
 |---|---|
@@ -308,12 +331,18 @@ test_deletion_is_not_a_soft_delete_flag
 test_health_consent_is_separate_from_terms_acceptance
 ```
 
-**One thing P1-C left open, deliberately.** Consent can be withdrawn on the consent
-screen, and `ConsentRecorder` supports withdrawing either at any time — but there is no
-Settings screen to withdraw from once the app has started, because Ninety has no Settings
-screen yet. The copy therefore says what withdrawal *does* rather than where to find it.
-S6's opt-out switch is the first Settings surface and P1-D builds it; this goes on the
-same screen.
+**What P1-C left open, and P1-D closed.** Consent could be withdrawn on the consent screen
+and nowhere else, because Ninety had no Settings screen — so once the app had started,
+neither switch was reachable again and the copy deliberately said what withdrawal *does*
+rather than where to find it.
+
+It is now `Settings → Your consent`: **the same two switches, in the same shape as the
+consent screen**, not a buried "manage data" link and not behind a confirmation dialogue.
+Withdrawal that is harder than giving means the consent was never freely given, so the two
+are deliberately the same act. Withdrawing health consent dismisses Settings and puts the
+consent gate back up — the app has just lost the lawful basis for the screen underneath it,
+and leaving the user on it would be processing without one. The consent copy now names
+Settings, because the screen it names exists.
 
 The deletion test is the one that will actually catch something. Add a table in Phase
 2 and forget to add it to the delete path, and the test fails — which is the entire
@@ -340,14 +369,23 @@ is not a substitute for professional advice."*
 
 ## Phase gate checklist
 
-**Phase 1 — build it in, do not defer it:**
-- [ ] S1 calorie floor, clamping with the slower-rate offer
-- [ ] S2 goal-weight BMI validation, rejecting
-- [ ] S3 rate ceiling enforced in onboarding
-- [ ] S4 age gate, hard stop, with signposting
-- [ ] S5 SwiftLint rule active and copy deck followed
-- [ ] S6 opt-out switch, with core usefulness intact
-- [ ] S7 signposting present in Settings
+**Phase 1 — build it in, do not defer it.** All seven built in P1-D and **closed on 8
+September**: compiled, 104 tests green, and the flow walked on a real device. The ticks are
+on executed tests rather than on written ones — a gate whose test has not run is a gate
+nobody has checked, and this list stayed unticked for the length of the branch for exactly
+that reason.
+
+- [x] S1 calorie floor, clamping with the slower-rate offer — `EnergyTarget`, 5 named tests
+- [x] S2 goal-weight BMI validation, rejecting — `GoalWeight`, 5 named tests
+- [x] S3 rate ceiling enforced in onboarding — `LossRate`, 3 named tests. **The scoring half is Phase 2 and is the half that matters**; this tick is the onboarding half only
+- [x] S4 age gate, hard stop, with signposting — `AgeGate`, 5 named tests. Walked on device: blocked, signed out, signed back in, still blocked. One open boundary question below
+- [x] S5 SwiftLint rule active and copy deck followed — the lint half has run since Phase 0; P1-D added the structural half (`Tone`, `BandState`, `DayMark`) and its tests
+- [x] S6 opt-out switch, with core usefulness intact — `CompetitiveFeatures`, 6 named tests, every promise asserted under both states of the switch
+- [x] S7 signposting present in Settings — `Signposting`, permanent section, no diagnostic language. **The pattern triggers are Phase 3** and have no code behind them
+
+**The one thing S4's tick does not cover**, because it was found by the test run rather than
+settled by it: the leap-day boundary in the note under S4 above. The gate opens a day early
+for a 29 February birthday, and that is recorded as a question rather than a defect.
 
 **Phase 2 — the scoring half of S3:**
 - [ ] Progress score peaks at target rate and declines above the ceiling

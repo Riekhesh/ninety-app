@@ -15,6 +15,15 @@ enum Log {
     /// Design system: token wiring, bundled font registration.
     static let design = Logger(subsystem: subsystem, category: "design")
 
+    /// The local store and the outbox — writes that did not land, and the
+    /// housekeeping the app does on its own (closing the calibration window).
+    ///
+    /// Same rule as `auth` and for a stronger reason: nothing under this
+    /// category may carry a logged value. A weight, a calorie total or a food
+    /// name in a log line is Article 9 health data written somewhere the consent
+    /// record does not reach. Ids, table names and error descriptions only.
+    static let data = Logger(subsystem: subsystem, category: "data")
+
     /// Sign in, sign out, session restore and refresh.
     ///
     /// Nothing logged under this category may carry a token, an identity token

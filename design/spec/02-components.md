@@ -38,6 +38,22 @@ elsewhere.
 **Destructive** ("Delete account and all data") is a Plain button in `critical`, and it must
 require a typed confirmation, not just a tap. This is the one place `critical` is correct.
 
+**Choice row** (P1-D) is the Secondary variant with a selected state, stacked full width —
+Pre-Season's four pickers (sex, activity level, goal, rate) and nothing else in the app. Not
+an eighth component: it is this button doing what this button does.
+
+| State | Treatment |
+|---|---|
+| Unselected | `surface`, `stroke` hairline, an empty `circle` glyph |
+| Selected | `accentSubtle` fill, `accent` border at `Border.focus`, a filled `checkmark.circle` |
+| Empty set | no options at all, and a `safety` line saying why — S3 filters the rate list against the user's ceiling, and below ~25 kg nothing clears it |
+
+Selection is carried by the tick **and** the border, never by colour alone — ADR 0012's rule
+about the tier badge generalises to every state in the app. Stacked rather than wrapped
+because a flow layout that reflows five activity levels at `.accessibility5` is a custom
+`Layout` and a set of edge cases; a column is neither, and gives each option a target well
+above 44pt.
+
 ---
 
 ## 2. Text input
@@ -127,7 +143,7 @@ is not optional — principle 1. If a stat has nothing to compare against yet, t
 ("no baseline yet — 6 days to go"), which is honest and also explains the calibration window.
 
 **States:** has data · no data yet · permission not granted (worded identically) · calibrating
-(within the 14-day window, §2.3) · pending sync.
+(within the 7-day window — §2.3, shortened by ADR 0018) · pending sync.
 
 ---
 
@@ -158,7 +174,8 @@ ladder is also legible without colour vision, which colour-only metals are not
 
 **States:** current · previous (40% opacity, used in the reveal transition) · locked/not yet
 reached (`stroke` outline only, no fill) · calibrating (outline plus a `TypeStyle.label`
-"CALIBRATING" chip — no tier is assigned until the 14-day window closes, §2.3).
+"CALIBRATING" chip — no tier is assigned until the 7-day window closes; §2.3 said fourteen
+and ADR 0018 halved it).
 
 **The reveal** is the one place the motion budget opens up: badge scales 0.9 → 1.0 with
 `revealSpring` over `Motion.reveal` (0.9s), chevrons filling in sequence. Gated on Reduce Motion
@@ -228,6 +245,12 @@ Because §0.5's "That's it" is the point:
 - **Tab bar** — system `TabView`, unstyled. Three tabs.
 - **Navigation bar** — system, large titles.
 - **Sheets** — system `presentationDetents`. Only `Radius.xl` is ours.
+- **Switches** — system `Toggle` in a chalk panel. `SwitchPanel` is the shared arrangement
+  (heading · explainer · optional detail · the switch), not a new control: it exists so the
+  three §10 obligations that use one — Article 9 consent, its withdrawal, and S6's opt-out —
+  cannot drift apart. None of them is behind a confirmation dialogue, because an opt-out the
+  user has to be talked out of is not an opt-out and consent that takes two taps to withdraw
+  and one to give was not freely given.
 - **Toasts** — one shared implementation for undo. Not a design surface.
 - **Confidence pill** on photo estimates — a variant of the entry-method chip, not its own
   component.

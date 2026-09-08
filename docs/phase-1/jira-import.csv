@@ -172,7 +172,7 @@ Acceptance criteria
 * test_signposting_always_available_in_settings
 * test_signposting_copy_contains_no_diagnostic_language
 * The ""not a medical device"" footer appears wherever it fits",High,2,phase-1,safety,gate,
-Story,"Calibration window state: 14 days, no rank shown",,P1-D Pre-Season: onboarding & the SS10 safety gates,"PRODUCT.md: the first 14 days are a calibration window, shown as ""CALIBRATING - N days to go"", with no rank displayed.
+Story,"Calibration window state: 7 days, no rank shown",,P1-D Pre-Season: onboarding & the SS10 safety gates,"ADR 0018: the first 7 days are a calibration window, shown as ""CALIBRATING - N days to go"", with no rank displayed. The brief said 14; the ADR halved it and records what the thinner baseline costs.
 
 Acceptance criteria
 * profiles.calibration_completed_at set and honoured
