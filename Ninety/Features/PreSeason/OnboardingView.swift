@@ -57,8 +57,7 @@ struct OnboardingView: View {
         }
     }
 
-    @ViewBuilder
-    private var step: some View {
+    @ViewBuilder private var step: some View {
         switch model.step {
         case .aboutYou: AboutYouStep(model: model)
         case .startingWeight: StartingWeightStep(model: model)

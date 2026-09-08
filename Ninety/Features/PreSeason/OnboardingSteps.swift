@@ -1,12 +1,15 @@
 import SwiftUI
 
-/// The four Pre-Season steps.
-///
-/// Split from `OnboardingView` because the flow and the fields are two different
-/// things to read: the shell is about order and navigation, and these are about
-/// what each screen asks and which §10 gate it states. Nothing here holds state
-/// — every value lives on `OnboardingModel`, which is where the gates that
-/// depend on each other can see each other.
+// The four Pre-Season steps.
+//
+// Split from `OnboardingView` because the flow and the fields are two different
+// things to read: the shell is about order and navigation, and these are about
+// what each screen asks and which §10 gate it states. Nothing here holds state
+// — every value lives on `OnboardingModel`, which is where the gates that
+// depend on each other can see each other.
+//
+// Plain comments, not `///`: a doc comment documents the declaration under it,
+// and there is no declaration here — this is about the file.
 
 // MARK: - 1 · About you
 

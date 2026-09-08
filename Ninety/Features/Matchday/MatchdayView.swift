@@ -20,24 +20,28 @@ struct MatchdayView: View {
     var openSettings: () -> Void
 
     var body: some View {
+        // Both closures labelled, neither trailing. `Screen` takes two now, and
+        // trailing-closure syntax with more than one is the case where a reader
+        // has to go and look up which parameter the braces landed on.
         Screen(
             title: Destination.matchday.title,
             meta: "No day started",
-            accessory: { SettingsButton(action: openSettings) }
-        ) {
-            VStack(alignment: .leading, spacing: Ninety.Space.lg) {
-                HoldingNote(
-                    eyebrow: "Today",
-                    headline: "Nothing logged yet.",
-                    detail: """
-                        The band, the pitch and the team sheet land with P1‑H. \
-                        Until then this screen is honest about being empty rather \
-                        than filled with a number nobody measured.
-                        """
-                )
-                subOnButton
+            accessory: { SettingsButton(action: openSettings) },
+            content: {
+                VStack(alignment: .leading, spacing: Ninety.Space.lg) {
+                    HoldingNote(
+                        eyebrow: "Today",
+                        headline: "Nothing logged yet.",
+                        detail: """
+                            The band, the pitch and the team sheet land with P1‑H. \
+                            Until then this screen is honest about being empty rather \
+                            than filled with a number nobody measured.
+                            """
+                    )
+                    subOnButton
+                }
             }
-        }
+        )
     }
 
     private var subOnButton: some View {
