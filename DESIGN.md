@@ -118,6 +118,26 @@ authored chalk glyphs belong in the content, where a 2pt line has room to be one
 Every screen is built in `Screen`, which owns the gutter, the pitch and the
 masthead so the spine lands in the same place on all three tabs.
 
+**Settings is a sheet from Matchday's masthead, and the masthead holds exactly
+one control.** §10 S6 requires the competitive opt-out within two taps of the
+Today screen, and the three-tab cap means Settings can be neither a fourth tab
+nor three taps deep. The masthead grew an `accessory` slot for it — one glyph at
+the trailing edge, `EmptyView` on every other screen — and nothing else is going
+in there. Anything that wants to live at the top of a screen belongs in its
+content.
+
+> **Deviation from the artboards.** None of the six screens has a settings
+> control, because none of them was drawn after the §10 gates were written. The
+> alternative to adding one was burying an eating-disorder helpline and a consent
+> withdrawal somewhere they could not be found, which is not a design decision
+> the artboards were making.
+
+**Pre-Season is four screens, and the last one carries two things.** About you ·
+starting weight · goal · your band. The band screen also holds the calibration
+explainer, because finishing the flow is what writes the goal — putting the write
+a screen earlier would let a user who quit on the last screen into the app
+without ever reading why there is no division yet.
+
 ---
 
 ## Motion

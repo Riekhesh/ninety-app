@@ -76,7 +76,7 @@ end.
 - Terms switch: `I accept the terms`
 - Health heading: `Health data`
 - Health body: `What you log — food, weight, and what Ninety reads from Apple Health — is special category data under UK GDPR. Processing it needs your explicit consent, given separately from the terms above.`
-- Health detail: `It stays on your phone and in Ninety's database. It isn't sold, and it isn't shared with anyone. Withdrawing consent stops Ninety processing anything new; it doesn't delete what's already logged, which is a separate request.`
+- Health detail: `It stays on your phone and in Ninety's database. It isn't sold, and it isn't shared with anyone. Withdrawing consent stops Ninety processing anything new; it doesn't delete what's already logged, which is a separate request. Both switches are in Settings whenever you want them.`
 - Health switch: `I consent to Ninety processing my health data`
 - Footnote: `Ninety needs both to start. Health data is what the app is made of.`
 - Button: `Kick off` — disabled until both switches are on
@@ -87,21 +87,47 @@ Three things the wording is doing deliberately. It **names** health data, the la
 word "explicit", because a consent screen that never says what is being consented to is not
 explicit consent whatever the timestamps say. It says *"given separately from the terms
 above"* in the copy as well as in the schema, so the separation is visible to the user and
-not only to the database. And it describes what withdrawal **does** rather than promising
-where to find it — there is no Settings screen until S6's opt-out lands in P1-D, and copy
-that points at a screen which does not exist is the same failure as an invented number.
+not only to the database. And it describes what withdrawal **does** as well as where to find
+it.
+
+> **Changed in P1-D.** The last sentence used to be missing. The copy deliberately said what
+> withdrawal *does* and not where to find it, because until P1-D there was no Settings screen
+> and copy pointing at one would have been the same failure as an invented number. There is
+> now — the same two switches, in `Settings → Your consent` — so the sentence is true and the
+> screen says it. Consent that cannot be withdrawn as easily as it was given was not freely
+> given.
 
 **About you**
 - Title: `A few things the engine needs`
 - Fields: `Date of birth` · `Height` · `Sex` · `Activity level`
+- Sex options: `Female` · `Male` · `Prefer not to say`
+- When sex is declined: `Ninety uses the higher of the two calorie floors when you'd rather not say. Erring high is the safe direction.`
 - Footnote: `Used to work out a realistic starting point for you. Not shared with anyone.`
+
+The activity levels each carry a line of their own — `Sedentary · Desk job, little
+deliberate exercise` through `Very active · Training most days, or heavy physical
+work` — because five words with no examples is five words nobody can choose
+between.
 
 **Age gate** (under 18 — §10)
 - Title: `Ninety is 18+`
 - Body: `Ninety isn't built for under-18s yet. Body-image and nutrition content for younger users needs safeguards we haven't built, and we'd rather say so than get it wrong.`
 - Body 2: `If you're looking for support with eating or body image, Beat has a youth helpline: beateatingdisorders.org.uk`
-- Button: `Close`
+- Button: `Sign out instead`
 - **This is a hard stop with no bypass.** No "continue anyway."
+
+> **Changed in P1-D.** It said `Close`. An iOS app cannot close itself — Apple
+> rejects `exit()` and there is no supported equivalent — so `Close` would have
+> been a button that does nothing on the one screen where the user has no other
+> move. Signing out is the only honest action left, and it is not a bypass: the
+> date of birth is on the profile, so signing back in lands here again.
+
+**Starting weight** (added in P1-D — the band needs a weight and the deck had no
+screen collecting one)
+- Title: `Where you're starting`
+- Body: `Ninety ranks on how much you improve against your own baseline, so it needs to know where the baseline starts.`
+- Field: `Today's weight` · `kg`
+- Footnote: `This becomes the first reading on your weight trend. You can add today's again later if you weigh yourself properly.`
 
 **Goal**
 - Title: `What are you aiming for?`
@@ -115,15 +141,15 @@ does not read as the app being broken when a faster rate does not score higher.
 
 **Your band**
 - Title: `Your daily band`
-- Value: `1,750–1,950 kcal`
+- Value: `1,850 ±100 kcal`
 - Body: `A band, not a number. Hitting exactly 1,847 isn't a real goal — landing in this range is.`
 - Footnote: `Worked out from your height, weight, age and activity using the Mifflin-St Jeor equation. It's an estimate, and Ninety adjusts as it sees your real data.`
 
-**Calibration explainer**
-- Title: `The first two weeks are calibration`
-- Body: `Ninety watches your first 14 days to learn your baseline. You won't get a tier until it closes — a rank based on two days of data would be meaningless.`
-- Body 2: `Log as normally as you can. An unusually light fortnight makes every week after it look worse by comparison.`
-- Button: `Got it`
+**Calibration explainer** (7 days — [ADR 0018](../../docs/decisions/0018-seven-day-calibration-window.md))
+- Title: `The first week is calibration`
+- Body: `Ninety watches your first 7 days to learn your baseline. You won't get a division until it closes — a rank based on two days of data would be meaningless.`
+- Body 2: `Log as normally as you can. An unusually light week makes every week after it look worse by comparison.`
+- Button: `Kick off` — it shares a screen with the band, and it is the action that finishes Pre-Season
 
 The second line is the honest version of anti-sandbagging (§2.3): rather than hiding the
 defence, tell people the incentive runs the other way.
@@ -173,6 +199,44 @@ Rank tab and stops score computation; it does not touch logging or the weight tr
 
 ---
 
+## 2a. Settings
+
+Four things on one screen, because they are the same obligation from four directions and
+each of them was unreachable before P1-D. Presented as a sheet from Matchday's masthead:
+§1.6 caps the app at three tabs, and §10 S6 wants the opt-out within two taps.
+
+- Masthead: `Settings`
+- Order, and it is load-bearing: **Competitive features** · **Support** · **Your consent** ·
+  **Account**. The opt-out is first because two taps is only true while it is the panel you
+  land on.
+
+**Competitive features** — the S6 copy above, plus:
+- When off: `Competitive features are off. You can turn them back on any time — your history is kept.`
+
+**Support** — heading `Support`, then the §2 signposting block verbatim. Permanently
+present, never behind a disclosure, never conditional on anything the app thinks it has
+noticed.
+
+**Your consent**
+- Heading: `Your consent`
+- Body: `Both decisions are yours to change. Withdrawing is the same switch that gave it, in the same place.`
+- The two switches are the consent screen's, unchanged — same headings, same wording.
+- Note: `Ninety can't process health data without your consent, so withdrawing it brings back the consent screen. Nothing already logged is deleted.`
+
+**Account**
+- Heading: `Account`
+- Body: `Signs you out on this phone. What's logged stays on the device and comes back when you sign in again.`
+- Button: `Sign out`
+
+Footer, on the screen itself: `Not a medical device. Ninety makes no medical claims and is
+not a substitute for professional advice.`
+
+**Not here yet.** Export and deletion (§7 below) are Phase 3 and the screen does not mention
+them — a Settings screen listing a data-rights action that does nothing is worse than one
+that does not list it.
+
+---
+
 ## 3. Today dashboard
 
 - Greeting: `Today` (no name, no time-of-day greeting — it ages badly and adds nothing)
@@ -183,7 +247,7 @@ Rank tab and stops score computation; it does not touch logging or the weight tr
 - Consistency ring: `5 of 7 days`
 - Weight card: `78.4 kg` · `−1.2 kg vs 4 weeks ago` · `7-day average`
 - Tier slot pre-Phase 2: `Ranking arrives in the next update`
-- Tier slot during calibration: `CALIBRATING · 6 days to go`
+- Tier slot during calibration: `CALIBRATING · 6 days to go` (of 7 — ADR 0018)
 
 **Empty states** (principle 5 — permission-denied and no-data are worded identically, because
 the app genuinely cannot tell them apart):
@@ -278,6 +342,7 @@ should not be made to feel accused.
 **Calibrating**
 - `CALIBRATING · 6 days to go`
 - `Ninety is learning your baseline. Your first tier arrives on 17 August.`
+- Singular on the last day: `CALIBRATING · 1 day to go`
 
 ---
 

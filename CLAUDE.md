@@ -7,7 +7,9 @@ absolute numbers. Swift 6.3 / SwiftUI / iOS 18+ / Supabase.
 device. **Phase 1 (single-player core) is live** and is the first phase that builds.
 P1-A landed the foundations: `Ninety/` (the app), `Packages/RankingEngine` (the Phase 2
 boundary, scaffolded so the purity lint has something to police), and ADR 0015 settling
-the type decision that blocked every view ticket.
+the type decision that blocked every view ticket. P1-D added `Ninety/Safety/`, which is
+where §10's S1–S7 live as types rather than as review notes — if you are touching a
+calorie target, a goal weight, a rate of loss or an age check, that is the directory.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -48,7 +50,7 @@ docs/
   phase-1/     the LIVE tracker. Exit criteria, the running order, the 21-day clock.
                jira-import.csv seeded the board — 11 epics, 60 issues
   phase-0/     closed tracker. accounts.md is a runbook, not reading
-  decisions/   13 ADRs. Index first, then one file. Never renumber
+  decisions/   18 ADRs. Index first, then one file. Never renumber
   safety/      §10 as numbered rules S1-S7 with test names. Load-bearing for Phase 1
   security/    secrets policy. The anon key is public; RLS is the security boundary
 
