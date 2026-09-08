@@ -13,9 +13,15 @@ struct SignInView: View {
     let session: SessionController
 
     /// Apple's button is a fixed-height system control, so it gets the same
-    /// scaled minimum the primary button uses rather than a hardcoded 50.
+    /// scaled height the primary button uses rather than a hardcoded 50.
     @ScaledMetric(relativeTo: .headline)
     private var buttonHeight: CGFloat = 50
+
+    /// The tallest `ASAuthorizationAppleIDButton` will draw. Apple's own
+    /// constraint, and Dynamic Type is not allowed to push past it — a scaled
+    /// height above this is the same unsatisfiable-constraint break at an
+    /// accessibility size instead of at the default one.
+    private static let appleButtonMaximumHeight: CGFloat = 64
 
     var body: some View {
         Screen(title: PreSeasonCopy.signInTitle) {
@@ -58,7 +64,15 @@ struct SignInView: View {
         // full width, which is why it looked right, but it logs an
         // unsatisfiable-constraints block on every launch. Capped and centred
         // instead: on the widest phone that is 375 of an available 390.
-        .frame(maxWidth: 375, minHeight: buttonHeight)
+        //
+        // The HEIGHT is the same class of bug and it is the visible one. This
+        // was `minHeight:` with no maximum, and the button is a
+        // `UIViewRepresentable` with no intrinsic height in SwiftUI's layout —
+        // so it accepted every point the VStack offered it (509 on an iPhone 17)
+        // and UIKit "recovered" by breaking Apple's own `height <= 64`. The
+        // result is not a subtle misalignment: the sign-in screen is a white
+        // slab most of the way down. An exact height, clamped to Apple's cap.
+        .frame(maxWidth: 375, height: min(buttonHeight, Self.appleButtonMaximumHeight))
         .frame(maxWidth: .infinity)
         .disabled(session.isSigningIn)
     }

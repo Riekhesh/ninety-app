@@ -175,7 +175,17 @@ The rejection screen signposts Beat's youth helpline. A user turned away should 
 leave with nothing.
 
 **Computed on the actual date**, not a year subtraction — someone turning 18 tomorrow
-is 17 today.
+is 17 today. `AgeGate` delegates to `Calendar.dateComponents` rather than doing the
+arithmetic itself, because hand-rolled versions are what get the boundary wrong.
+
+> **One open question for the review, found by running the tests.** For a birthday on
+> **29 February**, `Calendar` treats 28 February as the anniversary in a non-leap year,
+> so the gate opens on 28 February rather than 1 March — the date more commonly used for
+> attaining an age. It affects one birthday in four years and it errs a day **early**,
+> which is the direction §10 would rather it did not. Making it late needs a leap-day
+> special case, which is the hand-rolled arithmetic this rule avoids everywhere else.
+> Left as the calendar's answer, recorded here, and worth a sentence to whoever reviews
+> these numbers. `leapDayBirthdayIsHandledByTheCalendar` is the test that pins it.
 
 ```
 test_under_18_is_blocked
