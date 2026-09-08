@@ -74,9 +74,9 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 
 | Epic | What it covers | Pri |
 |---|---|---|
-| **P1-A** Foundations & app skeleton | **Built 2 Sep, not yet compiled.** Xcode project, `Packages/`, tokens wired in, macOS CI gated, type decision settled. Closes when a Mac builds it | Highest |
-| **P1-B** Data layer, schema & RLS | **4 of 5 done, 2 Sep.** Migrations applied to the live project, RLS proven with two accounts, SwiftData models, repositories. Food mirror deferred | Highest |
-| **P1-C** Authentication | **Both stories done, 7 Sep.** Sign in with Apple through Supabase's id-token exchange, and Article 9 consent recorded separately from ToS. Not compiled | High |
+| **P1-A** Foundations & app skeleton | **CLOSED 8 Sep.** Built 2 Sep, compiled and run on a real device 8 Sep. Xcode project, `Packages/`, tokens wired in, macOS CI gated, type decision settled | Highest |
+| **P1-B** Data layer, schema & RLS | **4 of 5 done; compiled and green 8 Sep.** Migrations applied to the live project, RLS proven with two accounts, SwiftData models, repositories. One bug the first run found (see below). Food mirror deferred | Highest |
+| **P1-C** Authentication | **CLOSED 8 Sep.** Sign in with Apple through Supabase's id-token exchange, Article 9 consent recorded separately from ToS. Verified on a real device against the live project | High |
 | **P1-D** Pre-Season: onboarding & the §10 gates | Mifflin-St Jeor as a band, S1–S7, the calibration window | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
 | **P1-F** Sub On: food logging, four routes | Manual, search, barcode, photo, and the mandatory Under Review screen | High |
@@ -183,11 +183,12 @@ without a toolchain has been, and is marked as such below.
 - **The macOS job's guard was inside the job.** Its per-step probe could skip the
   *steps*, but the runner was already billed. The gate is now a separate Ubuntu job.
 
-**Not verified here, and honestly outstanding.** This work was done in a Linux
-container: no Xcode, no Swift toolchain, no simulator. Nothing has been compiled. The
-first Mac session should run `scripts/verify-guardrails.sh`, open the project, build to
-the device, and record the result on the P1-A ticket. See
-[the handover](#first-mac-session) below.
+**Compiled and run, 8 September — P1-A is closed.** It was written in a Linux
+container with no Xcode, no Swift toolchain and no simulator, and that caveat stood for
+six days. The first Mac session built it, ran the full suite, and installed it on a real
+phone: `Bundled faces registered: 7`, the shell renders, and Dynamic Type reflows. The
+runbook that closed it is still [below](#first-mac-session), because a fresh clone needs
+it even though this epic no longer does.
 
 ---
 
@@ -234,7 +235,12 @@ model property that shadows an `NSManagedObject` one. The Postgres column is
 still `entity` — mapping a column name is P1-I's job and is cheaper than this
 was to find.
 
-**Still not compiled.** Same caveat as P1-A: the Swift in this epic was written
+**Compiled and green, 8 September**, and the first execution immediately earned its
+keep — see the `OutboxEntry.entity` bug above, which broke every write in the app and
+which nothing but running it could have found. The caveat below is kept as the record of
+what the state was.
+
+**Was: still not compiled.** The Swift in this epic was written
 in a Linux container with no Xcode. The SQL *is* verified — against a real
 Postgres 16 locally and applied to the live project — but the models,
 repositories and their tests have never been built. First Mac session: ⌘U.
@@ -354,7 +360,10 @@ are reasoned about and observed on a device, not asserted by a test.
 
 ---
 
-## First Mac session
+## First Mac session — happened 8 September 2026
+
+**It closed P1-A, un-blocked P1-B and P1-C, and found four bugs no compiler could
+have.** Kept below as the runbook, because every fresh clone still needs it.
 
 In order, and stop at the first failure — each step is the precondition for the next.
 
@@ -421,6 +430,18 @@ nothing should truncate or overlap.
 **Then record it.** Tick the P1-A ticket with what actually built rather than what was
 meant to, per the repo convention on closing criteria on different evidence.
 
+### Two chores that session left open
+
+Neither blocks anything; both are the sort of thing that is annoying to discover later.
+
+- **`Package.resolved` is not committed.** `.gitignore` says an app pins its
+  dependencies, and this one does not yet — so CI and a second machine could resolve a
+  different `supabase-swift` to the 2.55.1 that was verified. Find it with
+  `find Ninety.xcodeproj -name Package.resolved`, then commit it.
+- **`DEVELOPMENT_TEAM` in `Config/Local.xcconfig` holds a team *name*, not the
+  10-character Team ID.** Automatic signing works around it while there is one team on
+  the account, and stops working around it the moment there is not.
+
 ---
 
 ## Handoff prompt for a fresh session
@@ -430,12 +451,22 @@ meant to, per the repo convention on closing criteria on different evidence.
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **[ticket]**. P1-A is closed: the project builds, the type
-> decision is ADR 0015 (Dynamic Type, two bundled faces), the shell is three tabs with
-> Sub On as a sheet, and `DESIGN.md` is the authority on how the world is built.
-> P1-C is closed: Sign in with Apple is the only identity route (ADR 0016), and the app
-> will not start until Article 9 health consent is recorded separately from terms
-> acceptance (ADR 0017). Every repository is built from the signed-in user's id.
+> Currently working on: **[ticket]**. Everything below is verified on a real device as
+> of 8 September, not written-but-unbuilt.
+>
+> P1-A is closed: the project builds, the type decision is ADR 0015 (Dynamic Type, two
+> bundled faces), the shell is three tabs with Sub On as a sheet, and `DESIGN.md` is the
+> authority on how the world is built. P1-B is closed bar the food mirror: migrations are
+> applied to the live project, RLS is proven with two accounts, and the SwiftData models
+> and repositories are green. P1-C is closed: Sign in with Apple is the only identity
+> route (ADR 0016), and the app will not start until Article 9 health consent is recorded
+> separately from terms acceptance (ADR 0017). Every repository is built from the
+> signed-in user's id via `Repositories.live(context:userID:)`.
+>
+> **Two gaps P1-D is expected to close.** There is no Settings screen, so once consent is
+> given there is no way to withdraw it and no way to sign out — the only "Sign out
+> instead" button is on the consent screen. S6's opt-out switch and S7's signposting land
+> on that same screen, so all four belong together.
 >
 > Requirements: offline-first (the UI never waits on network), RLS on every table, photo
 > estimates always show ranges + confidence and require user confirmation. The safety
