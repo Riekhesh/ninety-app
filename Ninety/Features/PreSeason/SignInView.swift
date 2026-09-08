@@ -23,6 +23,11 @@ struct SignInView: View {
     /// accessibility size instead of at the default one.
     private static let appleButtonMaximumHeight: CGFloat = 64
 
+    /// The scaled height, held inside Apple's cap.
+    private var appleButtonHeight: CGFloat {
+        min(buttonHeight, Self.appleButtonMaximumHeight)
+    }
+
     var body: some View {
         Screen(title: PreSeasonCopy.signInTitle) {
             VStack(alignment: .leading, spacing: Ninety.Space.xl) {
@@ -72,7 +77,11 @@ struct SignInView: View {
         // and UIKit "recovered" by breaking Apple's own `height <= 64`. The
         // result is not a subtle misalignment: the sign-in screen is a white
         // slab most of the way down. An exact height, clamped to Apple's cap.
-        .frame(maxWidth: 375, height: min(buttonHeight, Self.appleButtonMaximumHeight))
+        //
+        // `minHeight`/`maxHeight` rather than `height:`: there is no `frame`
+        // overload taking a flexible width and a fixed height together, and
+        // pinning both bounds to the same value is what a fixed height is.
+        .frame(maxWidth: 375, minHeight: appleButtonHeight, maxHeight: appleButtonHeight)
         .frame(maxWidth: .infinity)
         .disabled(session.isSigningIn)
     }
