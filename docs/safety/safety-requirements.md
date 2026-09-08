@@ -369,19 +369,23 @@ is not a substitute for professional advice."*
 
 ## Phase gate checklist
 
-**Phase 1 — build it in, do not defer it.** All seven are written as of P1-D (8 Sep) with
-their named tests. **None is ticked**, and the repo convention is why: P1-D was written in a
-Linux container with no Xcode, so the Swift has never been compiled and the tests have never
-run. A gate whose test has not executed is a gate nobody has checked. These tick on the Mac
-session that runs ⌘U and walks the flow on a device.
+**Phase 1 — build it in, do not defer it.** All seven built in P1-D and **closed on 8
+September**: compiled, 104 tests green, and the flow walked on a real device. The ticks are
+on executed tests rather than on written ones — a gate whose test has not run is a gate
+nobody has checked, and this list stayed unticked for the length of the branch for exactly
+that reason.
 
-- [ ] S1 calorie floor, clamping with the slower-rate offer — *written: `EnergyTarget`, 5 named tests*
-- [ ] S2 goal-weight BMI validation, rejecting — *written: `GoalWeight`, 5 named tests*
-- [ ] S3 rate ceiling enforced in onboarding — *written: `LossRate`, 3 named tests. The scoring half is Phase 2*
-- [ ] S4 age gate, hard stop, with signposting — *written: `AgeGate`, 5 named tests*
-- [x] S5 SwiftLint rule active and copy deck followed — *the lint half has been active since Phase 0 and ran on a Mac; P1-D added the structural half (`Tone`, `BandState`, `DayMark`), which has not*
-- [ ] S6 opt-out switch, with core usefulness intact — *written: `CompetitiveFeatures`, 6 named tests, asserted under both states of the switch*
-- [ ] S7 signposting present in Settings — *written: `Signposting`, permanent section, no diagnostic language*
+- [x] S1 calorie floor, clamping with the slower-rate offer — `EnergyTarget`, 5 named tests
+- [x] S2 goal-weight BMI validation, rejecting — `GoalWeight`, 5 named tests
+- [x] S3 rate ceiling enforced in onboarding — `LossRate`, 3 named tests. **The scoring half is Phase 2 and is the half that matters**; this tick is the onboarding half only
+- [x] S4 age gate, hard stop, with signposting — `AgeGate`, 5 named tests. Walked on device: blocked, signed out, signed back in, still blocked. One open boundary question below
+- [x] S5 SwiftLint rule active and copy deck followed — the lint half has run since Phase 0; P1-D added the structural half (`Tone`, `BandState`, `DayMark`) and its tests
+- [x] S6 opt-out switch, with core usefulness intact — `CompetitiveFeatures`, 6 named tests, every promise asserted under both states of the switch
+- [x] S7 signposting present in Settings — `Signposting`, permanent section, no diagnostic language. **The pattern triggers are Phase 3** and have no code behind them
+
+**The one thing S4's tick does not cover**, because it was found by the test run rather than
+settled by it: the leap-day boundary in the note under S4 above. The gate opens a day early
+for a 29 February birthday, and that is recorded as a question rather than a defect.
 
 **Phase 2 — the scoring half of S3:**
 - [ ] Progress score peaks at target rate and declines above the ceiling

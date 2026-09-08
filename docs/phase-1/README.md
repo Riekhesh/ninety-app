@@ -60,7 +60,7 @@ a gate quietly deferred.
 - [ ] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series
 - [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect
 - [ ] **RLS policies on every table, tested with two accounts** — account A cannot touch account B's rows, proven repeatably
-- [ ] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting
+- [x] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting. **Closed 8 Sep by P1-D**, on the evidence it was written for: every gate has the named tests `docs/safety/safety-requirements.md` asks for, all of them ran green on a device, and the flow was walked including an under-18 date of birth. Two halves are later phases *by the criterion's own wording* and are not silently included — S3's scoring half is Phase 2, S7's pattern triggers are Phase 3
 
 **On the dates.** §1 nominally runs 17 August – 13 September 2026. Phase 0 closed on 31
 August, three weeks past its own window, effectively all of it spent waiting on Apple.
@@ -77,7 +77,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-A** Foundations & app skeleton | **CLOSED 8 Sep.** Built 2 Sep, compiled and run on a real device 8 Sep. Xcode project, `Packages/`, tokens wired in, macOS CI gated, type decision settled | Highest |
 | **P1-B** Data layer, schema & RLS | **4 of 5 done; compiled and green 8 Sep.** Migrations applied to the live project, RLS proven with two accounts, SwiftData models, repositories. One bug the first run found (see below). Food mirror deferred | Highest |
 | **P1-C** Authentication | **CLOSED 8 Sep.** Sign in with Apple through Supabase's id-token exchange, Article 9 consent recorded separately from ToS. Verified on a real device against the live project | High |
-| **P1-D** Pre-Season: onboarding & the §10 gates | **All ten stories written, not yet compiled.** Onboarding, the band, S1–S7, the Settings screen, and the calibration window — now seven days (ADR 0018) | Highest |
+| **P1-D** Pre-Season: onboarding & the §10 gates | **CLOSED 8 Sep.** All ten stories, compiled, 104 tests green, walked on a real device. Onboarding, the band, S1–S7, the Settings screen, and the calibration window — now seven days (ADR 0018) | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
 | **P1-F** Sub On: food logging, four routes | Manual, search, barcode, photo, and the mandatory Under Review screen | High |
 | **P1-G** The Run: weight & trend | Manual + HealthKit, 7-day EWMA, pace against the chosen rate | Medium |
@@ -110,7 +110,7 @@ order laid out visually, is published at
    lawful, so it cannot land after the thing it authorises. See
    [what P1-C landed](#p1-c--what-landed).
 4. ~~**Onboarding, with the safety gates wired in as it is built.**~~ **P1-D, 8 Sep —
-   written, not yet compiled.** S1–S4 are onboarding logic, not a review pass over
+   closed.** S1–S4 are onboarding logic, not a review pass over
    finished screens, and each arrived with its test names already written in
    `docs/safety/`. It carried the first Settings surface, which is where S6's opt-out,
    S7's signposting and P1-C's consent withdrawal all live. See
@@ -408,24 +408,46 @@ tier that can move in week two without reading as a punishment.
 not mention them. A data-rights action listed in Settings that does nothing is worse than
 one that is not listed.
 
-**Written, not compiled — same caveat as P1-A, P1-B and P1-C had.** This was produced in a
-Linux container with no Xcode, no Swift toolchain, no simulator and no SwiftLint (the
-sandbox's proxy also blocks fetching a Linux SwiftLint build). Everything checkable without
-a toolchain has been: `generate.py --check`, `check_schema_parity.py` and
-`verify-guardrails.sh` are green, and the twelve hook and bundle checks pass. **The Swift
-has never seen a compiler**, and on the evidence of the first Mac session — four real
-defects that only execution could find — that caveat is worth taking literally. First Mac
-session: ⌘U, then walk the flow on a device including an under-18 date of birth.
+**Compiled, green and walked on a device — 8 September.** The epic was written in a Linux
+container with no Xcode, no Swift toolchain and no SwiftLint (the sandbox's proxy also
+blocks fetching a Linux build), and that caveat stood for the length of the branch. It is
+closed on **104 tests passing** and on the flow being walked end to end on a real phone: an
+under-18 date of birth reaching the hard stop and surviving a sign-out and back in, S2
+refusing a goal weight below BMI 18.5, S3's rate list shortening when the weight is edited,
+the opt-out taking The Table away and giving it back, and health consent being withdrawn
+from Settings and putting the gate back up.
 
-Two things a Mac session should look at specifically, because they are the parts most
-likely to be wrong in a way a compiler will not catch:
+**Six things the first execution found, and what each cost.** None of the six was a
+compile error in the interesting sense — the app built once the four below were fixed, and
+the rest is the class of defect only running the thing surfaces.
 
-- **`Screen`'s new `accessory` slot.** It is a second generic parameter with a default of
-  `EmptyView`, which relies on Swift matching a single trailing closure to `content` by the
-  backward scan. Every existing call site should still be the same screen it was.
-- **The `Tab` inside an `if`** in `MainTabView`, which is what S6's opt-out removes. Turn
-  the switch on while The Table is the selected tab: the selection is moved to Matchday
-  first, and the thing to check is that nothing flashes blank in between.
+| Found by | What it was |
+|---|---|
+| `generate.py --check` | `claude-design-brief.md` was committed stale. It is generated from `brief.template.md`, which moved for ADR 0018 *after* the last check ran |
+| SwiftLint `--strict`, first run ever on this branch | Three violations, two of them caused by the new `Screen` accessory slot: a call passing one labelled and one trailing closure, `@ViewBuilder` on its own line above a *variable*, and a `///` block documenting a file rather than a declaration |
+| ⌘B | `frame(maxWidth:height:)` is not an overload — SwiftUI has a fixed `frame(width:height:)` and a flexible one and no mixture, so a flexible width with a fixed height means pinning both height bounds |
+| ⌘U | `leapDayBirthdayIsHandledByTheCalendar` asserted the wrong thing. See below |
+| Running it | **The sign-in button was drawing as a white slab down most of the screen** — P1-C's, not this epic's. See below |
+| Running it | Nothing else. The console is clean apart from Apple's own `TUIKeyplane` keyboard constraint break and the known `supabase-swift` initial-session warning, which `SupabaseAuthService.observe()` already documents |
+
+**The leap-day test was wrong and the gate was right.** It asserted that someone born on 29
+February 2008 is blocked on 28 February 2026 and turns 18 on 1 March. `Calendar` treats 28
+February as the anniversary in a non-leap year and says 18 a day earlier. The assertion was
+an unchecked assumption about Foundation written as a requirement — which is the exact
+failure the suite's own header warns about — and it is worth noticing that a *safety* test
+was the one that got it wrong. The gap it exposes is real and is now recorded in
+`docs/safety/safety-requirements.md` as a question for the Phase 3 review: the gate opens a
+day early for one birthday in four years, and closing that needs the hand-rolled leap
+arithmetic S4 avoids everywhere else.
+
+**The sign-in button had no height, and it is the same bug P1-C fixed on the other axis.**
+`SignInWithAppleButton` is a `UIViewRepresentable` with no intrinsic height in SwiftUI's
+layout; the frame said `minHeight:` with no maximum, so it took every point the VStack
+offered (509 on an iPhone 17) and UIKit "recovered" by breaking Apple's own `height <= 64`.
+P1-C recorded the width version of this and its unsatisfiable-constraint log; the height
+version was in the same expression and shipped. **It also means "verified on a real device,
+7 September" was verified with a white slab on the first screen** — worth remembering about
+what that phrase covers. Fixed here because it blocks walking the flow at all.
 
 ---
 
