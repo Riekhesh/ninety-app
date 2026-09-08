@@ -92,6 +92,19 @@ expect_block "a non-conventional commit subject is rejected" reject \
 expect_block "a conventional commit with clean content is accepted" accept \
   "docs/note.md" "hello" "docs(repo): add a note"
 
+# The template and the real file are one typo apart, and filling in the wrong
+# one is silent both ways: the build reads nothing and reports itself
+# unconfigured, while your project's coordinates sit in a tracked file waiting
+# for the next `git add`. Both directions are checked, because a tripwire that
+# also blocks the ordinary case is one that gets bypassed.
+expect_block "a filled-in Local.xcconfig.example is blocked" reject \
+  "Config/Local.xcconfig.example" "DEVELOPMENT_TEAM = A1B2C3D4E5" \
+  "build(repo): fill in the template by mistake"
+
+expect_block "an empty Local.xcconfig.example still commits" accept \
+  "Config/Local.xcconfig.example" "DEVELOPMENT_TEAM =" \
+  "build(repo): update the template"
+
 # ─── 3. The SwiftLint custom rules ───────────────────────────────────────────
 
 head_ "SwiftLint custom rules"
