@@ -61,10 +61,37 @@ extension ModelContainer {
     /// to the moment the user reopens it and a day of logging is gone. If this
     /// cannot open, that is a bug to fix before shipping, not to paper over.
     static func ninety(inMemory: Bool = false) throws -> ModelContainer {
-        try ModelContainer(
+        if !inMemory { try makeApplicationSupportDirectory() }
+        return try ModelContainer(
             for: Schema(versionedSchema: NinetySchemaV1.self),
             migrationPlan: NinetyMigrationPlan.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: inMemory)
+        )
+    }
+
+    /// `Library/Application Support` is not created for you.
+    ///
+    /// SwiftData puts `default.store` there and does not make the directory
+    /// first, so a fresh install logs around two hundred lines of CoreData
+    /// errors — `Sandbox access to file-write-create denied`, `The file
+    /// couldn't be saved` — before recovering and creating it itself. The store
+    /// does open, which is why this is a tidy-up rather than a bug.
+    ///
+    /// It is still worth doing. That block appears on *every* user's first
+    /// launch, it is indistinguishable at a glance from a store that genuinely
+    /// failed to open, and this is the one file whose whole design note is that
+    /// a local store which quietly goes wrong is the most expensive bug in the
+    /// project. A log that cries wolf on first launch is one nobody reads on
+    /// the launch that matters.
+    ///
+    /// `create: true` is the documented way to ask for it; the URL is
+    /// discarded because the directory existing is the entire point.
+    private static func makeApplicationSupportDirectory() throws {
+        _ = try FileManager.default.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
         )
     }
 }

@@ -308,14 +308,35 @@ to nil. Both are in `SupabaseAuthService` and neither is covered by a test: the
 mock cannot model the SDK's own storage, which is the honest limit of putting the
 lock-in behind one file.
 
-**Not verified here, and honestly outstanding.** Same caveat as P1-A and P1-B,
+**Verified on a real device, 8 September.** The epic's own acceptance criteria
+are met rather than argued for: Sign in with Apple completes against the live
+project, the session survives a cold launch (`Session restored; refresh handled
+by the SDK.`), consent is recorded as two separately-timestamped decisions, and
+all 43 tests pass on device — including
+`test_health_consent_is_separate_from_terms_acceptance`.
+
+**Four things the first execution found, none of which a compiler could have.**
+Three were real defects and the fourth was a warning worth acting on:
+`OutboxEntry.entity` shadowing `NSManagedObject.entity` (P1-B's, and it broke
+every write in the app); `SupabaseConfiguration` accepting the truncated
+`https:` its own guard existed to reject; a session signed out on an offline
+launch; and `Library/Application Support` not existing on a fresh install, which
+buried the first launch in CoreData recovery errors. Each has a check or a
+comment behind it now, and two of them added a tripwire that runs on Ubuntu.
+
+**Still outstanding.** Same caveat as P1-A and P1-B,
 plus one more that is new. This was written in a Linux container with no Xcode,
 so nothing is compiled — and P1-C is the first epic to take a **remote** Swift
 package (`supabase-swift`, pinned to 2.x). It has never been resolved, so
 `Package.resolved` does not exist and the SDK call sites have never seen a
 compiler. If any of them have moved, they are all in
 `Ninety/Auth/SupabaseAuthService.swift` and nowhere else — which is the whole
-reason `AuthServiceProtocol` exists.
+reason `AuthServiceProtocol` exists. The package resolved to **2.55.1** and the
+adapter compiled against it unchanged.
+
+The honest remainder is that adapter's own behaviour. The mock cannot model the
+SDK's session storage, so the offline-launch path and the change-stream fallback
+are reasoned about and observed on a device, not asserted by a test.
 
 ---
 

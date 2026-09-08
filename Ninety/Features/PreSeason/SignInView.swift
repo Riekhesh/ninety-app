@@ -53,8 +53,13 @@ struct SignInView: View {
             Task { await session.finish(result) }
         }
         .signInWithAppleButtonStyle(.white)
-        .frame(maxWidth: .infinity, minHeight: buttonHeight)
-        .fixedSize(horizontal: false, vertical: true)
+        // Apple's button carries its own `width <= 375`. Forcing it to fill the
+        // gutter breaks that constraint — UIKit recovers and still draws it
+        // full width, which is why it looked right, but it logs an
+        // unsatisfiable-constraints block on every launch. Capped and centred
+        // instead: on the widest phone that is 375 of an available 390.
+        .frame(maxWidth: 375, minHeight: buttonHeight)
+        .frame(maxWidth: .infinity)
         .disabled(session.isSigningIn)
     }
 
