@@ -285,12 +285,28 @@ turned out to be real decisions rather than implementation details.
   in `Config/Ninety.xcconfig`, filled in from the gitignored `Local.xcconfig`, and
   `scripts/check_bundle.py` fails CI if a literal ever reaches `Info.plist`.
 
-**The gap, named rather than buried.** Consent can be withdrawn on the consent
-screen, and `ConsentRecorder` supports withdrawing either at any time — but once
-both are given the shell moves on, and Ninety has no Settings screen to withdraw
-from yet. The copy therefore describes what withdrawal *does* and does not
-promise where to find it. **P1-D closes this**: the screen carrying S6's opt-out
-switch and S7's signposting carries this too.
+**The gap, named rather than buried — and it is two gaps, not one.** Consent can
+be withdrawn on the consent screen, and `ConsentRecorder` supports withdrawing
+either at any time; **and the only "Sign out instead" button is on that same
+screen.** Once both consents are given the shell moves on and neither is
+reachable again, because Ninety has no Settings screen at all yet. The consent
+copy therefore describes what withdrawal *does* rather than promising where to
+find it. Signing out currently means deleting the app — which does work, since
+iOS clears an app's Keychain items on uninstall, but it is not a feature.
+**P1-D closes both**: the screen carrying S6's opt-out switch and S7's
+signposting carries these too.
+
+**One thing the device run changed, and it came from a warning rather than a
+failure.** `supabase-swift` logs that `authStateChanges` emits its initial
+session only *after* attempting a refresh, so a launch with no signal and an
+expired access token emits nil — and an observer taking that at face value signs
+the user out for being on the Underground. ADR 0005 is explicit that the UI never
+waits on the network, and §1.3 is explicit about where people actually log food.
+`restore()` now keeps a stored session when the only thing that failed was
+reaching the server, and the change-stream falls back to the Keychain rather than
+to nil. Both are in `SupabaseAuthService` and neither is covered by a test: the
+mock cannot model the SDK's own storage, which is the honest limit of putting the
+lock-in behind one file.
 
 **Not verified here, and honestly outstanding.** Same caveat as P1-A and P1-B,
 plus one more that is new. This was written in a Linux container with no Xcode,

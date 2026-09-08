@@ -66,11 +66,26 @@ final class SupabaseAuthService: AuthServiceProtocol {
             Log.auth.info("Session restored; refresh handled by the SDK.")
             return restored
         } catch {
-            // A session that exists and cannot be revived is a real failure and
-            // the user is owed the reason, so this throws rather than quietly
-            // returning nil and showing the sign-in screen a second time.
+            let failure = AppleIdentity.failure(from: error)
+
+            // A refresh that failed for want of a network is not a revoked
+            // session. ADR 0005 is explicit that the UI never waits on the
+            // network, and gyms and basements have no signal — which is exactly
+            // where and when people log food. So a launch with the radio off
+            // keeps the session already in the Keychain and lets the SDK
+            // refresh when connectivity returns.
+            if failure == .offline, let local = client.auth.currentSession {
+                let kept = Self.session(from: local)
+                currentSession = kept
+                Log.auth.info("Offline at launch; keeping the stored session.")
+                return kept
+            }
+
+            // Anything else is a session that exists and cannot be revived.
+            // That is a real failure and the user is owed the reason, so it
+            // throws rather than quietly showing the sign-in screen again.
             currentSession = nil
-            throw AppleIdentity.failure(from: error)
+            throw failure
         }
     }
 
@@ -114,12 +129,25 @@ final class SupabaseAuthService: AuthServiceProtocol {
     // MARK: - Plumbing
 
     /// Mirrors the SDK's own stream, mapped to our value and nothing else.
+    ///
+    /// **With one correction, which the SDK itself asks for.** `authStateChanges`
+    /// emits its initial session only *after* trying to refresh, so a launch
+    /// with no signal and an expired access token emits nil — and an observer
+    /// that took that at face value would sign the user out for being on the
+    /// Underground. The SDK logs a warning about this and offers
+    /// `emitLocalSessionAsInitialSession` to opt into the fixed behaviour in a
+    /// future major version (supabase/supabase-swift#822).
+    ///
+    /// Falling back to `currentSession` gets the same result from the API that
+    /// exists today: a nil emission means signed out only when the Keychain
+    /// agrees. A real sign-out clears both, so that case still reads correctly.
     private func observe() {
         observation = Task { [weak self] in
             guard let stream = self?.client.auth.authStateChanges else { return }
             for await (event, session) in stream {
                 guard let self else { return }
-                let mapped = session.map(Self.session(from:))
+                let live = session ?? client.auth.currentSession
+                let mapped = live.map(Self.session(from:))
                 currentSession = mapped
                 if event == .tokenRefreshed {
                     Log.auth.debug("Access token refreshed without user action.")
