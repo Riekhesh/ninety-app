@@ -45,6 +45,38 @@ rebuild.
 
 > **Day 1 of 21:** `TO BE MEASURED` — record the date here the day it starts.
 
+**Decided 8 September: the clock runs in two halves, and the first half is not in
+Ninety.** Logging starts in MyFitnessPal *today*, because the app cannot log a meal
+until P1-F's manual route exists and there is no reason for the calendar to wait on the
+build. When manual entry and weight entry ship, logging moves into Ninety and stays
+there; the MyFitnessPal stretch is imported behind it.
+
+**The imported days are marked as imported and are not pretended to be Ninety days.**
+`EntryMethod` gains an `imported` case — a Postgres enum value and a line in
+`Domain.swift`, with `check_schema_parity.py` keeping the two sides honest — so Phase 2
+can tell the two halves apart. They are genuinely different data: the imported days
+carry food-database calories and no friction signal, and the Ninety days carry
+hand-entered estimates and a real reading on whether this app gets used. Consistency is
+weighted 0.50, and it measures showing up *given the friction*, which a polished
+third-party app with a barcode scanner does not test.
+
+What this buys is a week or more of wall clock, on the one criterion no effort
+compresses. What it costs is that the first stretch says nothing about the app itself —
+which is the half of P1-J's purpose the second stretch covers.
+
+**Two things the minimum set gets wrong as written**, found closing P1-D:
+
+- **Weight entry is a blocker and is not built.** Onboarding writes one `WeightLog` and
+  The Run is a holding screen, so there is no way to record tomorrow's weight. P1-J's own
+  criterion is "real food, **real weight**", so a weight-entry surface is part of day 0,
+  not part of P1-G's chart work.
+- **Backdating a log is normal use, not backfill.** `FoodLogDraft` already takes
+  `loggedAt`, and the 48-hour lock is on *editing* an existing log rather than on creating
+  one with an earlier timestamp. Logging last night's dinner this morning has to work, or
+  the streak breaks for a reason that has nothing to do with whether the food was eaten.
+  What "no synthetic backfill" is protecting against is reconstructing days from memory —
+  guesses that Phase 2 would then tune an engine on.
+
 ---
 
 ## Exit criteria
@@ -83,7 +115,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-G** The Run: weight & trend | Manual + HealthKit, 7-day EWMA, pace against the chosen rate | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
 | **P1-I** Offline-first sync | Outbox, last-write-wins, airplane-mode verification | High |
-| **P1-J** Dogfood: 21 consecutive days | The clock, plus the photo-accuracy benchmark it produces | Highest |
+| **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
 | **P1-X** Phase 1 exit criteria | The seven conditions above, mirrored as tickets | Highest |
 
 The full ticket text — descriptions, acceptance criteria, the named safety tests — is in
@@ -115,9 +147,15 @@ order laid out visually, is published at
    `docs/safety/`. It carried the first Settings surface, which is where S6's opt-out,
    S7's signposting and P1-C's consent withdrawal all live. See
    [what P1-D landed](#p1-d--what-landed).
-5. **Kick off.** The minimum set above. Record day 1.
-6. **Everything else, underneath a running clock.** Barcode, photo, HealthKit, sync,
-   Matchday polish.
+5. **Kick off.** Manual food entry and a weight-entry surface — the two things that are
+   actually missing. Record day 1.
+6. **Everything else, underneath a running clock**, in this order: **P1-I · P1-H · P1-E ·
+   P1-G**, then P1-F's remaining routes, then P1-J and P1-X. Sync is second rather than
+   last for two reasons: three weeks of the only irreplaceable asset in the project
+   currently live on one phone with nothing draining the outbox, and the airplane-mode
+   criterion needs real logging days to reconcile, so it has to happen *during* the clock.
+   HealthKit is late because it is retroactive — a first read pulls the history back
+   whether it lands on day 4 or day 18.
 
 ---
 
@@ -458,6 +496,7 @@ what that phrase covers. Fixed here because it blocks walking the flow at all.
 | Open Food Facts + USDA mirror | Moved out of P1-B to land with P1-F's search route. The `foods` table and its index ship now; the import is a data job |
 | Ranking maths, tiers, anti-gaming | Phase 2. `Packages/RankingEngine` is scaffolded now only so the lint purity rules have a boundary to police |
 | The scoring half of S3 | Phase 2 — progress score peaking at target rate |
+| The photo-accuracy benchmark | **Deferred 8 September, no date.** `spikes/vision-accuracy` needs 20 **weighed** meals, and that assumes cooking and portioning everything yourself — it does not survive eating out or being cooked for, which is most real meals. It is explicitly not a gate (the harness README: *"Whenever. Not a gate."*) because the estimate is always presented as a helper with ranges and one-tap correction, so a missing number changes nothing that ships. Picked up when there is a run of meals it can honestly be built from |
 | Privacy policy, export, deletion, S7 triggers | Phase 3, before the first external tester |
 | Friends and leaderboards | Phase 4 — but their two tables ship empty in migration 001, because retrofitting relationships hurts |
 | PostHog | Phase 3 |
