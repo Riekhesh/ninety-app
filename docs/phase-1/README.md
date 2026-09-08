@@ -111,7 +111,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-C** Authentication | **CLOSED 8 Sep.** Sign in with Apple through Supabase's id-token exchange, Article 9 consent recorded separately from ToS. Verified on a real device against the live project | High |
 | **P1-D** Pre-Season: onboarding & the §10 gates | **CLOSED 8 Sep.** All ten stories, compiled, 104 tests green, walked on a real device. Onboarding, the band, S1–S7, the Settings screen, and the calibration window — now seven days (ADR 0018) | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
-| **P1-F** Sub On: food logging, four routes | Manual, search, barcode, photo, and the mandatory Under Review screen | High |
+| **P1-F** Sub On: food logging, four routes | **All seven stories written, 8 Sep — not compiled.** Manual, search, barcode, photo, the Squad and the Bench, the mandatory Under Review screen, the Edge Function and its per-user cap. The food mirror lands with it as an import job | High |
 | **P1-G** The Run: weight & trend | Manual + HealthKit, 7-day EWMA, pace against the chosen rate | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
 | **P1-I** Offline-first sync | Outbox, last-write-wins, airplane-mode verification | High |
@@ -150,12 +150,27 @@ order laid out visually, is published at
 5. **Kick off.** Manual food entry and a weight-entry surface — the two things that are
    actually missing. Record day 1.
 6. **Everything else, underneath a running clock**, in this order: **P1-I · P1-H · P1-E ·
-   P1-G**, then P1-F's remaining routes, then P1-J and P1-X. Sync is second rather than
+   P1-G**, then P1-J and P1-X. Sync is second rather than
    last for two reasons: three weeks of the only irreplaceable asset in the project
    currently live on one phone with nothing draining the outbox, and the airplane-mode
    criterion needs real logging days to reconcile, so it has to happen *during* the clock.
    HealthKit is late because it is retroactive — a first read pulls the history back
    whether it lands on day 4 or day 18.
+
+> **Changed 8 September: P1-F was built whole rather than split.** The plan above put
+> manual entry at step 5 and *"P1-F's remaining routes"* after four other epics, on the
+> reasoning that barcode and photo can land on day 4 as easily as day 0. That reasoning
+> is still right about the *clock* and turned out to be wrong about the *work*: the four
+> routes are not four features, they are one screen and one write path with four ways in,
+> and the pieces that would have been deferred — the Under Review gate, the Edge
+> Function, the cap, the estimate row — are the ones that would have had to be designed
+> around when the rest landed. Building them together cost one session; splitting them
+> would have cost the same session twice and left the schema of `photo_estimates`
+> speculative in the meantime. **Nothing about the clock changed**: manual entry still
+> starts it, and it starts it the moment this compiles on a Mac.
+>
+> What this does move is P1-B's food mirror, which is now a prerequisite of two of the
+> four routes rather than a deferred story: search and barcode both resolve against it.
 
 ---
 
@@ -243,7 +258,7 @@ live project (`sxaewrpojdadywuybzhz`, London, Postgres 17).
 | RLS policies, tested with two real accounts | ✔ 27 assertions, `scripts/verify-rls.sh`, in CI on every schema change |
 | SwiftData models as the local source of truth | ✔ Eight `@Model` types, versioned schema, migration plan |
 | Protocol-based repositories with mocks | ✔ Four protocols, SwiftData and mock implementations |
-| Mirror Open Food Facts + USDA | **Deferred** — see below |
+| Mirror Open Food Facts + USDA | **Written with P1-F** — `scripts/import_food_mirror.py`, plus the ranked `search_foods` function. Not yet run against the live project |
 
 **The mirror is deferred to sit alongside P1-F.** It is 8 of the epic's 28
 points and nothing in the minimum daily-usable set needs it: manual entry is
@@ -341,6 +356,11 @@ find it. Signing out currently means deleting the app — which does work, since
 iOS clears an app's Keychain items on uninstall, but it is not a feature.
 **P1-D closes both**: the screen carrying S6's opt-out switch and S7's
 signposting carries these too.
+
+> **Closed 8 September.** Settings exists — a sheet from Matchday's masthead — and it
+> carries both consent switches and sign out alongside the opt-out and the signposting.
+> The paragraph above is kept as the record of what the state was when P1-C shipped;
+> read it in the past tense.
 
 **One thing the device run changed, and it came from a warning rather than a
 failure.** `supabase-swift` logs that `authStateChanges` emits its initial
@@ -489,11 +509,102 @@ what that phrase covers. Fixed here because it blocks walking the flow at all.
 
 ---
 
+## P1-F — what landed
+
+All seven stories plus the deferred P1-B mirror, on branch
+`claude/p1-f-food-logging-4g8w6s`. **Written, not yet built:** every line of Swift in
+this epic was produced in a Linux container with no Xcode, Swift toolchain or
+simulator, so the epic is not closed until a Mac has compiled it and a phone has
+logged a real meal through each route. That is the same caveat P1-A and P1-B carried
+for six days, and it is the honest state rather than a formality — the first ⌘U on
+P1-B found a bug that broke every write in the app.
+
+Everything that *could* be checked without a toolchain has been, and is marked as
+such below.
+
+| Story | Outcome |
+|---|---|
+| Sub On: four routes, the Squad and the Bench | Team sheet first, routes above it. `TeamSheet` is pure and tested; First Half / Second Half derived from `logged_at` in the user's calendar. ✔ 16 tests; ✗ never rendered |
+| Path 0: manual entry | Name, portion, calories, optional macros, and "keep this for next time". Offline by construction — nothing on the path is `async`. ✔ tested; ✗ never rendered |
+| Path 1: text search | Local-first, catalogue second, 250 ms debounce. `search_foods` ranks by `ts_rank`. ✔ tested, including the SQL against a real Postgres |
+| Path 2: barcode | `DataScannerViewController`, ~70 lines including the comments. Local cache before the network; a miss offers search or a custom food carrying the barcode. ✔ resolution logic tested; ✗ the scanner itself needs a device |
+| Path 3: photo estimate | Downscale → Storage → Edge Function → validate. Provider interface ported from the spike, Gemini default. ✔ validation and downscale tested; ✗ no round trip has happened |
+| Under Review | Mandatory. `confirm` is the only method on the route that can write. ✔ 14 tests; ✗ never rendered |
+| Per-user daily photo cap | Server-side, atomic, thirty a day. ✔ **proven against real Postgres** — it counts to the limit and refuses past it, in `verify-rls.sh` |
+| Keep the photo alongside the confirmed values | One `photo_estimates` row per item, written in the same transaction as its log. ✔ tested, plus the CSV export |
+| *(P1-B)* Mirror Open Food Facts + USDA | `scripts/import_food_mirror.py`. ✗ not run — needs the ~10 GB export and the live project |
+
+**Thirty-three RLS assertions now, up from twenty-seven**, and eleven tables. The new
+ones cover the photo-cap ledger from both directions — B cannot read A's quota, and B
+cannot write its own — plus two smoke tests on `search_foods` that only a real
+Postgres can answer.
+
+### Four things found while building it
+
+- **Counting `photo_estimates` would have been the wrong cap.** The obvious
+  implementation of §10's daily limit is `count(*)` over the confirmations, and it
+  misses exactly the requests the cap exists for: a row is only written when the user
+  gives the decision, so an abandoned estimate — or one a looping client never shows
+  anybody — costs a model call and leaves no trace. The ledger counts *requests*,
+  claims them atomically in one statement, and is not refunded on a failed model call.
+  See [migration 005](../../supabase/migrations/20260908000005_photo_estimate_usage.sql).
+
+- **The confirmed values are not weighed, and the spike says that makes them
+  worthless as a baseline.** ADR 0010 folded the photo benchmark into Phase 1 on the
+  condition that logging keeps the photo next to the confirmed values. It does — but
+  `spikes/vision-accuracy/README.md` requires ground truth weighed on a scale, and a
+  user nudging a portion on Under Review is not weighing anything. The set is real and
+  worth having; it measures **correction magnitude**, not accuracy, and every exported
+  row says so in its `notes` column. [ADR 0019](../decisions/0019-photo-logs-are-a-correction-dataset.md)
+  records it, and the honest consequence is that the 20 weighed meals are *more*
+  needed rather than less.
+
+- **A nested `enum State` inside a SwiftUI `View` shadows `@State`.** Caught by
+  reading rather than by a compiler, because there is no compiler here. Renamed to
+  `Lookup`, with the reason in the code — it is the sort of thing that produces a
+  confusing error a long way from its cause.
+
+- **"The only file in the app that imports the SDK" stopped being true.**
+  `SupabaseAuthService` said so and built its own client to make it so, with a comment
+  explaining that a second client would be a second Keychain session and a second
+  refresh loop. P1-F needs the network for two more things, so the client moved to
+  `SupabaseStack` and the three consumers take it. The lock-in ADR 0003 accepted is
+  unchanged in kind and still countable: three files, each behind a protocol.
+
+### One thing the design had to choose against the artboards
+
+`Var.dc.html` labels the confidence chips **CLEAR / TIGHT / UNSIGHTED**. The build
+uses the copy deck's **HIGH / MEDIUM / LOW**. The language runs through the product
+everywhere it costs nothing, and here it costs something: that chip is what tells
+somebody which number to go and check, and "TIGHT" does not say that to anyone who
+has not been told what it means. `DESIGN.md` records it, with the same tie-break the
+Mode section already used — scanability outranks expression on every screen except
+The Table.
+
+### What has to happen on a Mac before this closes
+
+1. ⌘U. The suite is 62 new tests across four suites plus one added to
+   `SafetyCopyTests`, none of which has executed. The Deno tests (7) run on Ubuntu in
+   CI and have not run here either — there is no Deno in this container.
+2. Walk each of the four routes on a device, and log a real meal through each.
+3. `supabase db push` for migrations 005 and 006, then `supabase functions deploy
+   estimate-meal` with `GEMINI_API_KEY` set. `supabase/functions/README.md` is the
+   runbook.
+4. Run `scripts/import_food_mirror.py --dry-run` against a real Open Food Facts
+   export before pushing a quarter of a million rows at the database.
+5. Record the measured photo latency. The spike saw 1.9–3.1 s; the app measures it
+   client-side with the upload included, so the figure will be larger and the
+   difference is the interesting part.
+6. Capture Sub On and Under Review at `.xSmall` and `.accessibility5`. Both ship
+   `.accessibility5` previews; neither has been looked at.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
 |---|---|
-| Open Food Facts + USDA mirror | Moved out of P1-B to land with P1-F's search route. The `foods` table and its index ship now; the import is a data job |
+| Open Food Facts + USDA mirror | ~~Moved out of P1-B to land with P1-F's search route.~~ **Landed with P1-F, 8 Sep** — `scripts/import_food_mirror.py` and the ranked `search_foods` function. Written, not yet run against a real export |
 | Ranking maths, tiers, anti-gaming | Phase 2. `Packages/RankingEngine` is scaffolded now only so the lint purity rules have a boundary to police |
 | The scoring half of S3 | Phase 2 — progress score peaking at target rate |
 | The photo-accuracy benchmark | **Deferred 8 September, no date.** `spikes/vision-accuracy` needs 20 **weighed** meals, and that assumes cooking and portioning everything yourself — it does not survive eating out or being cooked for, which is most real meals. It is explicitly not a gate (the harness README: *"Whenever. Not a gate."*) because the estimate is always presented as a helper with ranges and one-tap correction, so a missing number changes nothing that ships. Picked up when there is a run of meals it can honestly be built from |
@@ -595,26 +706,37 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **[ticket]**. Everything below is verified on a real device as
-> of 8 September, not written-but-unbuilt.
+> Currently working on: **[ticket]**. Everything below is verified on a real device as of
+> 8 September **except P1-F**, which is written and has never been compiled — the line
+> below says so, and the distinction is load-bearing: the first ⌘U on P1-B found a bug
+> that broke every write in the app.
 >
 > P1-A is closed: the project builds, the type decision is ADR 0015 (Dynamic Type, two
 > bundled faces), the shell is three tabs with Sub On as a sheet, and `DESIGN.md` is the
-> authority on how the world is built. P1-B is closed bar the food mirror: migrations are
-> applied to the live project, RLS is proven with two accounts, and the SwiftData models
-> and repositories are green. P1-C is closed: Sign in with Apple is the only identity
-> route (ADR 0016), and the app will not start until Article 9 health consent is recorded
-> separately from terms acceptance (ADR 0017). Every repository is built from the
-> signed-in user's id via `Repositories.live(context:userID:)`.
+> authority on how the world is built. P1-B is closed: migrations are applied to the live
+> project, RLS is proven with two accounts, the SwiftData models and repositories are
+> green, and the food mirror landed with P1-F. P1-C is closed: Sign in with Apple is the
+> only identity route (ADR 0016), and the app will not start until Article 9 health
+> consent is recorded separately from terms acceptance (ADR 0017). Every repository is
+> built from the signed-in user's id via `Repositories.live(context:userID:)`.
 >
-> **Two gaps P1-D is expected to close.** There is no Settings screen, so once consent is
-> given there is no way to withdraw it and no way to sign out — the only "Sign out
-> instead" button is on the consent screen. S6's opt-out switch and S7's signposting land
-> on that same screen, so all four belong together.
+> **P1-D is closed.** Onboarding, the band, S1–S7 as types in `Ninety/Safety/`, the
+> seven-day calibration window (ADR 0018) — and **there is a Settings screen**: a sheet
+> from Matchday's masthead carrying the competitive opt-out, the support signposting,
+> both consent switches and sign out, in that order, with `CompetitiveOptOutTests`
+> asserting the order because the two-tap requirement depends on it.
+>
+> **P1-F is written and not yet compiled.** All four logging routes, the Squad and the
+> Bench, the mandatory Under Review screen, the `estimate-meal` Edge Function with its
+> server-side daily cap, and the food-mirror import job. The SQL half is verified against
+> a real Postgres (33 RLS assertions, 11 tables); the Swift half has never been built.
+> **The next Mac session is ⌘U and a walk through all four routes** — see
+> [what has to happen on a Mac](#what-has-to-happen-on-a-mac-before-this-closes).
 >
 > Requirements: offline-first (the UI never waits on network), RLS on every table, photo
-> estimates always show ranges + confidence and require user confirmation. The safety
-> rules in `docs/safety/` are Phase 1 requirements, not Phase 3 polish. Design tokens are
+> estimates always show ranges + confidence and require user confirmation. Ranges render
+> as a figure plus a tolerance, never two numbers joined by a dash. The safety rules in
+> `docs/safety/` are Phase 1 requirements, not Phase 3 polish. Design tokens are
 > generated — edit `ninety.tokens.json`, never the Swift.
 
 The board is the source of truth for *what is next*; this file is the source of truth for

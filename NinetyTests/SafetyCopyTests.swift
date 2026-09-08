@@ -39,6 +39,7 @@ struct SafetyCopyTests {
             + PreSeasonCopy.all
             + OnboardingCopy.all
             + SettingsCopy.all
+            + SubOnCopy.all
             + Signposting.all
             + AuthFailure.allCases.compactMap(\.errorDescription)
             + AuthFailure.allCases.compactMap(\.recoveryDescription)
@@ -47,13 +48,19 @@ struct SafetyCopyTests {
             + BandState.allCases.map(\.label)
             + BandState.allCases.compactMap(\.note)
             + LossRate.selectable.map { LossRate.label(for: $0) }
+            // P1-F's own states, which are not strings in `SubOnCopy` because
+            // they are built from one.
+            + EstimateConfidence.allCases.map(\.label)
+            + EstimateConfidence.allCases.compactMap(\.note)
+            + MealEstimateError.allCases.compactMap(\.errorDescription)
+            + MealEstimateError.allCases.map(\.recoveryDescription)
+            + CatalogueError.allCases.compactMap(\.errorDescription)
             + [
-                "Sub On", "Sub on", "Sub on. Log food.", "Close",
+                "Sub on", "Sub on. Log food.",
                 "No day started", "No readings", "Today", "Nothing logged yet.",
                 "Weight", "No weight yet.", "Division",
                 "Ranking arrives in the next update.", "How it will be scored",
-                "Consistency", "Adherence", "Progress", "Four routes",
-                "Logging lands with P1‑F.",
+                "Consistency", "Adherence", "Progress",
                 "Settings, support and your consent",
             ]
     }
@@ -120,6 +127,34 @@ struct SafetyCopyTests {
         // colour of its own.
         #expect(DayMark.allCases.count == 2)
         #expect(!DayMark.missed.isFilled)
+    }
+
+    /// §1.2 and the Under Review ticket: a range is a figure and a tolerance,
+    /// never two numbers joined by a dash. It is in this suite rather than only
+    /// in `MealEstimateTests` because it is a rendering rule about how a number
+    /// is presented to a user, which is the same class of thing S5 is about —
+    /// `120–160` reads as a rule you are failing to stay inside, and `140 ±20`
+    /// reads as an estimate with slack in it.
+    @Test("no number the app shows is rendered as a dashed range")
+    func rangesAreNeverDashed() {
+        let band = CalorieBand(
+            centre: 1_850,
+            tolerance: 100,
+            isAtFloor: false,
+            floor: 1_500,
+            slowerRate: nil
+        )
+        let rendered = [
+            Figure.range(EstimateRange(low: 290, high: 390)),
+            Figure.range(EstimateRange(low: 23, high: 91)),
+            OnboardingCopy.band(band),
+        ]
+        for copy in rendered {
+            for dash in ["–", "—", " - ", " to "] {
+                #expect(!copy.contains(dash), "\"\(copy)\" renders a range as a span rather than a tolerance")
+            }
+            #expect(copy.contains("±"))
+        }
     }
 
     /// ADR 0018 halved the calibration window, and the number appears in copy as

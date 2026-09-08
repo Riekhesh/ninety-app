@@ -1,13 +1,22 @@
 import Foundation
 import Supabase
 
-/// The real one. **The only file in the app that imports the SDK.**
+/// The real one. **The only file in the app that imports the SDK for auth.**
 ///
 /// That is the whole reason `AuthServiceProtocol` exists. ADR 0003 accepts
 /// vendor lock-in on auth as the price of Supabase, and the honest way to hold
 /// a lock-in is to keep it in one file where its size is visible, rather than
 /// letting `Session` and `AuthError` spread through the shell until the cost of
 /// the decision can only be measured by trying to reverse it.
+///
+/// **Changed in P1-F.** It used to say "the only file in the app that imports
+/// the SDK", and it built its own `SupabaseClient` to make that true. P1-F needs
+/// the network for two more things — the food catalogue and the photo estimate —
+/// and a second client would be a second Keychain session and a second refresh
+/// loop racing this one, which is exactly what the note below already warned
+/// about. The client now lives in `SupabaseStack` and this takes it. The lock-in
+/// is unchanged in kind and is still countable: three files, each behind a
+/// protocol.
 ///
 /// Three things are deliberately *not* here, because the SDK already does them
 /// and doing them twice is worse than doing them once:
@@ -31,11 +40,8 @@ final class SupabaseAuthService: AuthServiceProtocol {
     private let continuation: AsyncStream<AuthSession?>.Continuation
     private var observation: Task<Void, Never>?
 
-    init(configuration: SupabaseConfiguration) {
-        client = SupabaseClient(
-            supabaseURL: configuration.url,
-            supabaseKey: configuration.anonKey
-        )
+    init(stack: SupabaseStack) {
+        client = stack.client
         (changes, continuation) = AsyncStream.makeStream()
         observe()
     }

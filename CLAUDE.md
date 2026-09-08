@@ -61,6 +61,12 @@ design/
   spec/        principles, component specs, copy deck (17 phrases banned at lint-error)
   redesign/    the MATCHDAY world: six screens as .dc.html + rendered PNGs
 
+supabase/
+  migrations/  applied in filename order by `supabase db push`. RLS is IN migration 001
+  functions/   estimate-meal — the photo route's server half. The model API key lives
+               here and nowhere else (§04). `deno test supabase/functions` in CI
+  tests/       the two-account RLS proof. scripts/verify-rls.sh boots its own Postgres
+
 spikes/        THROWAWAY de-risking code, not app code. Different quality bar
   vision-accuracy/   photo->calorie harness. Runs, scores, reports. Python
   healthkit/         Spike A. Blocked on Apple Developer enrolment
@@ -99,6 +105,12 @@ docs and design commits never spend the 200-minute budget.
   than reporting $0.00. Don't reintroduce a zero default.
 - **Photos and ground truth are gitignored.** Article 9 health data. Reports are
   committed; the data is not.
+- **The confirmed values from the app are not weighed ground truth** (ADR 0019). They
+  measure how far a human moved the model, which is real and useful; they are not the
+  accuracy baseline, and `spikes/vision-accuracy`'s own rules say why. The 20 weighed
+  meals are still outstanding.
+- **A range is a figure and a tolerance, never a dash** — `1,850 ±100`, not
+  `1,750–1,950`. `DESIGN.md` § Numbers, and `SafetyCopyTests` checks it.
 
 ---
 
@@ -107,6 +119,8 @@ docs and design commits never spend the 200-minute budget.
 ```bash
 python3 design/tokens/generate.py --check      # CI runs this
 python3 -m pytest spikes/vision-accuracy/tests -q
+deno test supabase/functions                   # the Edge Function contract
+scripts/verify-rls.sh                          # boots a throwaway Postgres, 33 assertions
 scripts/verify-toolchain.sh                    # macOS only
 scripts/verify-accounts.sh                     # reads .env, never prints a value
 ```

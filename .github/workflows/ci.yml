@@ -100,6 +100,18 @@ jobs:
           python3 -m pip install --quiet -r spikes/vision-accuracy/requirements.txt
           python3 -m pytest spikes/vision-accuracy/tests -q
 
+      - name: Edge Function tests
+        # The photo route's server half. Deno on Ubuntu, no key, no network and
+        # no cost — it covers exactly the failures a structured output cannot
+        # prevent, because the schema has no numeric constraints: an inverted
+        # range and a negative bound are both schema-valid and both wrong.
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Validate the estimate-meal contract
+        run: deno test supabase/functions
+
       - name: Check the app bundle's plist
         # Needs no Mac, and catches a class of failure that otherwise only
         # appears at install time on a device or simulator.

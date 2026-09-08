@@ -86,6 +86,26 @@ Three rules that are safety requirements rather than taste:
 
 ---
 
+## Numbers
+
+**A range is a figure and a tolerance. Never two numbers joined by a dash.**
+`1,850 ±100`, not `1,750–1,950`; `340 ±50`, not `290–390`. The two forms read as
+different things: the dash form reads as a rule about where you are meant to
+stay, and the tolerance form reads as a target with slack in it — which is what
+a calorie band and a photo estimate both actually are. It holds in three places
+so far and will hold everywhere a range appears: `CalorieBand`, `EstimateRange`
+and the room left on Sub On. `SafetyCopyTests.rangesAreNeverDashed` is the check.
+
+**Never a decimal place on a calorie figure.** §1.2: hitting exactly 1,847 is not
+a real human goal. `no_false_precision_kcal` catches the formatted version, and
+`Figure` is where the right thing is easier to type than the wrong one.
+
+**A number the app did not compute is not shown at all.** No band means a
+sentence saying what has to happen first, never a zero — the same rule that keeps
+`HoldingNote` out of skeleton-screen territory.
+
+---
+
 ## Structure
 
 **Three tabs, and that is the whole app** (§1.6): Matchday · The Run · The Table.
@@ -131,6 +151,35 @@ content.
 > alternative to adding one was burying an eating-disorder helpline and a consent
 > withdrawal somewhere they could not be found, which is not a design decision
 > the artboards were making.
+
+**Sub On is the team sheet first and a search box second.** You land on The Squad
+and On the Bench, with the four routes above them as a row of chips. Most people
+rotate through roughly thirty distinct foods, so for most meals the answer is
+already on the screen — and the fastest search is the one nobody types. That is
+the whole of the ticket's claim about speed, and there is no algorithm in it.
+
+> **Deviation from the artboards.** `SubOn.dc.html` draws the four chips as
+> SEARCH · BARCODE · SNAP · SQUAD, with manual entry at the bottom of the screen
+> as "Quick add by calories". The Squad is the list underneath rather than a way
+> of logging, so the fourth chip in the build is Manual. Both routes to manual
+> entry survive — the chip and the quick add — because they are two different
+> intentions: one is "I will type this in", the other is "I only know the
+> number".
+
+**Under Review is not skippable, and its numbers are never bare.** Every figure
+on it carries a tolerance, every item the model found carries how sure it was,
+and the only way off the screen with a row written is the button at the bottom.
+`UnderReviewModel.confirm` is the one method on the photo route that can reach a
+repository, so *"nothing is logged until the user gives the decision"* is a
+property of the types rather than a habit of the view.
+
+> **Deviation from the artboards.** `Var.dc.html` labels the confidence chips
+> CLEAR / TIGHT / UNSIGHTED. The build uses the copy deck's HIGH / MEDIUM / LOW.
+> The world's vocabulary runs through the product everywhere it costs nothing,
+> and here it costs something: this chip is what tells somebody which number to
+> go and check, and "TIGHT" does not say that to anyone who has not been told
+> what it means. The Mode section above settles ties the same way — scanability
+> outranks expression on every screen except The Table.
 
 **Pre-Season is four screens, and the last one carries two things.** About you ·
 starting weight · goal · your band. The band screen also holds the calibration

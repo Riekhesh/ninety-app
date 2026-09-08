@@ -40,11 +40,29 @@ final class MockProfileRepository: ProfileRepositoryProtocol {
 final class MockFoodRepository: FoodRepositoryProtocol {
     var storedLogs: [FoodLog] = []
     var catalogue: [Food] = []
+    var storedEstimates: [PhotoEstimate] = []
+    /// Set to make a write throw, for the paths that have to survive a failure.
+    var saveError: (any Error)?
+    var logError: (any Error)?
     private(set) var loggedCount = 0
 
-    init(logs: [FoodLog] = [], catalogue: [Food] = []) {
+    let userID: UUID
+    /// Injected, so a test can place a log at a known instant rather than at
+    /// whenever the suite happened to run.
+    var now: Date
+
+    init(
+        logs: [FoodLog] = [],
+        catalogue: [Food] = [],
+        estimates: [PhotoEstimate] = [],
+        userID: UUID = UUID(),
+        now: Date = Date()
+    ) {
         self.storedLogs = logs
         self.catalogue = catalogue
+        self.storedEstimates = estimates
+        self.userID = userID
+        self.now = now
     }
 
     func logs(on day: Date, calendar: Calendar) -> [FoodLog] {
@@ -63,10 +81,67 @@ final class MockFoodRepository: FoodRepositoryProtocol {
         )
     }
 
+    func food(withBarcode barcode: String) -> Food? {
+        catalogue.first { $0.barcode == barcode }
+    }
+
+    @discardableResult
+    func saveFood(_ draft: FoodDraft) throws -> Food {
+        if let saveError { throw saveError }
+        if let id = draft.id, let existing = catalogue.first(where: { $0.id == id }) {
+            existing.name = draft.name
+            existing.brand = draft.brand
+            existing.barcode = draft.barcode
+            existing.kcalPer100g = draft.kcalPer100g
+            existing.proteinG = draft.proteinG
+            existing.carbsG = draft.carbsG
+            existing.fatG = draft.fatG
+            return existing
+        }
+        let food = Food(
+            id: draft.id ?? UUID(),
+            source: draft.source,
+            createdBy: draft.source == .custom ? userID : nil,
+            barcode: draft.barcode,
+            name: draft.name,
+            brand: draft.brand,
+            kcalPer100g: draft.kcalPer100g,
+            proteinG: draft.proteinG,
+            carbsG: draft.carbsG,
+            fatG: draft.fatG
+        )
+        catalogue.append(food)
+        return food
+    }
+
+    func recentLogs(since moment: Date, limit: Int) -> [FoodLog] {
+        Array(
+            storedLogs
+                .filter { $0.loggedAt >= moment }
+                .sorted { $0.loggedAt > $1.loggedAt }
+                .prefix(limit)
+        )
+    }
+
     @discardableResult
     func log(_ draft: FoodLogDraft) throws -> FoodLog {
+        try write(draft, estimate: nil)
+    }
+
+    @discardableResult
+    func log(_ draft: FoodLogDraft, estimate: PhotoEstimateDraft) throws -> FoodLog {
+        try write(draft, estimate: estimate)
+    }
+
+    func photoEstimates(limit: Int) -> [PhotoEstimate] {
+        Array(storedEstimates.sorted { $0.createdAt > $1.createdAt }.prefix(limit))
+    }
+
+    private func write(_ draft: FoodLogDraft, estimate: PhotoEstimateDraft?) throws -> FoodLog {
+        if let logError { throw logError }
         let entry = FoodLog(
-            userID: UUID(),
+            userID: userID,
+            createdAt: now,
             loggedAt: draft.loggedAt,
             grams: draft.grams,
             entryMethod: draft.entryMethod,
@@ -76,6 +151,21 @@ final class MockFoodRepository: FoodRepositoryProtocol {
         )
         storedLogs.append(entry)
         loggedCount += 1
+
+        if let estimate {
+            storedEstimates.append(
+                PhotoEstimate(
+                    userID: userID,
+                    createdAt: now,
+                    storagePath: estimate.storagePath,
+                    modelOutput: estimate.modelOutput,
+                    confidence: estimate.confidence,
+                    wasCorrected: estimate.wasCorrected,
+                    correctionDelta: estimate.correctionDelta,
+                    log: entry
+                )
+            )
+        }
         return entry
     }
 

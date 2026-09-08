@@ -19,3 +19,15 @@ port = 54322
 # dashboard under Settings → Database → Infrastructure. It only affects a local
 # `supabase start`; `db push` uses whatever the hosted project runs.
 major_version = 17
+
+# ─── Edge Functions ─────────────────────────────────────────────────────────
+# `estimate-meal` is P1-F's photo route. The model API key lives in its
+# environment and nowhere else (§04) — see supabase/functions/README.md for the
+# secrets it needs and how to set them.
+
+[functions.estimate-meal]
+# On, and it is load-bearing rather than a default left alone. The function
+# reads a private Storage object under the service role, so the identity it
+# scopes that read to has to be a verified one; with this off, `getUser()` would
+# be reading an unverified token.
+verify_jwt = true
