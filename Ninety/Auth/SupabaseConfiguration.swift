@@ -28,11 +28,30 @@ struct SupabaseConfiguration: Equatable, Sendable {
     init?(host: String?, anonKey: String?) {
         let host = host?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let key = anonKey?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard !host.isEmpty, !key.isEmpty, !host.contains("/"), let url = URL(string: "https://\(host)") else {
+        guard Self.isAHost(host), !key.isEmpty, let url = URL(string: "https://\(host)") else {
             return nil
         }
         self.url = url
         self.anonKey = key
+    }
+
+    /// A host, and nothing that is not one.
+    ///
+    /// Checking only for `/` was not enough, and the test caught it: what an
+    /// xcconfig leaves behind when a full URL is pasted is `https:` — no
+    /// slashes at all, because the comment starts at the first one. That built
+    /// a perfectly valid `URL` pointing at `https://https:`, and the app would
+    /// have offered a sign-in button that could never work rather than saying
+    /// it was not configured.
+    ///
+    /// So the rule is what a host *is*, not a list of what it must not be. It
+    /// has a dot, and it has no scheme, port, path or space — which rejects
+    /// `https:`, `abc.supabase.co:5432`, a surviving URL, and a bare word,
+    /// while still allowing the custom domain the Data API settings offer.
+    private static func isAHost(_ host: String) -> Bool {
+        guard !host.isEmpty, host.contains(".") else { return false }
+        guard host.rangeOfCharacter(from: .whitespacesAndNewlines) == nil else { return false }
+        return !host.contains(":") && !host.contains("/")
     }
 
     /// Reads the two keys out of the built bundle.

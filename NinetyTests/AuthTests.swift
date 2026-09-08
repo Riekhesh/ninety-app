@@ -165,9 +165,20 @@ struct AuthTests {
         #expect(configuration?.url.absoluteString == "https://abcdefgh.supabase.co")
 
         // What a pasted URL becomes after xcconfig eats everything from `//`.
+        // This is the case that shipped broken: `https:` has no slash, so a
+        // guard that only rejected `/` built `https://https:` and handed the
+        // user a sign-in button that could never work.
         #expect(SupabaseConfiguration(host: "https:", anonKey: "k") == nil)
         // And what it would have been if xcconfig had not.
         #expect(SupabaseConfiguration(host: "https://abcdefgh.supabase.co", anonKey: "k") == nil)
+        // The neighbouring ways to write something that is not a host.
+        #expect(SupabaseConfiguration(host: "abcdefgh.supabase.co:5432", anonKey: "k") == nil)
+        #expect(SupabaseConfiguration(host: "localhost", anonKey: "k") == nil)
+        #expect(SupabaseConfiguration(host: "abcdefgh supabase co", anonKey: "k") == nil)
+
+        // A custom domain is still a host, and the Data API settings offer one.
+        let custom = SupabaseConfiguration(host: "api.ninety.app", anonKey: "k")
+        #expect(custom?.url.absoluteString == "https://api.ninety.app")
     }
 
     @Test("a clone with nothing filled in is unconfigured rather than half-configured")
