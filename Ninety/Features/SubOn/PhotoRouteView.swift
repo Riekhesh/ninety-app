@@ -17,6 +17,7 @@ struct PhotoRouteView: View {
 
     @State private var phase: Phase = .choosing
     @State private var isCapturing = false
+    @State private var isChoosing = false
     @State private var pickerItem: PhotosPickerItem?
 
     @Environment(\.dismiss)
@@ -101,13 +102,21 @@ struct PhotoRouteView: View {
             // The library route is not a fallback for a missing camera — it is
             // how a meal photographed twenty minutes ago gets logged, which is
             // most of them.
-            PhotosPicker(selection: $pickerItem, matching: .images) {
-                Text(SubOnCopy.photoChoosePhoto)
-                    .ninetyType(.callout)
-                    .foregroundStyle(Ninety.Colour.accent)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
+            //
+            // The **modifier**, not the `PhotosPicker` view, and the reason is
+            // Swift 6 rather than taste: the view takes a `@ViewBuilder label:`
+            // closure that is not `@MainActor`, so styling anything inside it
+            // calls `ninetyType` — main-actor isolated through the `View`
+            // extension it lives in — from a nonisolated context and returns a
+            // non-Sendable `some View` out of it. The modifier has no label to
+            // isolate, and the control in front of it is then an ordinary
+            // secondary button rather than a picker wearing a hand-made one.
+            Button(SubOnCopy.photoChoosePhoto) { isChoosing = true }
+                .ninetyType(.callout)
+                .foregroundStyle(Ninety.Colour.accent)
+                .frame(maxWidth: .infinity, minHeight: 44)
         }
+        .photosPicker(isPresented: $isChoosing, selection: $pickerItem, matching: .images)
     }
 
     private func failure(_ error: MealEstimateError) -> some View {
