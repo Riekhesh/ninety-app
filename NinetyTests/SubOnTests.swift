@@ -16,11 +16,27 @@ struct SubOnTests {
         return calendar
     }
 
-    static func moment(_ iso: String, in calendar: Calendar) -> Date {
-        let formatter = ISO8601DateFormatter()
-        formatter.timeZone = calendar.timeZone
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter.date(from: iso) ?? ISO8601DateFormatter().date(from: iso) ?? Date()
+    /// A wall-clock time in September 2026, in the calendar you hand it.
+    ///
+    /// **Built from components, never parsed from an ISO string**, and the first
+    /// version of this file got that wrong in a way worth keeping a note about.
+    /// It used `ISO8601DateFormatter` with `formatter.timeZone = calendar
+    /// .timeZone` and strings like `"2026-09-08T11:59:00Z"` — but a trailing `Z`
+    /// means UTC and wins over the formatter's timezone, so that string is 12:59
+    /// in London in September, not 11:59. Two assertions were checking a time
+    /// they did not mean, and two more passed by luck.
+    ///
+    /// The failure was in the fixture rather than in `MealPeriod`, which is the
+    /// good version of this bug — but it is exactly the confusion the type
+    /// exists to prevent, so the helper is now one that cannot be misread.
+    static func at(_ hour: Int, _ minute: Int = 0, day: Int, in calendar: Calendar) -> Date {
+        var components = DateComponents()
+        components.year = 2026
+        components.month = 9
+        components.day = day
+        components.hour = hour
+        components.minute = minute
+        return calendar.date(from: components) ?? Date()
     }
 
     // MARK: - First Half / Second Half
@@ -28,10 +44,10 @@ struct SubOnTests {
     @Test("the halves change over at midday")
     func halvesChangeAtMidday() {
         let calendar = Self.london
-        #expect(MealPeriod.of(Self.moment("2026-09-08T08:30:00Z", in: calendar), calendar: calendar) == .firstHalf)
-        #expect(MealPeriod.of(Self.moment("2026-09-08T11:59:00Z", in: calendar), calendar: calendar) == .firstHalf)
-        #expect(MealPeriod.of(Self.moment("2026-09-08T12:00:00Z", in: calendar), calendar: calendar) == .secondHalf)
-        #expect(MealPeriod.of(Self.moment("2026-09-08T19:45:00Z", in: calendar), calendar: calendar) == .secondHalf)
+        #expect(MealPeriod.of(Self.at(8, 30, day: 8, in: calendar), calendar: calendar) == .firstHalf)
+        #expect(MealPeriod.of(Self.at(11, 59, day: 8, in: calendar), calendar: calendar) == .firstHalf)
+        #expect(MealPeriod.of(Self.at(12, day: 8, in: calendar), calendar: calendar) == .secondHalf)
+        #expect(MealPeriod.of(Self.at(19, 45, day: 8, in: calendar), calendar: calendar) == .secondHalf)
     }
 
     /// The acceptance criterion: *"First Half / Second Half meal periods assign
@@ -45,12 +61,13 @@ struct SubOnTests {
     func acrossTheDateBoundary() {
         let calendar = Self.london
 
-        // 23:30 on 8 September, British Summer Time — 22:30 UTC.
-        let lateDinner = Self.moment("2026-09-08T22:30:00Z", in: calendar)
-        // 00:10 on 9 September BST — 23:10 UTC on the 8th. UTC says "still the
-        // 8th, late evening"; the user's calendar says "the 9th, first thing",
-        // and the user's calendar is what the log is counted against.
-        let midnightSnack = Self.moment("2026-09-08T23:10:00Z", in: calendar)
+        // 23:30 on the 8th, and 00:10 on the 9th, both London time. In British
+        // Summer Time those are 22:30 and 23:10 UTC — so UTC calls them the same
+        // evening of the same day, and the user's calendar calls them a late
+        // dinner and the next morning. The user's calendar is the one the log is
+        // counted against.
+        let lateDinner = Self.at(23, 30, day: 8, in: calendar)
+        let midnightSnack = Self.at(0, 10, day: 9, in: calendar)
 
         #expect(MealPeriod.of(lateDinner, calendar: calendar) == .secondHalf)
         #expect(MealPeriod.of(midnightSnack, calendar: calendar) == .firstHalf)
@@ -63,11 +80,18 @@ struct SubOnTests {
     func periodUsesTheGivenCalendar() {
         var tokyo = Calendar(identifier: .gregorian)
         tokyo.timeZone = TimeZone(identifier: "Asia/Tokyo") ?? .gmt
-        // 23:00 UTC is 08:00 the next morning in Tokyo. The same instant is a
-        // different half in each place, which is the whole point of passing one.
-        let instant = ISO8601DateFormatter().date(from: "2026-09-08T23:00:00Z") ?? Date()
-        #expect(MealPeriod.of(instant, calendar: Self.london) == .secondHalf)
-        #expect(MealPeriod.of(instant, calendar: tokyo) == .firstHalf)
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = .gmt
+
+        // **One instant, two answers.** 05:00 UTC is a six-in-the-morning coffee
+        // in London and a two-in-the-afternoon lunch in Tokyo, on a day when
+        // London is an hour ahead of UTC and Tokyo is nine. Nothing about the
+        // moment decides which half it is; the calendar does, which is the whole
+        // reason it is a parameter rather than read from ambient state.
+        let instant = Self.at(5, day: 8, in: utc)
+
+        #expect(MealPeriod.of(instant, calendar: Self.london) == .firstHalf)
+        #expect(MealPeriod.of(instant, calendar: tokyo) == .secondHalf)
     }
 
     // MARK: - The Squad and the Bench
