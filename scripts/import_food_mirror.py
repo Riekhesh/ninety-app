@@ -66,6 +66,7 @@ import gzip
 import json
 import os
 import sys
+import urllib.parse
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -112,7 +113,37 @@ def load_env() -> tuple[str, str]:
             "to .env and fill them in — the service key bypasses RLS, which is what a "
             "bulk import of rows belonging to nobody requires."
         )
-    return url.rstrip("/"), key
+    return project_url(url), key
+
+
+def project_url(value: str) -> str:
+    """Scheme, host, nothing else — whatever shape the value arrived in.
+
+    The dashboard shows several URLs on one page and they are easy to mix up:
+    the project URL, the REST endpoint (`.../rest/v1`), and the host on its own
+    with no scheme. Pasting the second one produced
+    `…supabase.co/rest/v1/rest/v1/foods` and a `ValueError` from deep inside
+    `urllib` naming neither the setting nor the file it came from.
+
+    So the value is normalised rather than trusted: the path is discarded, a
+    missing scheme is added, and anything that is not an https host is refused
+    here with a message that says which setting is wrong. `SupabaseConfiguration`
+    on the Swift side already does the same job for the same reason — a URL is
+    one of the few settings that can be wrong in a way that still looks right.
+    """
+    text = value.strip().rstrip("/")
+    if "://" not in text:
+        text = f"https://{text}"
+
+    parsed = urllib.parse.urlparse(text)
+    if parsed.scheme != "https" or not parsed.netloc or " " in parsed.netloc:
+        raise ImportError_(
+            f"SUPABASE_URL is not a project URL: {value!r}\n"
+            "  Wanted: https://<project-ref>.supabase.co\n"
+            "  Dashboard: Project Settings -> Data API -> Project URL.\n"
+            "  scripts/verify-accounts.sh checks this shape without printing a value."
+        )
+    return f"https://{parsed.netloc}"
 
 
 def number(value: Any) -> float | None:
@@ -252,9 +283,13 @@ def main() -> int:
     if args.usda:
         sources.append(usda_rows(args.usda, args.limit))
 
-    url, key = ("", "")
-    if not args.dry_run:
-        url, key = load_env()
+    # Loaded even for a dry run. The first version skipped this when nothing was
+    # going to be written, which meant the rehearsal passed and the real run
+    # failed on the one thing the rehearsal existed to catch — a malformed
+    # SUPABASE_URL. A dry run that does not check the environment is not a dry
+    # run of anything.
+    url, key = load_env()
+    print(f"    target: {url}")
 
     total = 0
     batch: list[dict[str, Any]] = []
