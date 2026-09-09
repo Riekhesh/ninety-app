@@ -181,6 +181,28 @@ property of the types rather than a habit of the view.
 > what it means. The Mode section above settles ties the same way — scanability
 > outranks expression on every screen except The Table.
 
+**The Run has one reference line, and it is the pace.**
+`design/spec/02-components.md` §6 reserves the dashed `chartBaseline` for the
+four-week baseline and makes the legend mandatory. On this chart the dashed line
+is the **pace** instead, and the four-week baseline is the figure under the
+headline rather than a second rule. Two dashed references on one plot is a
+legend nobody reads, and of the two the pace is the one the user chose — a
+baseline they did not pick, drawn in the same weight as a target they did, would
+make the chart argue with itself. The rule the spec is actually protecting holds:
+the reference is drawn, it is dashed, it is named in the legend, and the primary
+series keeps `chartLine` because the accent means interactive and a line you
+cannot tap is not.
+
+> **Deviation from the artboards.** `Season.dc.html` labels the raw-series toggle
+> "Show every weigh-in" and puts a WEEK / FORM / AVG / CHANGE table under the
+> chart. The build uses the copy deck's "Show daily readings" — §4 of the deck is
+> the source and the deck wins ties, the same way Under Review took HIGH / MEDIUM
+> / LOW over CLEAR / TIGHT / UNSIGHTED — and the table is a list of individual
+> readings rather than weekly rows. The weekly table is a second aggregation of
+> the same series with no way to act on a row; the reading list is the only place
+> a mistyped weight can be removed, and a mistyped weight drags every trend value
+> after it for as long as it is stored.
+
 **Pre-Season is four screens, and the last one carries two things.** About you ·
 starting weight · goal · your band. The band screen also holds the calibration
 explainer, because finishing the flow is what writes the goal — putting the write

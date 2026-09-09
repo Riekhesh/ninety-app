@@ -54,6 +54,22 @@
 		<string>SairaCondensed-ExtraBold.ttf</string>
 	</array>
 
+	<!-- HealthKit. Both strings are required the moment the entitlement is on,
+	     and an app that asks without them crashes at the authorization call
+	     rather than failing it. They say what is read and what is written, in
+	     the app's own voice: Article 9 consent was given inside Ninety on its own
+	     screen (ADR 0017), and this is the second, narrower thing iOS asks for
+	     on its own behalf.
+
+	     The share string is present and the share set is empty. Ninety reads
+	     body weight and writes nothing back — see `HealthKitBodyMass` — and the
+	     string is here because the key is required for the entitlement rather
+	     than because a write is planned. -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Ninety reads your weight, steps and activity from Apple Health so a smart scale counts as logging and your trend stays up to date without typing.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Ninety does not write anything to Apple Health. It only reads.</string>
+
 	<!-- Which Supabase project this build talks to. Substituted from the build
 	     settings of the same name, which are empty in Config/Ninety.xcconfig and
 	     filled in from the gitignored Config/Local.xcconfig — so a literal value

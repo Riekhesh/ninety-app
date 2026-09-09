@@ -125,6 +125,18 @@ private struct SignedInView: View {
         return SupabaseMealEstimator(stack: stack)
     }
 
+    /// Nil on a device with no health store — the simulator's iPad layouts, and
+    /// anything Apple ships without Health. The Run reads nil as "there is
+    /// nothing to offer here" and says so, rather than showing a button that
+    /// cannot work. It is unrelated to permission, which iOS never reports.
+    private var bodyMass: (any BodyMassSourcing)? {
+        #if canImport(HealthKit)
+        return HealthKitBodyMass()
+        #else
+        return nil
+        #endif
+    }
+
     var body: some View {
         Group {
             switch gate {
@@ -155,6 +167,7 @@ private struct SignedInView: View {
                     recorder: recorder,
                     catalogue: catalogue,
                     estimator: estimator,
+                    bodyMass: bodyMass,
                     onConsentChanged: refresh,
                     onSignOut: { Task { await session.signOut() } }
                 )
@@ -225,6 +238,11 @@ struct MainTabView: View {
     let catalogue: any FoodCatalogueProtocol
     let estimator: (any MealEstimating)?
 
+    /// P1-G's second weight route. Optional for the same reason as the other
+    /// two: a device without a health store still gets the whole of The Run,
+    /// because manual entry is the route that has to work with nothing at all.
+    let bodyMass: (any BodyMassSourcing)?
+
     /// Withdrawing consent from Settings has to reach the gate, not just the
     /// sheet. The shell re-reads the row and puts the consent screen back up.
     var onConsentChanged: () -> Void
@@ -246,7 +264,13 @@ struct MainTabView: View {
                 )
             }
             Tab(Destination.theRun.title, systemImage: Destination.theRun.symbol, value: .theRun) {
-                TheRunView()
+                TheRunView(
+                    model: TheRunModel(
+                        weights: repositories.weight,
+                        profiles: repositories.profile,
+                        health: bodyMass
+                    )
+                )
             }
             if features.showsTheTable {
                 Tab(Destination.theTable.title, systemImage: Destination.theTable.symbol, value: .theTable) {
@@ -305,6 +329,7 @@ private func previewShell() -> MainTabView {
         recorder: ConsentRecorder(profiles: repositories.profile, userID: user),
         catalogue: MockFoodCatalogue(),
         estimator: MockMealEstimator(),
+        bodyMass: MockBodyMassSource(),
         onConsentChanged: {},
         onSignOut: {}
     )

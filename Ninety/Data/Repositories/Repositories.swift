@@ -235,8 +235,31 @@ protocol WeightRepositoryProtocol {
     /// for — "Trend needs a week of readings" — not an error.
     func recent(limit: Int) -> [WeightLog]
 
+    /// Everything measured at or after a moment, **oldest first**.
+    ///
+    /// The opposite order from `recent(limit:)` on purpose: this is what the
+    /// trend is built from, the EWMA walks forward through time, and a reversed
+    /// array reaching `WeightTrend` would produce a line that smooths the past
+    /// toward the present. Sorting at the boundary means no caller has to
+    /// remember which way round the other method hands them.
+    func readings(since moment: Date) -> [WeightLog]
+
     @discardableResult
     func record(kg: Double, at measuredAt: Date, source: WeightSource) throws -> WeightLog
+
+    /// Writes the external readings this store has not already seen.
+    ///
+    /// One call rather than a read, a filter at the call site and a loop of
+    /// writes, because the read and the write have to be the same transaction
+    /// for the duplicate check to mean anything — two syncs racing each other
+    /// would otherwise each find the store empty of the sample they are both
+    /// about to insert. The rule itself is `WeightReconciliation.unseen`, which
+    /// is pure and tested without a store.
+    ///
+    /// Returns what was actually written, which is what lets the screen say
+    /// "nothing new" rather than claiming a sync that added nothing.
+    @discardableResult
+    func importReadings(_ readings: [BodyMassReading], calendar: Calendar) throws -> [WeightLog]
 
     func delete(_ log: WeightLog) throws
 }
