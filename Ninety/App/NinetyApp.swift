@@ -22,6 +22,11 @@ struct NinetyApp: App {
     /// unlaunchable to punish a configuration mistake.
     @State private var session: SessionController
 
+    /// Nil on a clone with no `Config/Local.xcconfig`. Everything that needs the
+    /// network takes it as an optional and has a designed answer for nil, which
+    /// is what keeps a fresh checkout runnable.
+    private let stack: SupabaseStack?
+
     init() {
         TabBarStyle.apply()
         BrandFont.verify()
@@ -36,9 +41,11 @@ struct NinetyApp: App {
         if configuration == nil {
             Log.auth.error("No Supabase project in this build; Config/Local.xcconfig is not filled in.")
         }
-        let service: (any AuthServiceProtocol)? = configuration.map {
-            SupabaseAuthService(configuration: $0)
-        }
+        // One client for the whole process. See `SupabaseStack` for why a
+        // second one would be a second refresh loop over one session.
+        let stack = configuration.map { SupabaseStack(configuration: $0) }
+        self.stack = stack
+        let service: (any AuthServiceProtocol)? = stack.map { SupabaseAuthService(stack: $0) }
         _session = State(initialValue: SessionController(service: service))
 
         Log.app.info("Ninety launched.")
@@ -46,7 +53,7 @@ struct NinetyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(session: session)
+            RootView(session: session, stack: stack)
         }
         .modelContainer(container)
     }

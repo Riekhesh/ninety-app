@@ -98,8 +98,92 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
         return (try? context.fetch(descriptor)) ?? []
     }
 
+    func food(withBarcode barcode: String) -> Food? {
+        let trimmed = barcode.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        // Typed as the optional the column is, rather than relying on the
+        // predicate macro promoting a `String` to `String?` inside a generated
+        // expression. Explicit is cheaper than finding out at runtime that a
+        // comparison never matched.
+        let target: String? = trimmed
+        var descriptor = FetchDescriptor<Food>(predicate: #Predicate { $0.barcode == target })
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor))?.first
+    }
+
+    @discardableResult
+    func saveFood(_ draft: FoodDraft) throws -> Food {
+        let now = Date()
+        let existing = draft.id.flatMap(food(withID:))
+        let food = existing ?? Food(
+            id: draft.id ?? UUID(),
+            createdAt: now,
+            source: draft.source,
+            // Ownership follows the source, and the check constraint in
+            // migration 001 says the same thing: a custom food has an owner and
+            // a catalogue row has none. Setting `created_by` on a cached Open
+            // Food Facts row would make the insert policy reject it as a custom
+            // food somebody else already owns.
+            createdBy: draft.source == .custom ? userID : nil,
+            name: draft.name,
+            kcalPer100g: draft.kcalPer100g
+        )
+
+        food.barcode = draft.barcode
+        food.name = draft.name
+        food.brand = draft.brand
+        food.kcalPer100g = draft.kcalPer100g
+        food.proteinG = draft.proteinG
+        food.carbsG = draft.carbsG
+        food.fatG = draft.fatG
+        food.updatedAt = now
+        if existing == nil { context.insert(food) }
+
+        // Only a custom food is ever pushed. A cached catalogue row is a local
+        // copy of something the server already has, and syncing it back would
+        // be the client trying to write a row its own RLS policy refuses.
+        if draft.source == .custom {
+            Outbox(context: context, userID: userID)
+                .enqueue(existing == nil ? .insert : .update, tableName: "foods", id: food.id, at: now)
+        }
+        try context.save()
+        return food
+    }
+
+    func recentLogs(since moment: Date, limit: Int) -> [FoodLog] {
+        let id = userID
+        var descriptor = FetchDescriptor<FoodLog>(
+            predicate: #Predicate { $0.userID == id && $0.loggedAt >= moment },
+            sortBy: [SortDescriptor(\.loggedAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = limit
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
     @discardableResult
     func log(_ draft: FoodLogDraft) throws -> FoodLog {
+        try write(draft, estimate: nil)
+    }
+
+    @discardableResult
+    func log(_ draft: FoodLogDraft, estimate: PhotoEstimateDraft) throws -> FoodLog {
+        try write(draft, estimate: estimate)
+    }
+
+    func photoEstimates(limit: Int) -> [PhotoEstimate] {
+        let id = userID
+        var descriptor = FetchDescriptor<PhotoEstimate>(
+            predicate: #Predicate { $0.userID == id },
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        descriptor.fetchLimit = limit
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    /// The one write path, so the estimate cannot land without its log or the
+    /// log without its estimate. Both objects are inserted before the single
+    /// `save`, which is what makes the pair atomic rather than merely adjacent.
+    private func write(_ draft: FoodLogDraft, estimate: PhotoEstimateDraft?) throws -> FoodLog {
         let now = Date()
         let entry = FoodLog(
             userID: userID,
@@ -113,10 +197,33 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
             food: draft.food
         )
         context.insert(entry)
-        Outbox(context: context, userID: userID)
-            .enqueue(.insert, tableName: "food_logs", id: entry.id, at: now)
+        let outbox = Outbox(context: context, userID: userID)
+        outbox.enqueue(.insert, tableName: "food_logs", id: entry.id, at: now)
+
+        if let estimate {
+            let record = PhotoEstimate(
+                userID: userID,
+                createdAt: now,
+                updatedAt: now,
+                storagePath: estimate.storagePath,
+                modelOutput: estimate.modelOutput,
+                confidence: estimate.confidence,
+                wasCorrected: estimate.wasCorrected,
+                correctionDelta: estimate.correctionDelta,
+                log: entry
+            )
+            context.insert(record)
+            outbox.enqueue(.insert, tableName: "photo_estimates", id: record.id, at: now)
+        }
+
         try context.save()
         return entry
+    }
+
+    private func food(withID id: UUID) -> Food? {
+        var descriptor = FetchDescriptor<Food>(predicate: #Predicate { $0.id == id })
+        descriptor.fetchLimit = 1
+        return (try? context.fetch(descriptor))?.first
     }
 
     func update(_ log: FoodLog, grams: Double, kcal: Double, at moment: Date) throws {

@@ -63,6 +63,99 @@ struct FoodLogDraft {
     }
 }
 
+/// A food about to be created or cached locally.
+///
+/// Two jobs, deliberately one type. A custom food the user typed on the manual
+/// route and an Open Food Facts row that arrived from search or a barcode scan
+/// are the same row in `public.foods` — they differ only in `source` and in who
+/// owns them — so a second draft type would be two shapes for one table.
+///
+/// **`id` is carried rather than generated when it is known.** A catalogue row
+/// cached from the server keeps the server's id, which is what stops the same
+/// food arriving twice under two local identities after two searches. A custom
+/// food has no server row yet, so it passes nil and the store mints one.
+struct FoodDraft {
+    /// The server's id for a catalogue row; nil for something typed here.
+    var id: UUID?
+    var source: FoodSource
+    var barcode: String?
+    var name: String
+    var brand: String?
+    var kcalPer100g: Double
+    var proteinG: Double?
+    var carbsG: Double?
+    var fatG: Double?
+
+    init(
+        id: UUID? = nil,
+        source: FoodSource,
+        barcode: String? = nil,
+        name: String,
+        brand: String? = nil,
+        kcalPer100g: Double,
+        proteinG: Double? = nil,
+        carbsG: Double? = nil,
+        fatG: Double? = nil
+    ) {
+        self.id = id
+        self.source = source
+        self.barcode = barcode
+        self.name = name
+        self.brand = brand
+        self.kcalPer100g = kcalPer100g
+        self.proteinG = proteinG
+        self.carbsG = carbsG
+        self.fatG = fatG
+    }
+}
+
+/// What the vision model said, alongside what the user decided.
+///
+/// ADR 0010's condition for folding the photo benchmark into Phase 1: the photo
+/// and the model's output are kept next to the confirmed values, so the 21 days
+/// produce the dataset rather than a separate evening's collection. All five
+/// fields are written in the same transaction as the log they belong to — a
+/// `photo_estimates` row written afterwards is one that can be missing.
+///
+/// `wasCorrected` is written on **every** pass, including the passes where the
+/// user changed nothing. A dataset that only records corrections cannot tell
+/// "the model was right" from "nobody looked".
+struct PhotoEstimateDraft {
+    var storagePath: String
+    /// The model's structured output, whole and unedited.
+    var modelOutput: Data
+    /// 0...1, surfaced as HIGH / MEDIUM / LOW.
+    var confidence: Double?
+    var wasCorrected: Bool
+    /// Confirmed kcal minus estimated kcal. Signed: the direction is the
+    /// interesting half, because a model that is consistently under is a
+    /// different problem from one that is noisy.
+    var correctionDelta: Double?
+}
+
+/// One food the user actually eats, with how often and how it was last logged.
+///
+/// The Squad and the Bench are both made of these. Keyed on the **name
+/// snapshot** rather than on a food id, and that is the load-bearing choice: a
+/// quick-add by calories has no food row at all, and a catalogue row can be
+/// deleted underneath a log. Grouping on the snapshot means both still appear on
+/// the team sheet, which is the difference between a feature that works for the
+/// user's own vocabulary and one that only works for packaged food.
+struct FoodHabit: Identifiable, Equatable, Sendable {
+    /// The name is the identity. See the note above.
+    var id: String { name }
+
+    let name: String
+    /// How many times it has been logged in the window. The artboard's "APPS".
+    let appearances: Int
+    let lastLoggedAt: Date
+    /// The portion it was last logged at, which is what a tap repeats.
+    let grams: Double
+    let kcal: Double
+    /// Nil for a quick-add, and for a log whose food row has gone.
+    let foodID: UUID?
+}
+
 /// Everything about the profile, including the values the §10 gates read.
 @MainActor
 protocol ProfileRepositoryProtocol {
@@ -89,10 +182,44 @@ protocol FoodRepositoryProtocol {
     /// The full mirror lives in Postgres and is not copied to the phone.
     func foods(matching query: String, limit: Int) -> [Food]
 
+    /// A cached or custom food carrying this barcode, if the phone has one.
+    ///
+    /// Checked before the network on the barcode route, because a scan in a
+    /// supermarket aisle is the case with the worst signal and the least
+    /// patience. A second scan of the same tin should never wait on anything.
+    func food(withBarcode barcode: String) -> Food?
+
+    /// Creates a custom food, or caches a catalogue row the server returned.
+    ///
+    /// Upserts on the draft's id when it has one, so a catalogue row that comes
+    /// back from three searches is cached once rather than three times.
+    @discardableResult
+    func saveFood(_ draft: FoodDraft) throws -> Food
+
+    /// The logs behind the Squad and the Bench, newest first.
+    ///
+    /// Raw logs rather than a computed team sheet, because the interesting part
+    /// — how frequency and recency are ranked against each other — is a rule
+    /// worth testing without a store. `TeamSheet` is where it lives.
+    func recentLogs(since moment: Date, limit: Int) -> [FoodLog]
+
     /// Writes locally and returns. §2.3's lock is set from `loggedAt` here and
     /// never moved afterwards.
     @discardableResult
     func log(_ draft: FoodLogDraft) throws -> FoodLog
+
+    /// A log and the estimate that produced it, in one write.
+    ///
+    /// One call rather than two so the pair cannot come apart: an estimate row
+    /// written after a successful log is one that a crash, a signal drop or a
+    /// user closing the sheet can lose, and the benchmark dataset ADR 0010 is
+    /// paying for is exactly the pair.
+    @discardableResult
+    func log(_ draft: FoodLogDraft, estimate: PhotoEstimateDraft) throws -> FoodLog
+
+    /// Every estimate kept alongside its confirmed log, newest first. The
+    /// benchmark export reads this and nothing else does.
+    func photoEstimates(limit: Int) -> [PhotoEstimate]
 
     /// Refuses after the 48-hour window. The moment is a parameter so the rule
     /// can be tested without waiting two days or moving the device clock.

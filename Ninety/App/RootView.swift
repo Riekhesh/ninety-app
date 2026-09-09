@@ -10,6 +10,11 @@ import SwiftUI
 struct RootView: View {
     let session: SessionController
 
+    /// Nil on a clone with no Supabase project. Carried down rather than reached
+    /// for from a singleton, so the one place that decides whether the network
+    /// exists is `NinetyApp` and every screen below is handed the answer.
+    let stack: SupabaseStack?
+
     var body: some View {
         Group {
             switch session.state {
@@ -18,7 +23,7 @@ struct RootView: View {
             case .unconfigured, .signedOut:
                 SignInView(session: session)
             case .signedIn(let userID):
-                SignedInView(userID: userID, session: session)
+                SignedInView(userID: userID, session: session, stack: stack)
             }
         }
         .task { await session.start() }
@@ -62,6 +67,7 @@ struct LaunchHold: View {
 private struct SignedInView: View {
     let userID: UUID
     let session: SessionController
+    let stack: SupabaseStack?
 
     @Environment(\.modelContext)
     private var context
@@ -100,6 +106,25 @@ private struct SignedInView: View {
         ConsentRecorder(profiles: repositories.profile, userID: userID)
     }
 
+    /// A build with no project in it still gets a search screen: the local
+    /// catalogue answers, the third section is simply always empty, and the note
+    /// under it says what is on the phone is what there is. That is the same
+    /// screen the app shows on the Underground, so it is a state that has to
+    /// work anyway.
+    private var catalogue: any FoodCatalogueProtocol {
+        if let stack { return SupabaseFoodCatalogue(stack: stack) }
+        return EmptyFoodCatalogue()
+    }
+
+    /// Nil rather than an empty stand-in, because there is nothing honest for a
+    /// stand-in to return: a photo estimate either happened or it did not. The
+    /// route reads nil as "this build has no project in it" and says so, which
+    /// is the same answer the sign-in screen gives for the same cause.
+    private var estimator: (any MealEstimating)? {
+        guard let stack else { return nil }
+        return SupabaseMealEstimator(stack: stack)
+    }
+
     var body: some View {
         Group {
             switch gate {
@@ -128,6 +153,8 @@ private struct SignedInView: View {
                 MainTabView(
                     repositories: repositories,
                     recorder: recorder,
+                    catalogue: catalogue,
+                    estimator: estimator,
                     onConsentChanged: refresh,
                     onSignOut: { Task { await session.signOut() } }
                 )
@@ -191,6 +218,13 @@ struct MainTabView: View {
     let repositories: Repositories
     let recorder: ConsentRecorder
 
+    /// P1-F's two network dependencies. Both are optional in effect — the
+    /// catalogue degrades to what the phone holds, and a nil estimator turns the
+    /// photo route into a screen that says why it is not available — because
+    /// three of the four logging routes must work with no signal at all.
+    let catalogue: any FoodCatalogueProtocol
+    let estimator: (any MealEstimating)?
+
     /// Withdrawing consent from Settings has to reach the gate, not just the
     /// sheet. The shell re-reads the row and puts the consent screen back up.
     var onConsentChanged: () -> Void
@@ -222,7 +256,11 @@ struct MainTabView: View {
         }
         .tint(Ninety.Colour.accent)
         .sheet(isPresented: $isSubbingOn) {
-            SubOnSheet()
+            SubOnSheet(
+                repositories: repositories,
+                catalogue: catalogue,
+                estimator: estimator
+            )
         }
         .sheet(isPresented: $isShowingSettings) {
             SettingsView(
@@ -265,6 +303,8 @@ private func previewShell() -> MainTabView {
     return MainTabView(
         repositories: repositories,
         recorder: ConsentRecorder(profiles: repositories.profile, userID: user),
+        catalogue: MockFoodCatalogue(),
+        estimator: MockMealEstimator(),
         onConsentChanged: {},
         onSignOut: {}
     )

@@ -10,6 +10,9 @@ boundary, scaffolded so the purity lint has something to police), and ADR 0015 s
 the type decision that blocked every view ticket. P1-D added `Ninety/Safety/`, which is
 where §10's S1–S7 live as types rather than as review notes — if you are touching a
 calorie target, a goal weight, a rate of loss or an age check, that is the directory.
+P1-F closed on 9 September with all four logging routes on a real device; `supabase/
+functions/` and `Ninety/Features/SubOn/` are its two halves. **The next ticket is P1-G's
+weight-entry surface, which is the only thing left before the 21-day clock can start.**
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -50,7 +53,7 @@ docs/
   phase-1/     the LIVE tracker. Exit criteria, the running order, the 21-day clock.
                jira-import.csv seeded the board — 11 epics, 60 issues
   phase-0/     closed tracker. accounts.md is a runbook, not reading
-  decisions/   18 ADRs. Index first, then one file. Never renumber
+  decisions/   19 ADRs. Index first, then one file. Never renumber
   safety/      §10 as numbered rules S1-S7 with test names. Load-bearing for Phase 1
   security/    secrets policy. The anon key is public; RLS is the security boundary
 
@@ -60,6 +63,12 @@ design/
   preview/     design-system.html — the visual reference
   spec/        principles, component specs, copy deck (17 phrases banned at lint-error)
   redesign/    the MATCHDAY world: six screens as .dc.html + rendered PNGs
+
+supabase/
+  migrations/  applied in filename order by `supabase db push`. RLS is IN migration 001
+  functions/   estimate-meal — the photo route's server half. The model API key lives
+               here and nowhere else (§04). `deno test supabase/functions` in CI
+  tests/       the two-account RLS proof. scripts/verify-rls.sh boots its own Postgres
 
 spikes/        THROWAWAY de-risking code, not app code. Different quality bar
   vision-accuracy/   photo->calorie harness. Runs, scores, reports. Python
@@ -99,6 +108,15 @@ docs and design commits never spend the 200-minute budget.
   than reporting $0.00. Don't reintroduce a zero default.
 - **Photos and ground truth are gitignored.** Article 9 health data. Reports are
   committed; the data is not.
+- **The confirmed values from the app are not weighed ground truth** (ADR 0019). They
+  measure how far a human moved the model, which is real and useful; they are not the
+  accuracy baseline, and `spikes/vision-accuracy`'s own rules say why. The 20 weighed
+  meals are still outstanding.
+- **The portion drives the numbers, not the other way round.** A catalogue row
+  knows kcal per 100 g and nothing else; `PortionBasis` scales it. The screen
+  that did not do this logged 200 g of food at 100 g of energy for a day.
+- **A range is a figure and a tolerance, never a dash** — `1,850 ±100`, not
+  `1,750–1,950`. `DESIGN.md` § Numbers, and `SafetyCopyTests` checks it.
 
 ---
 
@@ -107,6 +125,8 @@ docs and design commits never spend the 200-minute budget.
 ```bash
 python3 design/tokens/generate.py --check      # CI runs this
 python3 -m pytest spikes/vision-accuracy/tests -q
+deno test supabase/functions                   # the Edge Function contract
+scripts/verify-rls.sh                          # boots a throwaway Postgres, 33 assertions
 scripts/verify-toolchain.sh                    # macOS only
 scripts/verify-accounts.sh                     # reads .env, never prints a value
 ```

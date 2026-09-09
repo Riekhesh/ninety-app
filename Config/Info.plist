@@ -68,6 +68,20 @@
 	<key>NinetySupabaseAnonKey</key>
 	<string>$(SUPABASE_ANON_KEY)</string>
 
+	<!-- P1-F. The camera is used by two routes and by nothing else: VisionKit's
+	     barcode scanner and the meal photograph. The string is what iOS shows in
+	     the permission alert, so it says what the camera is for rather than
+	     asking for access in the abstract — "Ninety needs camera access" is the
+	     wording people decline.
+
+	     There is deliberately no NSPhotoLibraryUsageDescription. PhotosPicker is
+	     PHPickerViewController, which runs out of process and hands back only
+	     what the user picked, so it needs no library permission at all — asking
+	     for one would be requesting access to every photo on the phone in order
+	     to read the one they chose. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Ninety uses the camera to scan a barcode or photograph a meal. Photos are only sent for an estimate when you take one.</string>
+
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

@@ -89,6 +89,45 @@ begin
     values ('meal-photos', account_a::text || '/lunch.jpg', account_a);
 
   reset role;
+
+  -- ── P1-F's photo cap, claimed the way the Edge Function claims it ──────
+  --
+  -- Deliberately NOT an insert as `authenticated`: there is no insert policy
+  -- on this table and no grant, so the client cannot write its own quota row
+  -- at all. That is the whole reason §10's cap is server-side rather than a
+  -- number in the app, and it is asserted below.
+  --
+  -- Claiming it here also exercises the function itself, which is the one piece
+  -- of P1-F's backend that a unit test cannot reach: the atomic
+  -- test-and-increment is a property of one SQL statement, and a read-then-write
+  -- version would pass every test that did not run two of them at once.
+  declare
+    claimed int;
+  begin
+    for i in 1..5 loop
+      claimed := claim_photo_estimate(account_a, 5);
+    end loop;
+
+    if claimed = 5 then
+      passed := passed + 1;
+      raise notice '  PASS  the photo cap counts up to its limit';
+    else
+      failures := failures || ('claim_photo_estimate returned ' || claimed || ' on the fifth call, expected 5');
+      raise notice '  FAIL  the photo cap counted to % rather than 5', claimed;
+    end if;
+
+    -- The sixth is refused, and refused by the same statement that increments,
+    -- so two concurrent requests cannot both pass the check.
+    claimed := claim_photo_estimate(account_a, 5);
+    if claimed < 0 then
+      passed := passed + 1;
+      raise notice '  PASS  the photo cap refuses past its limit';
+    else
+      failures := failures || ('the photo cap allowed a claim past its limit (returned ' || claimed || ')');
+      raise notice '  FAIL  the photo cap allowed claim % past its limit', claimed;
+    end if;
+  end;
+
   raise notice '  seeded: account A owns a row in every table';
   raise notice '';
 
@@ -110,6 +149,7 @@ begin
         ('health_samples',      'select count(*) from health_samples where user_id = ' || quote_literal(account_a)),
         ('weekly_scores',       'select count(*) from weekly_scores where user_id = ' || quote_literal(account_a)),
         ('sync_outbox',         'select count(*) from sync_outbox where user_id = ' || quote_literal(account_a)),
+        ('photo_estimate_usage','select count(*) from photo_estimate_usage where user_id = ' || quote_literal(account_a)),
         ('storage.objects',     'select count(*) from storage.objects where owner = ' || quote_literal(account_a))
       ) as t(tbl, stmt)
     loop
@@ -193,7 +233,14 @@ begin
            || quote_literal(account_a) || ', current_date + 30, 99999)'),
         ('upload a photo into A''s folder',
          'insert into storage.objects (bucket_id, name) values (''meal-photos'', '
-           || quote_literal(account_a::text || '/stolen.jpg') || ')')
+           || quote_literal(account_a::text || '/stolen.jpg') || ')'),
+        -- The cap is only a cap while the client cannot write the ledger. There
+        -- is no insert or update policy on this table at all, so RLS denies —
+        -- which is the safe direction to fail and the whole reason §10's limit
+        -- is server-side rather than a number in the app.
+        ('write its own photo quota',
+         'insert into photo_estimate_usage (user_id, day, requests) values ('
+           || quote_literal(account_b) || ', current_date, 0)')
       ) as t(what, stmt)
     loop
       label := 'B cannot ' || r.what;
@@ -266,6 +313,32 @@ begin
       failures := failures || 'the shared food catalogue is not readable by other users';
       raise notice '  FAIL  B cannot read the shared food catalogue';
     end if;
+  end;
+
+  -- ── P1-F Path 1: the ranked search, still as account B ─────────────────
+  --
+  -- A smoke test rather than a relevance test: what it catches is the class of
+  -- failure that only shows up against a real Postgres — a parameter name
+  -- colliding with a column, a tsquery parser that raises on ordinary
+  -- punctuation, a function the client cannot execute. None of that is
+  -- reachable from a Swift test, because none of it is Swift.
+  declare
+    seen int;
+  begin
+    execute 'select count(*) from search_foods(''own recipe'', 10)' into seen;
+    if seen >= 1 then
+      passed := passed + 1;
+      raise notice '  PASS  search_foods returns a ranked match';
+    else
+      failures := failures || 'search_foods returned nothing for a phrase in a seeded food';
+      raise notice '  FAIL  search_foods found nothing';
+    end if;
+
+    -- A search box receives this. `to_tsquery` would raise a syntax error on
+    -- it; `websearch_to_tsquery` is why the function does not.
+    execute 'select count(*) from search_foods(''!! & "" recipe'', 10)' into seen;
+    passed := passed + 1;
+    raise notice '  PASS  search_foods survives punctuation a user can type';
   end;
 
   reset role;
