@@ -87,7 +87,7 @@ requirements rather than Phase 3 polish, and the phase should not be able to clo
 a gate quietly deferred.
 
 - [ ] **21 consecutive days of real data logged** — non-negotiable, and the phase's actual purpose
-- [ ] **All four logging routes work, offline included** — the brief says three paths; the redesign adds manual as a fourth, and it is the one that starts the clock
+- [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design, but neither has been exercised with the radio actually off, and nothing drains the outbox yet. That half belongs with P1-I's airplane-mode day and is deliberately not ticked here — the criterion says *offline included* and half a criterion is not a closed one
 - [ ] **HealthKit incremental sync with a persisted anchor** — proven the way Spike A proved it: 56,764 samples on a first read, ~0 on the next
 - [ ] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series
 - [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect
@@ -111,7 +111,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-C** Authentication | **CLOSED 8 Sep.** Sign in with Apple through Supabase's id-token exchange, Article 9 consent recorded separately from ToS. Verified on a real device against the live project | High |
 | **P1-D** Pre-Season: onboarding & the §10 gates | **CLOSED 8 Sep.** All ten stories, compiled, 104 tests green, walked on a real device. Onboarding, the band, S1–S7, the Settings screen, and the calibration window — now seven days (ADR 0018) | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
-| **P1-F** Sub On: food logging, four routes | **All seven stories written, 8 Sep — not compiled.** Manual, search, barcode, photo, the Squad and the Bench, the mandatory Under Review screen, the Edge Function and its per-user cap. The food mirror lands with it as an import job | High |
+| **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
 | **P1-G** The Run: weight & trend | Manual + HealthKit, 7-day EWMA, pace against the chosen rate | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
 | **P1-I** Offline-first sync | Outbox, last-write-wins, airplane-mode verification | High |
@@ -147,10 +147,10 @@ order laid out visually, is published at
    `docs/safety/`. It carried the first Settings surface, which is where S6's opt-out,
    S7's signposting and P1-C's consent withdrawal all live. See
    [what P1-D landed](#p1-d--what-landed).
-5. **Kick off.** Manual food entry and a weight-entry surface — the two things that are
-   actually missing. Record day 1.
-6. **Everything else, underneath a running clock**, in this order: **P1-I · P1-H · P1-E ·
-   P1-G**, then P1-J and P1-X. Sync is second rather than
+5. **Kick off.** ~~Manual food entry~~ **done — P1-F, 9 Sep** — and a weight-entry
+   surface, which is the one thing still missing. Record day 1.
+6. **Everything else, underneath a running clock**, in this order: **P1-G · P1-I · P1-H
+   · P1-E**, then P1-J and P1-X. Sync is second rather than
    last for two reasons: three weeks of the only irreplaceable asset in the project
    currently live on one phone with nothing draining the outbox, and the airplane-mode
    criterion needs real logging days to reconcile, so it has to happen *during* the clock.
@@ -171,6 +171,22 @@ order laid out visually, is published at
 >
 > What this does move is P1-B's food mirror, which is now a prerequisite of two of the
 > four routes rather than a deferred story: search and barcode both resolve against it.
+
+> **Changed 9 September: P1-G moved to the front of step 6.** The order was P1-I · P1-H
+> · P1-E · P1-G, on the reasoning that sync protects three weeks of irreplaceable data
+> and HealthKit is retroactive. Both still hold — but with P1-F closed, **weight entry is
+> the only thing left between here and day 1**, and this file has said so since 8
+> September without the order reflecting it: *"P1-J's own criterion is 'real food, real
+> weight', so a weight-entry surface is part of day 0, not part of P1-G's chart work."*
+>
+> Food can be logged today and is not being counted, because half the pair does not
+> exist. Everything in the old order is a thing that improves a clock that is already
+> running; P1-G is the thing that starts it. Nothing else has that property, and the
+> twenty-one days are the one cost no effort compresses.
+>
+> **Only the weight-entry half is day 0.** The 7-day EWMA, the chart and the pace against
+> the chosen rate are P1-G's own work and can land underneath the clock like everything
+> else.
 
 ---
 
@@ -258,7 +274,7 @@ live project (`sxaewrpojdadywuybzhz`, London, Postgres 17).
 | RLS policies, tested with two real accounts | ✔ 27 assertions, `scripts/verify-rls.sh`, in CI on every schema change |
 | SwiftData models as the local source of truth | ✔ Eight `@Model` types, versioned schema, migration plan |
 | Protocol-based repositories with mocks | ✔ Four protocols, SwiftData and mock implementations |
-| Mirror Open Food Facts + USDA | **Written with P1-F** — `scripts/import_food_mirror.py`, plus the ranked `search_foods` function. Not yet run against the live project |
+| Mirror Open Food Facts + USDA | **Done 9 Sep** — 142,068 UK-tagged foods in the live project, plus the ranked `search_foods` function. A scanned tin resolves against it |
 
 **The mirror is deferred to sit alongside P1-F.** It is 8 of the epic's 28
 points and nothing in the minimum daily-usable set needs it: manual entry is
@@ -626,22 +642,57 @@ worth scanning against, and it is smaller as well as more relevant.
 
 ---
 
-### What has to happen on a Mac before this closes
+### Closed 9 September, on a device, against the live project
 
-1. ⌘U. The suite is 62 new tests across four suites plus one added to
-   `SafetyCopyTests`, none of which has executed. The Deno tests (7) run on Ubuntu in
-   CI and have not run here either — there is no Deno in this container.
-2. Walk each of the four routes on a device, and log a real meal through each.
-3. `supabase db push` for migrations 005 and 006, then `supabase functions deploy
-   estimate-meal` with `GEMINI_API_KEY` set. `supabase/functions/README.md` is the
-   runbook.
-4. ~~Run `scripts/import_food_mirror.py --dry-run` against a real Open Food Facts
-   export.~~ **Done.** Re-run with `--country united-kingdom` — see above.
-5. Record the measured photo latency. The spike saw 1.9–3.1 s; the app measures it
-   client-side with the upload included, so the figure will be larger and the
-   difference is the interesting part.
-6. Capture Sub On and Under Review at `.xSmall` and `.accessibility5`. Both ship
-   `.accessibility5` previews; neither has been looked at.
+All four routes walked on a real phone. What that run actually established, and
+what it did not:
+
+| | |
+|---|---|
+| ⌘U | 175 tests green, across 19 suites. 71 of them new |
+| Manual | A real meal logged, killed the app, still there on relaunch |
+| Search | Resolves against 142,068 UK-tagged foods through `search_foods` |
+| Barcode | A tin off the shelf resolves and fills in the portion screen |
+| Photo | End-to-end round trip: capture → Storage → Edge Function → Under Review → confirmed. *"Works surprisingly well"* |
+| The Squad | A food logged twice moves up and repeats on one tap |
+| Migrations 005–006 | Applied to the live project |
+| `estimate-meal` | Deployed, Gemini, with the daily cap live |
+
+**Three things it did not establish**, listed because a device run is only worth
+what it actually exercised:
+
+- **Nothing has been logged with the radio off.** Manual is offline by
+  construction and search degrades by design, but neither has been *seen* to.
+  That is P1-I's airplane-mode day and the exit criterion stays open for it.
+- **The photo latency was not recorded.** The spike measured 1.9–3.1 s
+  server-side; the app measures it client-side with the upload included, and the
+  difference is the interesting part. `Log.data` writes it on every estimate —
+  it needs one Console read, not new code.
+- **Sub On and Under Review have not been captured at `.xSmall` or
+  `.accessibility5`.** Both ship the previews; nobody has looked at them. Same
+  outstanding item P1-A carried into P1-H for Matchday.
+
+---
+
+### What the first build session cost, and what it caught
+
+Seven rounds between "written" and "closed", which is the honest number and the
+argument for not treating a written epic as a finished one. Five were the
+environment; two were real defects the tests could not have found.
+
+| Round | What |
+|---|---|
+| 1 | `PhotosPicker`'s `@ViewBuilder label:` is not `@MainActor` under Swift 6 — the only construct in P1-F that produced an isolation error. Replaced with the `.photosPicker` modifier |
+| 2 | Nine `@ViewBuilder` attributes on the wrong line for SwiftLint's `attributes` rule, two four-member tuples, and a stored `static let [String: Any]` that is not expressible under Swift 6 |
+| 3 | Two meal-period fixtures written in UTC when they meant local time. **The fixture, not `MealPeriod`** — the criterion's own test passed throughout |
+| 4 | `SUPABASE_URL` pasted as the REST endpoint. The importer now normalises it, and the dry run — which had skipped the environment check entirely — now rehearses the thing the real run fails on |
+| 5 | A python.org Python with an empty trust store. Named as a remedy rather than worked around: an unverified SSL context would downgrade the only thing protecting a service-role key in flight |
+| 6 | **The portion screen was logging 200 g of food at 100 g of energy.** Found by using it. See above |
+| 7 | `--limit` importing the wrong two hundred thousand foods — a working scanner against a full table that could not contain the tin |
+
+Rounds 6 and 7 are the ones worth the session. Neither is reachable from a test
+suite: the first needed somebody to type a number into a field and look at the
+result, the second needed a real barcode on a real tin.
 
 ---
 
@@ -649,7 +700,7 @@ worth scanning against, and it is smaller as well as more relevant.
 
 | | |
 |---|---|
-| Open Food Facts + USDA mirror | ~~Moved out of P1-B to land with P1-F's search route.~~ **Landed with P1-F, 8 Sep** — `scripts/import_food_mirror.py` and the ranked `search_foods` function. Written, not yet run against a real export |
+| Open Food Facts + USDA mirror | ~~Moved out of P1-B to land with P1-F's search route.~~ **Landed and loaded with P1-F, 9 Sep** — 142,068 UK-tagged rows via `scripts/import_food_mirror.py`, searched through the ranked `search_foods` function |
 | Ranking maths, tiers, anti-gaming | Phase 2. `Packages/RankingEngine` is scaffolded now only so the lint purity rules have a boundary to police |
 | The scoring half of S3 | Phase 2 — progress score peaking at target rate |
 | The photo-accuracy benchmark | **Deferred 8 September, no date.** `spikes/vision-accuracy` needs 20 **weighed** meals, and that assumes cooking and portioning everything yourself — it does not survive eating out or being cooked for, which is most real meals. It is explicitly not a gate (the harness README: *"Whenever. Not a gate."*) because the estimate is always presented as a helper with ranges and one-tap correction, so a missing number changes nothing that ships. Picked up when there is a run of meals it can honestly be built from |
@@ -751,38 +802,54 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **[ticket]**. Everything below is verified on a real device as of
-> 8 September **except P1-F**, which is written and has never been compiled — the line
-> below says so, and the distinction is load-bearing: the first ⌘U on P1-B found a bug
-> that broke every write in the app.
+> Currently working on: **[ticket]**. Everything below is verified on a real device
+> against the live project as of 9 September — not written-but-unbuilt. Where something
+> is written and not yet run, it says so.
 >
 > P1-A is closed: the project builds, the type decision is ADR 0015 (Dynamic Type, two
 > bundled faces), the shell is three tabs with Sub On as a sheet, and `DESIGN.md` is the
-> authority on how the world is built. P1-B is closed: migrations are applied to the live
-> project, RLS is proven with two accounts, the SwiftData models and repositories are
-> green, and the food mirror landed with P1-F. P1-C is closed: Sign in with Apple is the
-> only identity route (ADR 0016), and the app will not start until Article 9 health
-> consent is recorded separately from terms acceptance (ADR 0017). Every repository is
-> built from the signed-in user's id via `Repositories.live(context:userID:)`.
+> authority on how the world is built. P1-B is closed: migrations applied, RLS proven
+> with two accounts, SwiftData models and repositories green, and the food mirror loaded
+> — 142,068 UK-tagged foods. P1-C is closed: Sign in with Apple is the only identity
+> route (ADR 0016), and the app will not start until Article 9 health consent is recorded
+> separately from terms acceptance (ADR 0017). Every repository is built from the
+> signed-in user's id via `Repositories.live(context:userID:)`.
 >
 > **P1-D is closed.** Onboarding, the band, S1–S7 as types in `Ninety/Safety/`, the
 > seven-day calibration window (ADR 0018) — and **there is a Settings screen**: a sheet
 > from Matchday's masthead carrying the competitive opt-out, the support signposting,
-> both consent switches and sign out, in that order, with `CompetitiveOptOutTests`
-> asserting the order because the two-tap requirement depends on it.
+> both consent switches and sign out, in that order.
 >
-> **P1-F is written and not yet compiled.** All four logging routes, the Squad and the
-> Bench, the mandatory Under Review screen, the `estimate-meal` Edge Function with its
-> server-side daily cap, and the food-mirror import job. The SQL half is verified against
-> a real Postgres (33 RLS assertions, 11 tables); the Swift half has never been built.
-> **The next Mac session is ⌘U and a walk through all four routes** — see
-> [what has to happen on a Mac](#what-has-to-happen-on-a-mac-before-this-closes).
+> **P1-F is closed (9 Sep).** All four logging routes walked on a real phone: manual,
+> search against the mirror, barcode off a real tin, and photo end-to-end through the
+> `estimate-meal` Edge Function to the mandatory Under Review screen. Plus the Squad and
+> the Bench, a Today list with correction and removal inside §2.3's 48-hour window, and
+> the per-user daily photo cap enforced server-side. 175 tests, 19 suites.
+>
+> **The next ticket is P1-G, and specifically its weight-entry half.** The running order
+> was changed on 9 September to put it first: with P1-F done, weight entry is the only
+> thing between here and day 1 of the clock, because P1-J's criterion is "real food,
+> **real weight**". Onboarding writes one `WeightLog` and The Run is still a holding
+> screen. The EWMA, the chart and the pace against the chosen rate are the rest of P1-G
+> and can land underneath a clock that is already running.
+>
+> **Three things P1-F left open, none of them blocking:** nothing has been logged with
+> the radio off (P1-I's airplane-mode day, and the exit criterion stays open for it); the
+> photo latency has not been read out of `Log.data` yet; and Sub On and Under Review have
+> not been captured at `.xSmall` or `.accessibility5`.
+>
+> **One product question parked for P1-H:** whether Ninety grows real meal slots
+> (breakfast / lunch / dinner) or keeps First Half / Second Half. The Today list
+> currently groups by half, which costs no column — the half is a pure function of
+> `logged_at`. Real slots mean a migration and a Postgres enum, so it is a decision to
+> make with the dashboard in front of you rather than a patch.
 >
 > Requirements: offline-first (the UI never waits on network), RLS on every table, photo
 > estimates always show ranges + confidence and require user confirmation. Ranges render
-> as a figure plus a tolerance, never two numbers joined by a dash. The safety rules in
-> `docs/safety/` are Phase 1 requirements, not Phase 3 polish. Design tokens are
-> generated — edit `ninety.tokens.json`, never the Swift.
+> as a figure plus a tolerance, never two numbers joined by a dash. The portion drives
+> the calories, never the reverse. The safety rules in `docs/safety/` are Phase 1
+> requirements, not Phase 3 polish. Design tokens are generated — edit
+> `ninety.tokens.json`, never the Swift.
 
 The board is the source of truth for *what is next*; this file is the source of truth for
 *what closes the phase*.
