@@ -264,6 +264,40 @@ def push(url: str, key: str, rows: list[dict[str, Any]]) -> None:
         raise ImportError_(
             f"insert failed ({error.code}): {error.read().decode()[:400]}"
         ) from None
+    except urllib.error.URLError as error:
+        raise ImportError_(transport_help(error)) from None
+
+
+def transport_help(error: Exception) -> str:
+    """Turn a transport failure into the thing to actually do about it.
+
+    One case is worth naming rather than leaving as a traceback, because it is
+    the machine rather than the code and it will break every other Python tool
+    here in exactly the same way. A python.org install of Python does not use
+    the system keychain: it ships its own OpenSSL with an empty trust store, so
+    every HTTPS call fails with "unable to get local issuer certificate" until
+    the bundled script has been run once. The vision spike hits the same wall
+    the first time it calls a model API.
+
+    Deliberately NOT worked around in code. Passing an unverified SSL context,
+    or quietly pointing this one script at `certifi`, would fix the symptom here
+    and leave the machine broken for everything else — and the first of those
+    turns a transport error into a silent downgrade of the only thing protecting
+    a service-role key in flight.
+    """
+    reason = str(getattr(error, "reason", error))
+    if "CERTIFICATE_VERIFY_FAILED" not in reason:
+        return f"could not reach the server: {reason}"
+
+    version = f"{sys.version_info.major}.{sys.version_info.minor}"
+    return (
+        "TLS certificate verification failed, and this is almost certainly the "
+        "Python install rather than the network.\n"
+        "  A python.org Python ships its own OpenSSL with an empty trust store. "
+        "Run its certificate installer once:\n"
+        f"    /Applications/Python\\ {version}/Install\\ Certificates.command\n"
+        "  Then run this again. Nothing was written."
+    )
 
 
 def main() -> int:
