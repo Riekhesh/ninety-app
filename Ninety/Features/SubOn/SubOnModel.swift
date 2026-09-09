@@ -78,6 +78,21 @@ final class SubOnModel {
     private(set) var squad: [FoodHabit] = []
     private(set) var bench: [FoodHabit] = []
 
+    /// Everything logged today, newest first.
+    ///
+    /// **The screen had no way to see this, and that was the hole.** Four routes
+    /// wrote rows and nothing read them back: the undo strip covered only the
+    /// last entry and vanished the moment anything else was logged, so a Squad
+    /// row tapped twice by accident was permanent. §2.3's forty-eight-hour edit
+    /// window has been in the repository and tested since P1-B and had no
+    /// surface at all.
+    ///
+    /// Deliberately *not* Matchday's team sheet. That is P1-H and it is a
+    /// different screen doing a different job — the band, the Form ring, the
+    /// sparkline, the division. This is the list you check while you are still
+    /// standing in the place you did the logging.
+    private(set) var today: [FoodLog] = []
+
     /// Nil until Pre-Season has produced one. Nil renders as a sentence, never
     /// as a zero: a band nobody computed is a number nobody measured.
     private(set) var band: CalorieBand?
@@ -145,7 +160,10 @@ final class SubOnModel {
         squad = TeamSheet.squad(from: habits, limit: Self.squadLimit)
         bench = TeamSheet.bench(from: habits, excluding: squad, limit: Self.benchLimit)
 
-        loggedTodayKcal = foods.logs(on: moment, calendar: calendar).reduce(0) { $0 + $1.kcal }
+        // Newest first: the thing you just logged, and most likely the thing
+        // you want to correct, is the thing at the top.
+        today = foods.logs(on: moment, calendar: calendar).sorted { $0.loggedAt > $1.loggedAt }
+        loggedTodayKcal = today.reduce(0) { $0 + $1.kcal }
         band = profiles.current().flatMap { profile in
             EnergyTarget.band(
                 for: profile,
@@ -223,6 +241,61 @@ final class SubOnModel {
     @discardableResult
     func cache(_ food: CatalogueFood) -> Food? {
         try? foods.saveFood(food.draft)
+    }
+
+    /// Today's logs, split into the two halves.
+    ///
+    /// This is most of what a meal breakdown would give you, and it costs no
+    /// column: the half is a pure function of `logged_at` in the user's own
+    /// calendar. Whether Ninety ever grows real meal slots is a product
+    /// decision with a migration behind it, and this is deliberately not a
+    /// down-payment on one.
+    func today(in period: MealPeriod) -> [FoodLog] {
+        today.filter { MealPeriod.of($0.loggedAt, calendar: calendar) == period }
+    }
+
+    /// Whether a log is still inside §2.3's window, asked at the model's own
+    /// clock so a view never has to reach for one.
+    func isEditable(_ log: FoodLog) -> Bool {
+        log.isEditable(at: now())
+    }
+
+    /// Correct a portion after the fact.
+    ///
+    /// Refused past forty-eight hours by the repository, which is where the rule
+    /// lives — the copy deck's line says so plainly rather than leaving a
+    /// mysterious disabled control: *"Logs older than 48 hours can't be edited.
+    /// It keeps scores honest."*
+    @discardableResult
+    func update(_ log: FoodLog, grams: Double, kcal: Double) -> Bool {
+        do {
+            try foods.update(log, grams: max(grams, 1), kcal: kcal, at: now())
+            writeFailed = false
+            refresh()
+            return true
+        } catch {
+            writeFailed = true
+            return false
+        }
+    }
+
+    /// Take a log back out, at any point in the window.
+    ///
+    /// The answer to a Squad row tapped twenty times: not a confirmation
+    /// dialogue on the tap, which would cost the one-tap speed the whole screen
+    /// is built on, but a list where the mistake is visible and removable.
+    @discardableResult
+    func delete(_ log: FoodLog) -> Bool {
+        do {
+            try foods.delete(log, at: now())
+            if lastLogged?.id == log.id { lastLogged = nil }
+            writeFailed = false
+            refresh()
+            return true
+        } catch {
+            writeFailed = true
+            return false
+        }
     }
 
     /// Takes the last log back.

@@ -31,6 +31,18 @@ enum SubOnCopy {
         breakfast twice is one tap the second time.
         """
 
+    // MARK: - Today
+
+    static let todayHeading = "Today"
+    static let todayDetail = "Tap to correct"
+    static let nothingLoggedYet = "Nothing logged yet today."
+    static let nothingLoggedDetail = """
+        What you log turns up here, so a tap you did not mean is one you can take straight \
+        back out.
+        """
+    static let editTitle = "Correct it"
+    static let saveEdit = "Save"
+
     /// The band remaining, on the artboard as ROOM LEFT TODAY.
     static let roomLeft = "Room left today"
     static let roomLeftUnknown = "Finish Pre-Season to see your band."
@@ -130,6 +142,12 @@ enum SubOnCopy {
     static let nothingLeftToLog = "Nothing left on the sheet. Retake the photo, or add it yourself."
     static let modelNotesHeading = "What it couldn't tell"
 
+    /// Says where a derived calorie figure came from, so a number that moves
+    /// when you edit a *different* field does not read as the app being broken.
+    static func derivedFrom(kcalPer100g: Double) -> String {
+        "Following the portion, at \(Int(kcalPer100g.rounded())) kcal / 100 g. Change it yourself to stop."
+    }
+
     /// "3 found" — the count beside The Calls heading.
     static func found(_ count: Int) -> String {
         count == 1 ? "1 found" : "\(count) found"
@@ -189,6 +207,8 @@ enum SubOnCopy {
         addMissedItem, addMissedDetail, mealTotal, confirmAction,
         nothingLeftToLog, modelNotesHeading,
         confirmLabel(items: 1), confirmLabel(items: 3),
+        todayHeading, todayDetail, nothingLoggedYet, nothingLoggedDetail,
+        editTitle, saveEdit, derivedFrom(kcalPer100g: 133),
         found(1), found(3), estimated("340 ±50"), appearances(1), appearances(9),
         nudgeLabel(up: true, item: "Greek yogurt", grams: 10),
         nudgeLabel(up: false, item: "Greek yogurt", grams: 10),

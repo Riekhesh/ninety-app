@@ -47,6 +47,19 @@ struct ManualEntryView: View {
     @State private var fatText = ""
     @State private var keepForNextTime = true
 
+    /// Per-100 g figures from whatever found this food. Nil on the typed route,
+    /// where there is nothing to scale from and the user supplies both numbers.
+    @State private var basis: PortionBasis?
+
+    /// True while the calories and macros are being derived from the portion.
+    ///
+    /// One flag rather than one per field, and the mental model is the sentence
+    /// under the calories field: the numbers follow the portion **until you
+    /// change one yourself**, and after that the screen stops rewriting your
+    /// answer. Three independent flags would be more clever and much harder to
+    /// predict, on a screen whose whole job is to be quick.
+    @State private var isDerived = false
+
     var body: some View {
         Screen(title: SubOnCopy.manualTitle, meta: model.period.title) {
             ScrollView {
@@ -63,6 +76,15 @@ struct ManualEntryView: View {
                     )
                     NinetyField(label: SubOnCopy.gramsField, unit: "g", value: $gramsText)
                     NinetyField(label: SubOnCopy.kcalField, unit: "kcal", value: $kcalText)
+
+                    if let basis, isDerived {
+                        // Says why the number moved. A figure that changes when
+                        // you edit a different field, with nothing explaining
+                        // it, reads as the app being broken.
+                        Text(SubOnCopy.derivedFrom(kcalPer100g: basis.kcalPer100g))
+                            .ninetyType(.footnote)
+                            .foregroundStyle(Ninety.Colour.textTertiary)
+                    }
 
                     macros
 
@@ -89,6 +111,11 @@ struct ManualEntryView: View {
             .scrollBounceBehavior(.basedOnSize)
         }
         .onAppear(perform: applyPrefill)
+        .onChange(of: gramsText) { if let grams { applyBasis(forGrams: grams) } }
+        .onChange(of: kcalText) { _, new in releaseIfEdited(new) }
+        .onChange(of: proteinText) { detach() }
+        .onChange(of: carbsText) { detach() }
+        .onChange(of: fatText) { detach() }
     }
 
     private var macros: some View {
@@ -131,14 +158,56 @@ struct ManualEntryView: View {
     private func applyPrefill() {
         guard let prefill = prefill?.food, name.isEmpty, !prefill.name.isEmpty else { return }
         name = prefill.name
+        basis = PortionBasis(prefill)
+        isDerived = basis != nil
         // 100 g, because that is the unit the catalogue stores and the number
         // the user is about to correct. A guessed portion would be a number
         // nobody measured presented as a starting point.
-        gramsText = "100"
-        kcalText = "\(Int(prefill.kcalPer100g.rounded()))"
-        proteinText = Self.text(prefill.proteinG)
-        carbsText = Self.text(prefill.carbsG)
-        fatText = Self.text(prefill.fatG)
+        gramsText = "\(Int(Self.defaultPortion))"
+        applyBasis(forGrams: Self.defaultPortion)
+    }
+
+    /// The portion a catalogue row starts on. 100 g, because that is the unit
+    /// the row stores — it is the number the user is about to correct rather
+    /// than a guess at what they ate.
+    static let defaultPortion: Double = 100
+
+    /// Fill the derived fields from the portion.
+    ///
+    /// Called on every change to the grams field, which is the fix for the bug
+    /// this screen shipped with: the portion is the input, and everything a
+    /// catalogue row can tell you follows from it.
+    private func applyBasis(forGrams grams: Double) {
+        // The portion is a parameter rather than read back off `gramsText`.
+        // `@State` does not promise that a value you just wrote is readable in
+        // the same call, and a prefill that silently derived from an empty
+        // field would be this bug's second coming.
+        guard let basis, isDerived else { return }
+        let portion = basis.scaled(toGrams: grams)
+        kcalText = "\(Int(portion.kcal))"
+        proteinText = Self.text(portion.proteinG)
+        carbsText = Self.text(portion.carbsG)
+        fatText = Self.text(portion.fatG)
+    }
+
+    /// The user has taken the calorie figure over — stop rewriting it.
+    ///
+    /// Detected by comparing against what would have been derived rather than
+    /// by a flag set around the write. `onChange` fires after the update rather
+    /// than during it, so a "we are writing now" boolean is a race; a value
+    /// nobody would have derived is unambiguous.
+    private func releaseIfEdited(_ newValue: String) {
+        guard let basis, isDerived, let grams else { return }
+        if newValue != "\(Int(basis.scaled(toGrams: grams).kcal))" { isDerived = false }
+    }
+
+    private func detach() {
+        guard let basis, isDerived, let grams else { return }
+        let portion = basis.scaled(toGrams: grams)
+        let untouched = proteinText == Self.text(portion.proteinG)
+            && carbsText == Self.text(portion.carbsG)
+            && fatText == Self.text(portion.fatG)
+        if !untouched { isDerived = false }
     }
 
     private func log() {

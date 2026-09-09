@@ -59,6 +59,11 @@ struct SubOnSheet: View {
 
                         squad
                         bench
+                        // After the two lists and before the total, so the sheet
+                        // reads as: how to log, what you eat, what you have
+                        // eaten, how much room is left. The fast path stays at
+                        // the top — you open this to log, not to review.
+                        TodaySection(model: model)
                         roomLeft
                     }
                     .padding(.bottom, Ninety.Space.xxl)

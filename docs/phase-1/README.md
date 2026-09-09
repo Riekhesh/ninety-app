@@ -581,6 +581,51 @@ has not been told what it means. `DESIGN.md` records it, with the same tie-break
 Mode section already used — scanability outranks expression on every screen except
 The Table.
 
+### Three things the first device session found
+
+Logged, corrected, and worth reading — the first two are the reason a device
+session is not a formality.
+
+**The portion screen was writing wrong calories.** It filled in `100 g` and the
+catalogue's `kcal_per_100g`, then logged whatever was in the calories field — so
+changing the portion to 200 g wrote 200 g of food at 100 g of energy. Silently,
+with nothing on screen suggesting anything was wrong, into the twenty-one days
+the entire ranking engine is designed against. `Food.kcal(forGrams:)` already
+existed and was already tested; the screen simply never called it. The
+arithmetic now lives in `PortionBasis` with its own tests, the portion drives
+the derived numbers, and a line under the field says so — because a figure that
+moves when you edit a *different* field, with nothing explaining it, reads as the
+app being broken. **This is the standing rule's own case:** a change that breaks
+a day's logging is a fix-now bug, and one that quietly halves it is worse than
+one that stops it.
+
+**Four routes wrote rows and nothing read them back.** The undo strip covered
+only the last entry and vanished the moment anything else was logged, so a Squad
+row tapped twice by accident was permanent — and §2.3's forty-eight-hour edit
+window had been in the repository, tested, since P1-B with no surface at all. A
+**Today** section now sits on the Sub On sheet between the team sheet and the
+band: every log for the day, newest first, tap to correct the portion or remove
+it, with the lock stated in the copy deck's words once the window closes. It is
+deliberately not Matchday's team sheet, which is P1-H and a different screen
+doing a different job.
+
+> **Grouped by half, not by meal.** The Today list splits into First Half and
+> Second Half, which is most of what a lunch-and-dinner breakdown would give and
+> costs no column — the half is a pure function of `logged_at`. Whether Ninety
+> grows real meal slots is a product decision with a migration behind it, and
+> this is deliberately not a down-payment on one. Carried to the P1-H
+> conversation, where the dashboard makes the question easier to answer.
+
+**`--limit` was importing the wrong two hundred thousand foods.** A scan of a
+real tin returned "no match for that barcode" with a working scanner and a full
+`foods` table. Nothing was broken: `--limit` stops after N rows *in file order*,
+the Open Food Facts export is ordered roughly by barcode, and a UK product is an
+EAN-13 beginning `50` — millions of rows into a 3.9-million-row file. The flag is
+a smoke test and now says so; `--country united-kingdom` is what builds a mirror
+worth scanning against, and it is smaller as well as more relevant.
+
+---
+
 ### What has to happen on a Mac before this closes
 
 1. ⌘U. The suite is 62 new tests across four suites plus one added to
@@ -590,8 +635,8 @@ The Table.
 3. `supabase db push` for migrations 005 and 006, then `supabase functions deploy
    estimate-meal` with `GEMINI_API_KEY` set. `supabase/functions/README.md` is the
    runbook.
-4. Run `scripts/import_food_mirror.py --dry-run` against a real Open Food Facts
-   export before pushing a quarter of a million rows at the database.
+4. ~~Run `scripts/import_food_mirror.py --dry-run` against a real Open Food Facts
+   export.~~ **Done.** Re-run with `--country united-kingdom` — see above.
 5. Record the measured photo latency. The spike saw 1.9–3.1 s; the app measures it
    client-side with the upload included, so the figure will be larger and the
    difference is the interesting part.

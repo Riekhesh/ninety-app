@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Load Open Food Facts and USDA into `public.foods`.
 
-    python3 scripts/import_food_mirror.py --off data/off.csv.gz --limit 200000
+    python3 scripts/import_food_mirror.py --off data/off.csv.gz --country united-kingdom
     python3 scripts/import_food_mirror.py --usda data/usda-foundation.json
 
 P1-B deferred this to sit alongside P1-F, and the reasoning holds up: nothing in
@@ -44,6 +44,25 @@ whole design principle is never to show a figure nobody measured.
 So a row has to have a name, a barcode, and an energy value between 0 and 900
 kcal per 100 g. Nine hundred is the ceiling because pure fat is about 900 and
 nothing edible is denser; anything above it is a unit error.
+
+---
+
+## `--limit` is a smoke test. `--country` is the one you want.
+
+`--limit` stops after N rows **in file order**, and the export is ordered roughly
+by barcode. A UK product is an EAN-13 beginning `50`, which is millions of rows
+into a 3.9-million-row file — so `--limit 200000` imports a couple of hundred
+thousand products from the low end of the barcode space and nothing anybody
+here is going to scan. It is for proving the pipeline runs, not for building a
+catalogue.
+
+**This was found by scanning a tin and getting "no match for that barcode"**,
+with a working scanner and a table full of two hundred thousand foods in it.
+Nothing was broken; the wrong two hundred thousand had been imported.
+
+`--country united-kingdom` gives a smaller mirror *and* a more relevant one,
+which is the right trade for a single-user app: your cupboard is the catalogue
+that matters.
 
 ---
 
@@ -161,8 +180,13 @@ def clean(value: Any, limit: int = 300) -> str | None:
     return text[:limit]
 
 
-def off_rows(path: Path, limit: int | None) -> Iterator[dict[str, Any]]:
-    """Open Food Facts CSV. Tab-separated, and the file is enormous."""
+def off_rows(path: Path, limit: int | None, country: str | None = None) -> Iterator[dict[str, Any]]:
+    """Open Food Facts CSV. Tab-separated, and the file is enormous.
+
+    `country` filters on `countries_tags`, whose values look like
+    `en:france,en:united-kingdom`. It is the flag that makes a partial import
+    worth having — see the note on `--limit` in `main`.
+    """
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rt", encoding="utf-8", errors="replace", newline="") as handle:
         # The export has fields containing unescaped quotes. QUOTE_NONE stops
@@ -178,6 +202,8 @@ def off_rows(path: Path, limit: int | None) -> Iterator[dict[str, Any]]:
             if not name or not barcode or kcal is None:
                 continue
             if not 0 <= kcal <= MAX_KCAL_PER_100G:
+                continue
+            if country and country not in (row.get("countries_tags") or "").lower():
                 continue
 
             yield {
@@ -304,7 +330,22 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--off", type=Path, help="Open Food Facts CSV (.csv or .csv.gz)")
     parser.add_argument("--usda", type=Path, help="USDA FoodData Central JSON")
-    parser.add_argument("--limit", type=int, help="stop after this many rows per source")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        help=(
+            "stop after this many rows per source. NOTE: this takes the HEAD of the "
+            "file, which is ordered roughly by barcode — so it is a smoke test, not a "
+            "sample. Use --country to get a partial mirror worth scanning against."
+        ),
+    )
+    parser.add_argument(
+        "--country",
+        help=(
+            "keep only rows whose countries_tags contains this, e.g. united-kingdom. "
+            "Matched case-insensitively against the raw tag list."
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true", help="parse and report, write nothing")
     args = parser.parse_args()
 
@@ -313,7 +354,7 @@ def main() -> int:
 
     sources: list[Iterator[dict[str, Any]]] = []
     if args.off:
-        sources.append(off_rows(args.off, args.limit))
+        sources.append(off_rows(args.off, args.limit, (args.country or "").lower() or None))
     if args.usda:
         sources.append(usda_rows(args.usda, args.limit))
 

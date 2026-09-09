@@ -109,6 +109,9 @@ docs and design commits never spend the 200-minute budget.
   measure how far a human moved the model, which is real and useful; they are not the
   accuracy baseline, and `spikes/vision-accuracy`'s own rules say why. The 20 weighed
   meals are still outstanding.
+- **The portion drives the numbers, not the other way round.** A catalogue row
+  knows kcal per 100 g and nothing else; `PortionBasis` scales it. The screen
+  that did not do this logged 200 g of food at 100 g of energy for a day.
 - **A range is a figure and a tolerance, never a dash** — `1,850 ±100`, not
   `1,750–1,950`. `DESIGN.md` § Numbers, and `SafetyCopyTests` checks it.
 
