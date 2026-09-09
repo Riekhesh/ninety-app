@@ -72,17 +72,12 @@ struct SubOnTests {
 
     // MARK: - The Squad and the Bench
 
-    static func logs(_ entries: [(String, Double, Double, TimeInterval)], from now: Date) -> [FoodLog] {
-        entries.map { name, grams, kcal, hoursAgo in
-            FoodLog(
-                userID: UUID(),
-                loggedAt: now.addingTimeInterval(-hoursAgo * 3_600),
-                grams: grams,
-                entryMethod: .manual,
-                kcal: kcal,
-                nameSnapshot: name
-            )
-        }
+    /// `SampleLog` is the shared fixture type in `SubOnPreviews.swift`, so the
+    /// previews and the tests are built from the same shape. A preview standing
+    /// on different numbers from the tests is a preview of something nobody
+    /// checked.
+    static func logs(_ samples: [SampleLog], from now: Date) -> [FoodLog] {
+        samples.logs(for: UUID(), endingAt: now)
     }
 
     @Test("a food logged twice is in the Squad; a food logged once is not")
@@ -91,9 +86,9 @@ struct SubOnTests {
         let habits = TeamSheet.habits(
             from: Self.logs(
                 [
-                    ("Flat white", 220, 120, 1),
-                    ("Flat white", 220, 120, 25),
-                    ("Sourdough toast", 90, 280, 3),
+                    SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 1),
+                    SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 25),
+                    SampleLog(name: "Sourdough toast", grams: 90, kcal: 280, hoursAgo: 3),
                 ],
                 from: now
             )
@@ -114,10 +109,10 @@ struct SubOnTests {
         let habits = TeamSheet.habits(
             from: Self.logs(
                 [
-                    ("Porridge", 250, 320, 1),
-                    ("Porridge", 250, 320, 25),
-                    ("Porridge", 250, 320, 49),
-                    ("Banana", 118, 105, 2),
+                    SampleLog(name: "Porridge", grams: 250, kcal: 320, hoursAgo: 1),
+                    SampleLog(name: "Porridge", grams: 250, kcal: 320, hoursAgo: 25),
+                    SampleLog(name: "Porridge", grams: 250, kcal: 320, hoursAgo: 49),
+                    SampleLog(name: "Banana", grams: 118, kcal: 105, hoursAgo: 2),
                 ],
                 from: now
             )
@@ -134,7 +129,10 @@ struct SubOnTests {
         // repository's sort order.
         let habits = TeamSheet.habits(
             from: Self.logs(
-                [("Porridge", 200, 250, 48), ("Porridge", 300, 400, 1)],
+                [
+                    SampleLog(name: "Porridge", grams: 200, kcal: 250, hoursAgo: 48),
+                    SampleLog(name: "Porridge", grams: 300, kcal: 400, hoursAgo: 1),
+                ],
                 from: now
             )
         )
@@ -148,10 +146,10 @@ struct SubOnTests {
         let habits = TeamSheet.habits(
             from: Self.logs(
                 [
-                    ("Older", 100, 100, 100),
-                    ("Older", 100, 100, 120),
-                    ("Newer", 100, 100, 1),
-                    ("Newer", 100, 100, 30),
+                    SampleLog(name: "Older", grams: 100, kcal: 100, hoursAgo: 100),
+                    SampleLog(name: "Older", grams: 100, kcal: 100, hoursAgo: 120),
+                    SampleLog(name: "Newer", grams: 100, kcal: 100, hoursAgo: 1),
+                    SampleLog(name: "Newer", grams: 100, kcal: 100, hoursAgo: 30),
                 ],
                 from: now
             )
@@ -165,7 +163,13 @@ struct SubOnTests {
     func quickAddReachesTheTeamSheet() {
         let now = Date()
         let habits = TeamSheet.habits(
-            from: Self.logs([("Pub lunch", 1, 850, 2), ("Pub lunch", 1, 850, 26)], from: now)
+            from: Self.logs(
+                [
+                    SampleLog(name: "Pub lunch", grams: 1, kcal: 850, hoursAgo: 2),
+                    SampleLog(name: "Pub lunch", grams: 1, kcal: 850, hoursAgo: 26),
+                ],
+                from: now
+            )
         )
         #expect(habits.count == 1)
         #expect(habits.first?.foodID == nil)
@@ -202,7 +206,13 @@ struct SubOnTests {
     func tapToBringOn() throws {
         let now = Date()
         let (model, foods) = Self.model(
-            logs: Self.logs([("Flat white", 220, 120, 2), ("Flat white", 220, 120, 26)], from: now),
+            logs: Self.logs(
+                [
+                    SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 2),
+                    SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 26),
+                ],
+                from: now
+            ),
             now: now
         )
 

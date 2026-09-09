@@ -70,8 +70,7 @@ struct BarcodeRouteView: View {
         )
     }
 
-    @ViewBuilder
-    private var status: some View {
+    @ViewBuilder private var status: some View {
         switch lookup {
         case .scanning:
             EmptyView()

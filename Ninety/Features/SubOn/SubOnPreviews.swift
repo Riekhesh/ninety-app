@@ -82,34 +82,55 @@ extension CatalogueFood {
     ]
 }
 
+/// One logged meal, as a fixture.
+///
+/// A struct rather than a four-member tuple, and not only because SwiftLint says
+/// so: `entry.2` for "kcal" is exactly how a fixture quietly starts asserting
+/// against the wrong number, and the two numbers here are both `Double`s that
+/// mean different things.
+struct SampleLog {
+    let name: String
+    let grams: Double
+    let kcal: Double
+    /// How long before the fixture's "now" this was eaten.
+    let hoursAgo: Double
+
+    func made(for userID: UUID, endingAt end: Date) -> FoodLog {
+        FoodLog(
+            userID: userID,
+            loggedAt: end.addingTimeInterval(-hoursAgo * 3_600),
+            grams: grams,
+            entryMethod: .manual,
+            kcal: kcal,
+            nameSnapshot: name
+        )
+    }
+}
+
+extension [SampleLog] {
+    func logs(for userID: UUID, endingAt end: Date) -> [FoodLog] {
+        map { $0.made(for: userID, endingAt: end) }
+    }
+}
+
 /// A week of plausible logs, for the team sheet.
 ///
 /// The counts are what make the Squad and the Bench different lists: the flat
 /// white and the porridge repeat, the rest do not.
 enum PreviewLogs {
     static func week(userID: UUID, endingAt end: Date) -> [FoodLog] {
-        let day: TimeInterval = 24 * 60 * 60
-        let entries: [(String, Double, Double, Double)] = [
-            ("Flat white", 220, 120, 0.2),
-            ("Porridge & semi-skimmed", 250, 320, 0.4),
-            ("Flat white", 220, 120, 1.2),
-            ("Chicken salad bowl", 380, 545, 1.4),
-            ("Porridge & semi-skimmed", 250, 320, 2.4),
-            ("Flat white", 220, 120, 2.2),
-            ("Greek yogurt & berries", 170, 233, 3.3),
-            ("Sourdough toast & butter", 90, 280, 4.5),
-            ("Flat white", 220, 120, 5.2),
+        [
+            SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 5),
+            SampleLog(name: "Porridge & semi-skimmed", grams: 250, kcal: 320, hoursAgo: 10),
+            SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 29),
+            SampleLog(name: "Chicken salad bowl", grams: 380, kcal: 545, hoursAgo: 34),
+            SampleLog(name: "Porridge & semi-skimmed", grams: 250, kcal: 320, hoursAgo: 58),
+            SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 53),
+            SampleLog(name: "Greek yogurt & berries", grams: 170, kcal: 233, hoursAgo: 79),
+            SampleLog(name: "Sourdough toast & butter", grams: 90, kcal: 280, hoursAgo: 108),
+            SampleLog(name: "Flat white", grams: 220, kcal: 120, hoursAgo: 125),
         ]
-        return entries.map { name, grams, kcal, daysAgo in
-            FoodLog(
-                userID: userID,
-                loggedAt: end.addingTimeInterval(-daysAgo * day),
-                grams: grams,
-                entryMethod: .manual,
-                kcal: kcal,
-                nameSnapshot: name
-            )
-        }
+        .logs(for: userID, endingAt: end)
     }
 }
 

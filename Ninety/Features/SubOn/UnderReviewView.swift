@@ -70,8 +70,7 @@ struct UnderReviewView: View {
 
     // MARK: - The items
 
-    @ViewBuilder
-    private var calls: some View {
+    @ViewBuilder private var calls: some View {
         VStack(alignment: .leading, spacing: Ninety.Space.sm) {
             SectionHeading(
                 title: SubOnCopy.callsHeading,
@@ -99,8 +98,7 @@ struct UnderReviewView: View {
         }
     }
 
-    @ViewBuilder
-    private var notes: some View {
+    @ViewBuilder private var notes: some View {
         if !review.estimate.notes.isEmpty {
             VStack(alignment: .leading, spacing: Ninety.Space.sm) {
                 SectionHeading(title: SubOnCopy.modelNotesHeading)

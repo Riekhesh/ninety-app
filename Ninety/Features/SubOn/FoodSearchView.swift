@@ -49,8 +49,7 @@ struct FoodSearchView: View {
 
     // MARK: - Sections
 
-    @ViewBuilder
-    private var habits: some View {
+    @ViewBuilder private var habits: some View {
         if !search.habitMatches.isEmpty {
             VStack(alignment: .leading, spacing: Ninety.Space.sm) {
                 SectionHeading(title: SubOnCopy.squadHeading, detail: SubOnCopy.squadDetail)
@@ -68,8 +67,7 @@ struct FoodSearchView: View {
         }
     }
 
-    @ViewBuilder
-    private var onThisPhone: some View {
+    @ViewBuilder private var onThisPhone: some View {
         if !search.localMatches.isEmpty {
             VStack(alignment: .leading, spacing: Ninety.Space.sm) {
                 SectionHeading(title: SubOnCopy.yourFoodsHeading)
@@ -99,8 +97,7 @@ struct FoodSearchView: View {
         }
     }
 
-    @ViewBuilder
-    private var results: some View {
+    @ViewBuilder private var results: some View {
         VStack(alignment: .leading, spacing: Ninety.Space.sm) {
             if !search.remoteMatches.isEmpty {
                 SectionHeading(title: SubOnCopy.resultsHeading)
@@ -137,8 +134,7 @@ struct FoodSearchView: View {
         }
     }
 
-    @ViewBuilder
-    private var emptyState: some View {
+    @ViewBuilder private var emptyState: some View {
         if search.isEmptyResult {
             VStack(alignment: .leading, spacing: Ninety.Space.md) {
                 Text(SubOnCopy.noMatch(for: search.query))

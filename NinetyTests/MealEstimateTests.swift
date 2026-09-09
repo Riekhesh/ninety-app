@@ -12,29 +12,39 @@ import Testing
 /// satisfying its own schema.
 @Suite("Meal estimates")
 struct MealEstimateTests {
+    /// One item, written as the JSON the Edge Function actually returns.
+    ///
+    /// A string rather than a `[String: Any]`, for two reasons that point the
+    /// same way. `[String: Any]` is not `Sendable`, so it cannot be a stored
+    /// `static` under Swift 6 at all. And the thing under test is a **decoder**:
+    /// feeding it bytes is the path the app takes, where handing it
+    /// `JSONSerialization` output of a dictionary would test a round trip
+    /// through Foundation as much as the type.
+    static func item(
+        name: String = "porridge with milk",
+        gramsLow: Int = 200,
+        gramsHigh: Int = 280,
+        kcalLow: Int = 290,
+        kcalHigh: Int = 390,
+        confidence: String = "high"
+    ) -> String {
+        """
+        {"name": "\(name)", "grams_low": \(gramsLow), "grams_high": \(gramsHigh), \
+        "kcal_low": \(kcalLow), "kcal_high": \(kcalHigh), "confidence": "\(confidence)"}
+        """
+    }
+
     static func payload(
-        _ items: [[String: Any]],
+        _ items: [String],
         notes: String = "",
         model: String = "gemini-3.5-flash-lite"
     ) throws -> MealEstimatePayload {
-        let body: [String: Any] = [
-            "items": items,
-            "notes": notes,
-            "model": model,
-            "storage_path": "abc/meal.jpg",
-        ]
-        let data = try JSONSerialization.data(withJSONObject: body)
-        return try JSONDecoder().decode(MealEstimatePayload.self, from: data)
+        let json = """
+            {"items": [\(items.joined(separator: ","))], "notes": "\(notes)", \
+            "model": "\(model)", "storage_path": "abc/meal.jpg"}
+            """
+        return try JSONDecoder().decode(MealEstimatePayload.self, from: Data(json.utf8))
     }
-
-    static let item: [String: Any] = [
-        "name": "porridge with milk",
-        "grams_low": 200,
-        "grams_high": 280,
-        "kcal_low": 290,
-        "kcal_high": 390,
-        "confidence": "high",
-    ]
 
     // MARK: - Ranges
 
@@ -74,7 +84,7 @@ struct MealEstimateTests {
 
     @Test("a well-formed response passes through")
     func wellFormedResponseValidates() throws {
-        let estimate = try Self.payload([Self.item]).validated(rawOutput: Data(), latency: 2.0)
+        let estimate = try Self.payload([Self.item()]).validated(rawOutput: Data(), latency: 2.0)
         #expect(estimate.items.count == 1)
         #expect(estimate.items[0].confidence == .high)
         #expect(estimate.items[0].kcal.centre == 340)
@@ -86,21 +96,20 @@ struct MealEstimateTests {
 
     @Test("an unknown confidence level becomes medium rather than throwing")
     func unknownConfidenceBecomesMedium() throws {
-        var item = Self.item
-        item["confidence"] = "certain"
-        let estimate = try Self.payload([item]).validated(rawOutput: Data(), latency: 1)
+        let estimate = try Self.payload([Self.item(confidence: "certain")])
+            .validated(rawOutput: Data(), latency: 1)
         #expect(estimate.items[0].confidence == .medium)
     }
 
     @Test("one unusable item does not lose the rest of the meal")
     func oneBadItemDoesNotLoseTheMeal() throws {
-        var nameless = Self.item
-        nameless["name"] = "   "
-        var weightless = Self.item
-        weightless["kcal_low"] = 0
-        weightless["kcal_high"] = 0
+        // A name that is only whitespace, and an item whose whole energy range
+        // is zero. Both satisfy the schema — it carries no numeric constraints
+        // and cannot — and neither is something a user can confirm or correct.
+        let nameless = Self.item(name: "   ")
+        let weightless = Self.item(kcalLow: 0, kcalHigh: 0)
 
-        let estimate = try Self.payload([Self.item, nameless, weightless])
+        let estimate = try Self.payload([Self.item(), nameless, weightless])
             .validated(rawOutput: Data(), latency: 1)
         #expect(estimate.items.count == 1)
     }
@@ -121,13 +130,13 @@ struct MealEstimateTests {
         // Re-encoding from the parsed values would leave the benchmark
         // re-scoring the app's idea of the answer rather than the model's.
         let raw = Data(#"{"items":[{"name":"porridge with milk"}],"notes":"oil unknown"}"#.utf8)
-        let estimate = try Self.payload([Self.item]).validated(rawOutput: raw, latency: 1)
+        let estimate = try Self.payload([Self.item()]).validated(rawOutput: raw, latency: 1)
         #expect(estimate.rawOutput == raw)
     }
 
     @Test("the model id survives, because a measurement is attributed to one")
     func modelIDSurvives() throws {
-        let estimate = try Self.payload([Self.item], model: "gemini-3.5-flash-lite")
+        let estimate = try Self.payload([Self.item()], model: "gemini-3.5-flash-lite")
             .validated(rawOutput: Data(), latency: 2.7)
         #expect(estimate.model == "gemini-3.5-flash-lite")
         #expect(estimate.latency == 2.7)
@@ -135,12 +144,9 @@ struct MealEstimateTests {
 
     @Test("the meal total adds the tolerances rather than narrowing them")
     func totalAddsTolerances() throws {
-        var second = Self.item
-        second["name"] = "banana"
-        second["kcal_low"] = 90
-        second["kcal_high"] = 120
-
-        let estimate = try Self.payload([Self.item, second]).validated(rawOutput: Data(), latency: 1)
+        let second = Self.item(name: "banana", kcalLow: 90, kcalHigh: 120)
+        let estimate = try Self.payload([Self.item(), second])
+            .validated(rawOutput: Data(), latency: 1)
         // 290+90 .. 390+120. The errors on two items of one meal are not
         // independent — one badly judged plate size moves both the same way —
         // so a total narrower than its parts would be false confidence.

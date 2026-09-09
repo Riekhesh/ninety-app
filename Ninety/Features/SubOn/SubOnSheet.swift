@@ -90,8 +90,7 @@ struct SubOnSheet: View {
 
     // MARK: - The team sheet
 
-    @ViewBuilder
-    private var squad: some View {
+    @ViewBuilder private var squad: some View {
         VStack(alignment: .leading, spacing: Ninety.Space.sm) {
             SectionHeading(title: SubOnCopy.squadHeading, detail: SubOnCopy.squadDetail)
 
@@ -119,8 +118,7 @@ struct SubOnSheet: View {
         }
     }
 
-    @ViewBuilder
-    private var bench: some View {
+    @ViewBuilder private var bench: some View {
         if !model.bench.isEmpty {
             VStack(alignment: .leading, spacing: Ninety.Space.sm) {
                 SectionHeading(title: SubOnCopy.benchHeading, detail: SubOnCopy.benchDetail)
