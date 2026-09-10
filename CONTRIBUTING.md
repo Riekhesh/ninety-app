@@ -135,6 +135,12 @@ unzip -o sl.zip && ./swiftlint-static lint --strict
 Worth knowing because it is otherwise possible to write a lot of Swift on a
 machine that cannot check any of it, and find out one CI run at a time.
 
+**Proven in P1-I.** An epic written entirely in a Linux container carried seven
+`--strict` violations — a file over the length limit, four `String(decoding:)`
+calls, a trailing closure among two, and a misplaced attribute. All seven would
+have failed the macOS job; none needed a Mac to find. Run it before every push
+from a container, not after the first red build.
+
 `git commit` runs these via `.githooks/pre-commit`. Enable the hooks once per
 clone:
 

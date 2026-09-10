@@ -71,6 +71,10 @@ enum SettingsSection: String, CaseIterable, Identifiable, Sendable {
     case competitive
     /// S7. Permanently available, never behind a disclosure.
     case support
+    /// P1-I. Where the day's logging currently is. Not a §10 obligation — it is
+    /// the one surface that can tell a day spent offline from a day quietly
+    /// lost, which is what the airplane-mode exit criterion is read off.
+    case sync
     /// Article 9 withdrawal (ADR 0017).
     case consent
     /// Sign out. Last because it is the way out, not the point of the screen.

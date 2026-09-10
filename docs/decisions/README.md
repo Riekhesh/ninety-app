@@ -53,5 +53,6 @@ Re-litigating settled decisions is the most expensive habit in solo projects.
 | [0018](0018-seven-day-calibration-window.md) | Calibration window is seven days, not fourteen | Locked | 1 |
 | [0019](0019-photo-logs-are-a-correction-dataset.md) | The 21 days produce a correction dataset, not an accuracy baseline | Locked | 1 |
 | [0020](0020-trend-smoothed-over-calendar-days.md) | The weight trend is smoothed over calendar days, not over readings | Locked | 1 |
+| [0021](0021-outbox-drains-one-plan-per-row.md) | The outbox drains one plan per row, and only a refusal costs an attempt | Locked | 1 |
 
 New decisions get the next number. Do not renumber; a stale link is worse than a gap.

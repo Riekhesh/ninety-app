@@ -26,11 +26,6 @@ struct FoodSearchTests {
         )
     }
 
-    /// The debounce is real time, so a test that waits for it has to wait for
-    /// slightly more than it. Two of them, which is short enough not to slow the
-    /// suite and long enough not to be flaky on a loaded machine.
-    static let settle = Duration.milliseconds(600)
-
     // MARK: - Ordering
 
     /// *"Recent and frequent foods surface above raw search results."* What
@@ -60,7 +55,7 @@ struct FoodSearchTests {
         #expect(model.localMatches.map(\.name) == ["Greek yogurt, own brand"])
         #expect(catalogue.searches.isEmpty)
 
-        try? await Task.sleep(for: Self.settle)
+        await model.settle()
         #expect(!catalogue.searches.isEmpty)
         #expect(model.remoteMatches.contains { $0.name.contains("Greek") })
     }
@@ -108,7 +103,7 @@ struct FoodSearchTests {
         model.queryChanged()
         #expect(model.habitMatches.count == 1)
 
-        try? await Task.sleep(for: Self.settle)
+        await model.settle()
         #expect(model.remoteMatches.isEmpty)
         // The copy deck's offline line: reassuring, not a warning. What is above
         // it on screen is real and loggable.
@@ -128,7 +123,7 @@ struct FoodSearchTests {
         model.query = "   "
         model.queryChanged()
 
-        try? await Task.sleep(for: Self.settle)
+        await model.settle()
         #expect(catalogue.searches.isEmpty)
         #expect(!model.isSearching)
         #expect(!model.isEmptyResult)
@@ -147,7 +142,7 @@ struct FoodSearchTests {
             model.queryChanged()
         }
 
-        try? await Task.sleep(for: Self.settle)
+        await model.settle()
         #expect(catalogue.searches == ["porridge"])
     }
 
@@ -162,7 +157,7 @@ struct FoodSearchTests {
         model.query = "quinoa salad"
         model.queryChanged()
 
-        try? await Task.sleep(for: Self.settle)
+        await model.settle()
         #expect(model.isEmptyResult)
         #expect(SubOnCopy.noMatch(for: "quinoa salad") == "No match for \"quinoa salad\"")
     }

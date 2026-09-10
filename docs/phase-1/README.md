@@ -115,10 +115,10 @@ requirements rather than Phase 3 polish, and the phase should not be able to clo
 a gate quietly deferred.
 
 - [ ] **21 consecutive days of real data logged** — non-negotiable, and the phase's actual purpose. **Running since 9 September**; earliest close 29 September. The standing rule below applies from here on: anything that breaks a day's logging is a fix-now bug, because it resets a counter that costs three weeks to rebuild
-- [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design, but neither has been exercised with the radio actually off, and nothing drains the outbox yet. That half belongs with P1-I's airplane-mode day and is deliberately not ticked here — the criterion says *offline included* and half a criterion is not a closed one
+- [x] **All four logging routes work, offline included** — the four routes closed with P1-F on 9 Sep; the *offline included* half closed with P1-I's airplane-mode day on 10 Sep, on a real phone with the radio off. **Closed on different evidence than the wording implies, and the difference is worth stating rather than glossing:** three routes work with no signal — manual by construction, search degraded to the phone's own foods, barcode against the local cache — and **the photo route does not and never will**. §1.3 puts the model behind an Edge Function precisely so no key ships in the binary, so "photo works offline" was never achievable and was never what this asked for. What it asked for is that no route *loses* anything offline, and that holds: the photo screen says it cannot reach the estimator and names the three routes that need no signal, and nothing on any of them waits on a network
 - [ ] **HealthKit incremental sync with a persisted anchor** — proven the way Spike A proved it: 56,764 samples on a first read, ~0 on the next
 - [x] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series. **Closed 10 Sep by P1-G**, on the evidence the criterion was written for: the chart renders on a real phone, the headline figure is the smoothed value and the raw dailies are off behind a toggle that resets every time the screen appears. `WeightTrend` is pure and carries 16 tests and 48 assertions, including the gaps that ADR 0020 is about
-- [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect
+- [x] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect. **Closed 10 Sep by P1-I**, on exactly the evidence the criterion was written for: the app was used on a real phone with the radio off and the queue reconciled on reconnect. Not a synthetic test — the criterion's own wording is *"gyms and restaurant basements have no signal, this is the scenario"*. Underneath it, 270 tests in 21 suites cover the parts a day cannot: the queue kept whole with no connection and **nothing charged an attempt for it**, the coalescing of a meal logged and corrected offline into one upsert, the dependency order that puts a custom food ahead of the log referencing it, and a drain that never touches what was logged. `Settings → Sync` is the instrument the day was read off, and it exists for that reason
 - [ ] **RLS policies on every table, tested with two accounts** — account A cannot touch account B's rows, proven repeatably
 - [x] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting. **Closed 8 Sep by P1-D**, on the evidence it was written for: every gate has the named tests `docs/safety/safety-requirements.md` asks for, all of them ran green on a device, and the flow was walked including an under-18 date of birth. Two halves are later phases *by the criterion's own wording* and are not silently included — S3's scoring half is Phase 2, S7's pattern triggers are Phase 3
 
@@ -142,7 +142,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
 | **P1-G** The Run: weight & trend | **CLOSED 10 Sep.** All four stories, walked on a real device: weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. 231 tests, 19 suites. ADR 0020 settles what the average is an average of | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
-| **P1-I** Offline-first sync | Outbox, last-write-wins, airplane-mode verification | High |
+| **P1-I** Offline-first sync | **CLOSED 10 Sep.** Both stories, walked on a real phone including a day with the radio off. `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and the panel in Settings the day is read off. ADR 0021 settles the drain policy. 270 tests, 21 suites | High |
 | **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
 | **P1-X** Phase 1 exit criteria | The seven conditions above, mirrored as tickets | Highest |
 
@@ -180,15 +180,17 @@ order laid out visually, is published at
    9 September** — the day food could first be logged in Ninety, on the weight
    Pre-Season had already recorded. See [the clock](#the-one-thing-that-shapes-the-plan)
    for what day 1 actually consisted of.
-6. **Everything else, underneath a running clock**, in this order: ~~P1-G ·~~ **P1-I ·
-   P1-H · P1-E**, then P1-J and P1-X. **The clock is running as of 9 September, so this
+6. **Everything else, underneath a running clock**, in this order: ~~P1-G ·~~ ~~P1-I ·~~
+   **P1-H · P1-E**, then P1-J and P1-X. **The clock is running as of 9 September, so this
    is no longer a plan — it is the order the remaining epics land in while the days
-   count.** Sync is second rather than
-   last for two reasons: three weeks of the only irreplaceable asset in the project
-   currently live on one phone with nothing draining the outbox, and the airplane-mode
-   criterion needs real logging days to reconcile, so it has to happen *during* the clock.
-   HealthKit is late because it is retroactive — a first read pulls the history back
-   whether it lands on day 4 or day 18.
+   count.** P1-I closed on 10 September, airplane-mode day included, so the three weeks
+   are no longer sitting on one phone with nothing draining the outbox. Sync was second
+   rather than last for two reasons, and both proved right: three weeks of the only
+   irreplaceable asset in the project were living on one phone with nothing draining the
+   outbox, and the airplane-mode criterion needs real logging days to reconcile — so it
+   had to happen *during* the clock rather than at the end of it. HealthKit is late
+   because it is retroactive: a first read pulls the history back whether it lands on day
+   4 or day 18.
 
 > **Changed 8 September: P1-F was built whole rather than split.** The plan above put
 > manual entry at step 5 and *"P1-F's remaining routes"* after four other epics, on the
@@ -822,6 +824,174 @@ does not, which is why it is in the runbook rather than only in a commit.
 
 ---
 
+## P1-I — what landed
+
+Both stories, 8 points, on branch `p1-i`.
+
+**Closed 10 September, on a real phone, with the radio off.** Written the same day in a
+Linux container with no Xcode, Swift toolchain or simulator; the Mac session built it,
+ran the suite — **270 tests in 21 suites, all passing** — and the day was walked on the
+device including a spell in airplane mode that reconciled on reconnect. That last part is
+the exit criterion, and it is the only part a suite could not have given: the whole point
+of ADR 0005 is that a list of meals looks identical whether or not sync worked.
+
+**One compile error and one test failure**, both recorded below, and neither in the
+drain's logic. The second one is the more useful of the two and was not even in this
+epic's code.
+
+**The Linux linter earned its place, and so did the Linux checks.**
+`check_schema_parity.py` now reads the drain's columns against migration 001 and every
+enqueued table name against `SyncTable`; both pass without a Mac. `swiftlint-static`
+caught seven `--strict` violations before the first build. What none of them could catch
+was the one thing that did fail, which is the point of the section below.
+
+**The gap this closed is not "sync was slow", it is "sync did not exist".** Every write
+in the app has left a note in `sync_outbox` since P1-B, and nothing had ever read one.
+Three weeks of the only irreplaceable asset in the project were on one phone, and the
+`OutboxEntry.attempts` column had never been incremented because nothing had ever
+attempted anything.
+
+| Story | Outcome |
+|---|---|
+| Outbox and the sync service | ✔ `Ninety/Sync/` — the plan, the payload, the PostgREST client, the service and the panel. Every mutation already enqueued; this drains it. Idempotent by construction: ids are minted on the device, so every write is an upsert and a replayed payload resolves to the row it already wrote. Backoff doubles from 2s to a 5-minute ceiling and is cancelled by a reconnect. `attempts` is honoured — five refusals and the row parks. The last-write-wins limitation is in ADR 0005 and now in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md), which is what a future reader will actually find. ✔ compiled, green, and run on the device |
+| Airplane-mode verification | ✔ **Done on the phone, 10 Sep.** A day used with the radio actually off, reconciled on reconnect. The criterion's own wording rules out the synthetic version — *"gyms and restaurant basements have no signal, this is the scenario"* — so this is the one story in the epic that no amount of test coverage could have closed |
+
+**The one compile error: a formatter that cannot be shared.** `SyncTime` held a
+`static let ISO8601DateFormatter`. That is an `NSFormatter` subclass — a class, not
+`Sendable` — so a shared one is exactly the mutable static `SWIFT_STRICT_CONCURRENCY =
+complete` refuses. Both obvious repairs are worse than dropping it: an instance per call
+allocates a formatter to print six columns, and a lock around a shared one is a mutex
+protecting a date. `SyncTime` had already hand-rolled `yyyy-MM-dd` to avoid
+`String(format:)` reading `%d` as a 32-bit width against a 64-bit `Int`, so the instant
+went the same way and the file now holds no shared state at all. It gained precision on
+the way: microseconds rather than milliseconds, which is what `timestamptz` stores and
+what `weight_logs` resolves its upsert against.
+
+**The one test failure was not in this epic's code, and it is the more interesting of
+the two.** `FoodSearchTests.noMatchAnywhere` — a P1-F test, untouched, passing since 9
+September — started failing. Nothing about search changed. What changed is the *timing
+environment*.
+
+`FoodSearchModel` debounces the catalogue call by 250 ms of real time. The tests slept
+600 ms and asserted afterwards, leaving 350 ms of slack for the debounce task to be
+scheduled and finish. Both the model and this epic's 39 new tests are `@MainActor`, and
+several of the new ones build in-memory `ModelContainer`s — they ran at 0.7–1.2 s each
+and held the MainActor exactly while the debounce was waiting for it. The headroom went.
+The test's own comment had called the interval *"long enough not to be flaky on a loaded
+machine"*, which was a guess, and adding tests falsified it.
+
+**The fix is not a longer sleep.** A sleep that is long enough is not a fix, it is a
+longer bet, and the next epic would collect on it again. `FoodSearchModel` gained
+`settle()` — it awaits the pending task — and all five sleeps in the suite became
+`await model.settle()`. It still costs the debounce, because the debounce is the thing
+under test; what it no longer costs is a guess about how busy the machine is. **There is
+now no `Task.sleep` anywhere in `NinetyTests/`**, which is worth keeping true.
+
+The general lesson is worth more than the fix: **a test suite that waits on a wall clock
+gets more fragile every time the suite grows.** It is a cost that arrives on somebody
+else's ticket, in somebody else's file, looking like a bug they caused.
+
+**Seven SwiftLint violations under `--strict`, all this epic's, all fixed before the
+first build — found on Linux.** `CONTRIBUTING.md` documents `swiftlint-static`, which runs on
+Linux with no Swift toolchain and skips only the `custom_rules` block (those need
+SourceKit). It had never been used in this repo, and it earned its keep immediately: on a
+machine that cannot compile a line of Swift it caught every structural violation that
+would have failed the macOS job. **Run it before every push from a container.** What it
+found:
+
+- **`RootView.swift` hit 420 lines against a 400-line limit** once the sync service was
+  threaded through it. `MainTabView` and its previews moved to `Ninety/App/MainTabView.swift`
+  — the same split P1-G made for `SwiftDataWeightRepository`, and the same wrong fix
+  avoided: trimming comments until the number comes down.
+- **`optional_data_string_conversion`, four times.** `String(decoding:as:)` is
+  non-failable and substitutes replacement characters. In `SyncRow` that would have put
+  them inside a `jsonb` column, so the rule was right about more than style — the
+  failable initialiser is there now, falling back to `{}` rather than a JSON `null` that
+  `model_output`'s `not null` would refuse forever.
+- **Two closures, one of them trailing**, on the Sub On sheet once `onDismiss` arrived.
+  `MatchdayView` already carries the note: with more than one closure, a reader has to go
+  and look up which parameter the braces landed on.
+- **`@ViewBuilder` on its own line above a *variable*.** The rule wants attributes on
+  their own line in functions and types, and on the same line as variables.
+
+**Four decisions, all in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md),
+and the third is the one the clock forced.**
+
+- **One plan per row, not one request per entry.** A meal logged on the Underground,
+  corrected at the barrier and corrected again on the bus is three outbox entries and one
+  write, read from the current local row at drain time. `Outbox.enqueue` promised exactly
+  this in P1-B and wrote `{}` as its payload on the strength of it.
+- **Upserts in dependency order, deletes in the reverse.** `food_logs.food_id` references
+  `foods` and `photo_estimates.log_id` references `food_logs`, so a batch sent in the
+  order the user made it violates a foreign key roughly whenever somebody adds a custom
+  food and logs it.
+- **Only a refusal of the row costs the row an attempt.** No network, no session, a 5xx
+  or a 429 stops the drain where it is and charges nothing to anything. This is not
+  tidiness: a week logged on a plane would otherwise spend five attempts per row on an
+  aeroplane and land at the gate already parked, which is the clock's failure mode
+  written as a retry loop.
+- **Five refusals and it stops asking, visibly.** Parked, kept, counted, and shown in
+  `Settings → Sync` with a control that resets the count. `OutboxEntry`'s own doc comment
+  asked for this in P1-B — *"so a row that fails forever can be found rather than retried
+  silently until the end of time"* — and this is the first code that could honour it.
+
+**Two writes are dropped on purpose rather than sent**, both logged by name so a queue
+that empties without sending anything can be explained afterwards. A queued insert whose
+local row has gone describes something that does not exist — created and deleted offline,
+or cascaded away with its parent. And a correction to a `food_logs` row that reaches the
+front of the queue after §2.3's 48-hour window has closed is dropped rather than sent to
+be refused five times: the rule is what bounds the conflict window in the first place, and
+ADR 0005 already counted that as a happy side effect.
+
+**One surface, and it is an instrument rather than a feature.** `Settings → Sync` says
+where the day's logging currently is: up to date, *n* changes waiting, sending, or *n*
+still here with a way to ask again. It exists because "reconciled cleanly on reconnect"
+is not visible in a list of meals — the whole point of ADR 0005 is that the list looks
+identical either way — so the airplane-mode day needs somewhere to read the answer off.
+Deliberately the only place: a count of unsent rows on Matchday would be the network
+leaking into the screen someone opens to log breakfast.
+
+**Three things this epic deliberately did not do.**
+
+- **It does not pull.** The outbox is a push, so the server copy protects the 21 days
+  against a lost phone and does not yet repopulate a new one. `RootView` has said since
+  P1-C that a reinstall would stop asking for consent twice once P1-I landed; half of that
+  is now true — the timestamp reaches Postgres — and the comment has been corrected rather
+  than left reading as a claim about what the code does. Last-write-wins against a device
+  holding no rows is indistinguishable from a wipe, which is why a restore is a separate
+  decision and not a follow-on commit.
+- **It does not send `updated_at`.** ADR 0005 resolves conflicts by *server* timestamp
+  and migration 001 is emphatic about the word: a client-supplied one lets a device with a
+  wrong clock win every conflict. The `set_updated_at` trigger owns the column and the
+  payload does not mention it.
+- **It does not send `hk_anchor`.** An anchor describes what *one device* has already
+  read. Pushing it to a second phone would tell that phone it had read a history it has
+  never seen, which is the exact failure §1.4 calls "the entire trick" for avoiding.
+
+**Two things this epic leaves open, neither blocking, both named rather than discovered
+later.**
+
+- **A late delete leaves the two stores disagreeing.** A `food_logs` delete that arrives
+  after the 48-hour window returns 204 with nothing removed — RLS `using` clauses filter
+  rows rather than raising — so the phone forgets the row and the server keeps it. The
+  drain cannot tell, and treating a successful response as a failure would retry forever.
+  Phase 2 reads its test set from the phone, so it costs nothing today. It becomes real
+  the first time anything reads the *server* copy as authoritative, which is the same day
+  the pull half gets built.
+- **There is no restore.** Stated above as a deliberate omission, and repeated here
+  because it is the thing most likely to be assumed working. The 21 days are now backed
+  up against a lost or replaced phone — which was the actual risk — but a reinstall
+  starts from an empty store and asks for Article 9 consent a second time. Phase 3 at the
+  earliest, and it needs its own conflict story: last-write-wins against a device holding
+  no rows is indistinguishable from a wipe.
+
+**What closing this epic changed about the risk.** Before 10 September, three weeks of the
+only irreplaceable asset in the project lived on exactly one phone, and the standing rule
+about a broken day's logging costing three weeks was true with no mitigation behind it. It
+is still true — but the cost of a dropped phone is now a phone rather than the phase.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
@@ -897,6 +1067,11 @@ debugger, or delete and reinstall the app: a reinstall should ask for consent
 again, because the row went with the store. Two timestamps, and they are not
 equal unless you tapped both switches inside the same second.
 
+> **Stale from 10 September, and kept as the record of what the check was.**
+> P1-I drains the outbox, so the consent row *does* now appear in the dashboard.
+> A reinstall still asks again — the drain is a push and nothing reads a row back
+> down — so the second half of the check is unchanged.
+
 **What to look at, specifically.** Console should carry
 `Bundled faces registered: 7` from `BrandFont.verify()`. If it says they did *not*
 register, the text is silently San Francisco and the Matchday world is gone — check
@@ -928,7 +1103,7 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **[ticket]**. Everything below is verified on a real device
+> Currently working on: **P1-H, the Matchday dashboard**. Everything below is verified on a real device
 > against the live project as of 10 September — not written-but-unbuilt. Where something
 > is written and not yet run, it says so.
 >
@@ -960,14 +1135,34 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > on readings, so the chart measures the body rather than the weighing habit. 231 tests,
 > 19 suites.
 >
+> **P1-I is closed (10 Sep).** `Ninety/Sync/` is the first code that
+> ever reads `sync_outbox`: one plan per row, dependency order on the way up and the
+> reverse on the way down, upserts so a replay cannot duplicate, backoff on the
+> connection, and five refusals before a row parks. [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md)
+> settles the policy, and the one rule to hold on to is that **only a refusal of the row
+> costs the row an attempt** — a week logged on a plane must not land at the gate already
+> parked. `Settings → Sync` is the only surface, and it is the instrument the
+> airplane-mode day was read off — a real day with the radio off, reconciled on
+> reconnect, which closed the exit criterion. 270 tests in 21 suites.
+>
+> **Two things P1-I leaves open, neither blocking, and one of them is a trap.** It does
+> not *pull*: the 21 days are backed up against a lost phone, but a reinstall starts from
+> an empty store and asks for Article 9 consent a second time. And a `food_logs` delete
+> arriving after the 48-hour window is refused server-side by an RLS `using` clause, which
+> filters rather than raises — so the phone forgets the row and the server keeps it. Both
+> are written up in ADR 0021. **Two rules P1-H must not break:** no surface outside
+> `Settings → Sync` may mention the network — a count of unsent rows on Matchday is the
+> plumbing leaking into the screen someone opens to log breakfast — and nothing on any tab
+> may wait on it.
+>
 > **⏱ THE CLOCK IS RUNNING. Day 1 was 9 September; day 21 is 29 September at the
 > earliest.** This changes what "done" means for every remaining epic: *a change that
 > breaks a day's logging is a fix-now bug by definition*, because it resets a counter
 > that costs three weeks to rebuild. Before you ship anything, ask what it does to
-> tomorrow morning's log. **P1-I is the next ticket** — the outbox, last-write-wins, and
-> the airplane-mode day — and it is next precisely because three weeks of the only
-> irreplaceable asset in the project currently live on one phone with nothing draining
-> the outbox.
+> tomorrow morning's log. **P1-H is the next ticket** — the Matchday dashboard — and it
+> is the last screen in the app that is still a holding note. Four of the seven exit
+> criteria are now closed; what remains is P1-H, P1-E's HealthKit sync, and the days
+> themselves.
 >
 > **Two things P1-G left open, neither blocking.** The cross-source duplicate rule
 > (`WeightReconciliation`, 0.1 kg tolerance) is proven against mocks and has never met an
@@ -977,8 +1172,7 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > four cases; the pace panel does not read it. The fix is a designed state, not a
 > condition.
 >
-> **Three things P1-F left open, none of them blocking:** nothing has been logged with
-> the radio off (P1-I's airplane-mode day, and the exit criterion stays open for it); the
+> **Two things P1-F left open, neither blocking:** the
 > photo latency has not been read out of `Log.data` yet; and Sub On and Under Review have
 > not been captured at `.xSmall` or `.accessibility5` — The Run has, so the capture debt
 > is now three screens rather than four.

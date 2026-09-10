@@ -41,6 +41,7 @@ struct SafetyCopyTests {
             + SettingsCopy.all
             + SubOnCopy.all
             + TheRunCopy.all
+            + SyncCopy.all
             + Signposting.all
             + AuthFailure.allCases.compactMap(\.errorDescription)
             + AuthFailure.allCases.compactMap(\.recoveryDescription)

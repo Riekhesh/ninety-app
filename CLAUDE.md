@@ -13,14 +13,19 @@ calorie target, a goal weight, a rate of loss or an age check, that is the direc
 P1-F closed on 9 September with all four logging routes on a real device; `supabase/
 functions/` and `Ninety/Features/SubOn/` are its two halves. P1-G closed on 10 September
 and added `Ninety/Features/TheRun/` and `Ninety/Health/` — weight entry, the 7-day EWMA,
-and the one `import HealthKit` in the app.
+and the one `import HealthKit` in the app. **P1-I closed on 10 September** and added
+`Ninety/Sync/` — the first code that ever reads the outbox. ADR 0021 settles how it
+drains, and the airplane-mode day it exists for was walked on a real phone. 270 tests,
+21 suites.
 
 **⏱ The 21-day clock has been running since 9 September** (`docs/phase-1/README.md` is
 where it is counted). That is the single most important fact about this repo right now:
 **a change that breaks a day's logging is a fix-now bug by definition**, because it
 resets a counter that costs three weeks to rebuild. Ask what a change does to tomorrow
-morning's log before you ship it. **The next ticket is P1-I** — the outbox, and the
-airplane-mode day.
+morning's log before you ship it. **The next ticket is P1-H** — the Matchday dashboard,
+and the last screen in the app that is still a holding note. Four of the seven exit
+criteria are closed; what is left is P1-H, P1-E's HealthKit sync, and the days
+themselves.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -90,10 +95,13 @@ scripts/       verify-toolchain.sh (the Mac) · verify-accounts.sh (the .env)
 
 ```
 Ninety/          the app. App/ · Auth/ · Data/ · DesignSystem/ · Features/ · Health/ ·
-                 Safety/ · Support/ · Resources/Fonts/
+                 Safety/ · Support/ · Sync/ · Resources/Fonts/
                  A synchronized folder in Xcode — new files need no .pbxproj edit
   Health/        the ONLY place `import HealthKit` appears. Everything above it works
                  against `BodyMassSourcing`, which is what makes it testable at all
+  Sync/          the outbox drain (ADR 0021). The ONLY thing that reads sync_outbox, and
+                 the only place a Postgres column name is spelled in Swift. It may never
+                 delete anything but a queue entry
   Features/TheRun/  weight entry, the EWMA, the chart, the pace. `WeightTrend` is pure
                  and calendar-injected, because Phase 2's progress score reads it
 NinetyTests/     unit tests (Swift Testing)
@@ -139,6 +147,16 @@ docs and design commits never spend the 200-minute budget.
   array of weigh-ins makes α a function of how often the user remembers, so the chart
   measures the habit rather than the body. The two agree exactly when somebody weighs in
   daily, which is why the bug is invisible until it is somebody else's data.
+- **The drain may not spend an attempt on a failed connection** (ADR 0021). `attempts` is
+  a count of times the *server refused this row*, and five of them park it. Charging one
+  for a plane or a basement would take a week logged offline and land it already parked,
+  which is the clock's failure mode written as a retry loop.
+- **No test may wait on a wall clock.** There is no `Task.sleep` in `NinetyTests/` and it
+  is worth keeping that way. `FoodSearchTests` used to sleep past a 250 ms debounce and
+  assert; P1-I's 39 new `@MainActor` tests ate the slack and it started failing while
+  being perfectly correct. A longer sleep is a longer bet — await the work instead
+  (`FoodSearchModel.settle()`). The cost of this kind of test always lands on somebody
+  else's ticket, looking like a bug they caused.
 - **Never show raw daily weight as the headline.** §1.5 calls it actively harmful, and it
   is the one display rule the brief argues for at length. The toggle exists and resets to
   off every time the screen appears.
