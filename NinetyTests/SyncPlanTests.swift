@@ -299,6 +299,28 @@ struct SyncPlanTests {
         #expect(String(bytes: row.body, encoding: .utf8) == #"{"id":null,"kg":78.4,"source":"manual"}"#)
     }
 
+    @Test("a timestamptz goes up as UTC, to the microsecond")
+    func instantsAreUTC() {
+        // Pinned, because this is hand-rolled now: `ISO8601DateFormatter` is a
+        // class and not `Sendable`, so a shared one is exactly the static
+        // property `SWIFT_STRICT_CONCURRENCY = complete` refuses.
+        let moment = Date(timeIntervalSince1970: 1_800_050_400)
+        #expect(SyncTime.instant(moment) == "2027-01-15T22:00:00.000000Z")
+    }
+
+    @Test("the instant is fixed width whatever the fraction is")
+    func instantsAreFixedWidth() {
+        let odd = Date(timeIntervalSince1970: 1_800_050_400.123_456)
+        let text = SyncTime.instant(odd)
+
+        // A ragged fraction is still valid ISO 8601, but a fixed width is what
+        // makes a payload comparable against a literal — and an unpadded
+        // microsecond field would silently mean a different instant.
+        #expect(text.count == "2027-01-15T22:00:00.000000Z".count)
+        #expect(text.hasPrefix("2027-01-15T22:00:00."))
+        #expect(text.hasSuffix("Z"))
+    }
+
     @Test("a day is the day in the user's own calendar, not the day in UTC")
     func daysAreLocal() throws {
         // 22:00 UTC on 15 January 2027, which is already the 16th in Auckland.

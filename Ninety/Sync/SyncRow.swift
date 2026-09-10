@@ -129,8 +129,36 @@ extension SyncRow {
 /// actual date because someone turning 18 tomorrow is 17 today, and a day
 /// re-derived in UTC from a local midnight is the wrong day for half the year.
 enum SyncTime {
+    /// A `timestamptz`, always in UTC.
+    ///
+    /// **Hand-rolled, and the formatter it replaces is why.**
+    /// `ISO8601DateFormatter` is an `NSFormatter` subclass — a class, not
+    /// `Sendable` — so a `static let` holding one is shared mutable state, and
+    /// `SWIFT_STRICT_CONCURRENCY = complete` rejects it outright. The obvious
+    /// repairs are both worse than this: an instance per call allocates a
+    /// formatter to print six columns, and a lock around a shared one is a
+    /// mutex protecting a date.
+    ///
+    /// So this file holds no shared state at all. Every value it emits is a
+    /// pure function of its input, which is also what lets the payload tests
+    /// compare against a literal.
+    ///
+    /// Microseconds rather than milliseconds because that is the precision
+    /// `timestamptz` actually stores, and because `weight_logs` has a unique
+    /// constraint on `(user_id, measured_at, source)` — truncating the value we
+    /// resolve an upsert against is not somewhere to lose digits.
     static func instant(_ date: Date) -> String {
-        formatter.string(from: date)
+        let calendar = utc
+        let parts = calendar.dateComponents(
+            [.year, .month, .day, .hour, .minute, .second, .nanosecond],
+            from: date
+        )
+        return day(date, calendar: calendar)
+            + "T" + padded(parts.hour ?? 0, to: 2)
+            + ":" + padded(parts.minute ?? 0, to: 2)
+            + ":" + padded(parts.second ?? 0, to: 2)
+            + "." + padded((parts.nanosecond ?? 0) / 1_000, to: 6)
+            + "Z"
     }
 
     /// `yyyy-MM-dd`, in the calendar the user chose it in.
@@ -152,9 +180,13 @@ enum SyncTime {
         return String(repeating: "0", count: max(0, width - digits.count)) + digits
     }
 
-    private static let formatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
+    /// Computed, not stored. A `Calendar` is a `Sendable` value type, so a
+    /// `static let` would be legal — but the whole point of the note above is
+    /// that this file keeps no state, and one exception to that is how the next
+    /// one gets in.
+    private static var utc: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+        return calendar
+    }
 }
