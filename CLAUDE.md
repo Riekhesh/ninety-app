@@ -13,17 +13,19 @@ calorie target, a goal weight, a rate of loss or an age check, that is the direc
 P1-F closed on 9 September with all four logging routes on a real device; `supabase/
 functions/` and `Ninety/Features/SubOn/` are its two halves. P1-G closed on 10 September
 and added `Ninety/Features/TheRun/` and `Ninety/Health/` — weight entry, the 7-day EWMA,
-and the one `import HealthKit` in the app. **P1-I's build landed on 10 September**:
-`Ninety/Sync/` is the first code that ever reads the outbox, and ADR 0021 settles how it
-drains. It compiles and the suite is green (270 tests, 21 suites), but the airplane-mode
-day has not been run, so the epic is not closed.
+and the one `import HealthKit` in the app. **P1-I closed on 10 September** and added
+`Ninety/Sync/` — the first code that ever reads the outbox. ADR 0021 settles how it
+drains, and the airplane-mode day it exists for was walked on a real phone. 270 tests,
+21 suites.
 
 **⏱ The 21-day clock has been running since 9 September** (`docs/phase-1/README.md` is
 where it is counted). That is the single most important fact about this repo right now:
 **a change that breaks a day's logging is a fix-now bug by definition**, because it
 resets a counter that costs three weeks to rebuild. Ask what a change does to tomorrow
-morning's log before you ship it. **The next ticket is P1-H** — the Matchday dashboard —
-with P1-I's airplane-mode day still outstanding and travelling with P1-J.
+morning's log before you ship it. **The next ticket is P1-H** — the Matchday dashboard,
+and the last screen in the app that is still a holding note. Four of the seven exit
+criteria are closed; what is left is P1-H, P1-E's HealthKit sync, and the days
+themselves.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.

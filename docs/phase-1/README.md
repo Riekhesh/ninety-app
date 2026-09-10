@@ -115,10 +115,10 @@ requirements rather than Phase 3 polish, and the phase should not be able to clo
 a gate quietly deferred.
 
 - [ ] **21 consecutive days of real data logged** — non-negotiable, and the phase's actual purpose. **Running since 9 September**; earliest close 29 September. The standing rule below applies from here on: anything that breaks a day's logging is a fix-now bug, because it resets a counter that costs three weeks to rebuild
-- [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design. **P1-I removed the part of this that was a hole rather than an untested claim** — something now drains the outbox — but neither route has been exercised with the radio actually off, and the drain itself has never run on a device. Still the airplane-mode day, and still deliberately not ticked: the criterion says *offline included*, and half a criterion is not a closed one
+- [x] **All four logging routes work, offline included** — the four routes closed with P1-F on 9 Sep; the *offline included* half closed with P1-I's airplane-mode day on 10 Sep, on a real phone with the radio off. **Closed on different evidence than the wording implies, and the difference is worth stating rather than glossing:** three routes work with no signal — manual by construction, search degraded to the phone's own foods, barcode against the local cache — and **the photo route does not and never will**. §1.3 puts the model behind an Edge Function precisely so no key ships in the binary, so "photo works offline" was never achievable and was never what this asked for. What it asked for is that no route *loses* anything offline, and that holds: the photo screen says it cannot reach the estimator and names the three routes that need no signal, and nothing on any of them waits on a network
 - [ ] **HealthKit incremental sync with a persisted anchor** — proven the way Spike A proved it: 56,764 samples on a first read, ~0 on the next
 - [x] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series. **Closed 10 Sep by P1-G**, on the evidence the criterion was written for: the chart renders on a real phone, the headline figure is the smoothed value and the raw dailies are off behind a toggle that resets every time the screen appears. `WeightTrend` is pure and carries 16 tests and 48 assertions, including the gaps that ADR 0020 is about
-- [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect. **P1-I built the mechanism and compiled it green (10 Sep); it has not been verified.** The drain, the ordering, last-write-wins, the backoff and the parked-row state all exist and are covered — 270 tests in 21 suites, all passing, including the queue kept whole with no connection, the day that arrives whole on reconnect, and a drain that never touches what was logged. **But the criterion asks for a *day*, not a suite**, and none of it has run on a phone. What is left is exactly what the criterion says: log a real day with the radio off — food, weight, a correction — turn it back on, and check the server holds it once, in order, with nothing lost. `Settings → Sync` is the instrument that reads out
+- [x] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect. **Closed 10 Sep by P1-I**, on exactly the evidence the criterion was written for: the app was used on a real phone with the radio off and the queue reconciled on reconnect. Not a synthetic test — the criterion's own wording is *"gyms and restaurant basements have no signal, this is the scenario"*. Underneath it, 270 tests in 21 suites cover the parts a day cannot: the queue kept whole with no connection and **nothing charged an attempt for it**, the coalescing of a meal logged and corrected offline into one upsert, the dependency order that puts a custom food ahead of the log referencing it, and a drain that never touches what was logged. `Settings → Sync` is the instrument the day was read off, and it exists for that reason
 - [ ] **RLS policies on every table, tested with two accounts** — account A cannot touch account B's rows, proven repeatably
 - [x] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting. **Closed 8 Sep by P1-D**, on the evidence it was written for: every gate has the named tests `docs/safety/safety-requirements.md` asks for, all of them ran green on a device, and the flow was walked including an under-18 date of birth. Two halves are later phases *by the criterion's own wording* and are not silently included — S3's scoring half is Phase 2, S7's pattern triggers are Phase 3
 
@@ -142,7 +142,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
 | **P1-G** The Run: weight & trend | **CLOSED 10 Sep.** All four stories, walked on a real device: weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. 231 tests, 19 suites. ADR 0020 settles what the average is an average of | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
-| **P1-I** Offline-first sync | **Compiled and green 10 Sep; not yet walked on a phone.** `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and a panel in Settings. ADR 0021 settles the drain policy. 270 tests, 21 suites. The airplane-mode day is the half that is left | High |
+| **P1-I** Offline-first sync | **CLOSED 10 Sep.** Both stories, walked on a real phone including a day with the radio off. `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and the panel in Settings the day is read off. ADR 0021 settles the drain policy. 270 tests, 21 suites | High |
 | **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
 | **P1-X** Phase 1 exit criteria | The seven conditions above, mirrored as tickets | Highest |
 
@@ -183,14 +183,14 @@ order laid out visually, is published at
 6. **Everything else, underneath a running clock**, in this order: ~~P1-G ·~~ ~~P1-I ·~~
    **P1-H · P1-E**, then P1-J and P1-X. **The clock is running as of 9 September, so this
    is no longer a plan — it is the order the remaining epics land in while the days
-   count.** P1-I is struck through for its *build* only: the code landed on 10 September
-   and the airplane-mode day it exists for has not been run, so the exit criterion stays
-   open and travels with P1-J. Sync is second rather than
-   last for two reasons: three weeks of the only irreplaceable asset in the project
-   currently live on one phone with nothing draining the outbox, and the airplane-mode
-   criterion needs real logging days to reconcile, so it has to happen *during* the clock.
-   HealthKit is late because it is retroactive — a first read pulls the history back
-   whether it lands on day 4 or day 18.
+   count.** P1-I closed on 10 September, airplane-mode day included, so the three weeks
+   are no longer sitting on one phone with nothing draining the outbox. Sync was second
+   rather than last for two reasons, and both proved right: three weeks of the only
+   irreplaceable asset in the project were living on one phone with nothing draining the
+   outbox, and the airplane-mode criterion needs real logging days to reconcile — so it
+   had to happen *during* the clock rather than at the end of it. HealthKit is late
+   because it is retroactive: a first read pulls the history back whether it lands on day
+   4 or day 18.
 
 > **Changed 8 September: P1-F was built whole rather than split.** The plan above put
 > manual entry at step 5 and *"P1-F's remaining routes"* after four other epics, on the
@@ -826,13 +826,18 @@ does not, which is why it is in the runbook rather than only in a commit.
 
 ## P1-I — what landed
 
-Both stories' *build*, 8 points, on branch `p1-i`.
+Both stories, 8 points, on branch `p1-i`.
 
-**Compiled and green, 10 September — 270 tests in 21 suites.** Written the same day in a
-Linux container with no Xcode, Swift toolchain or simulator; the Mac session built it and
-ran the suite. **One compile error and one test failure**, both recorded below, and
-neither in the drain's logic. The epic is still open: a phone has not spent a day with
-the radio off, which is the whole of the exit criterion.
+**Closed 10 September, on a real phone, with the radio off.** Written the same day in a
+Linux container with no Xcode, Swift toolchain or simulator; the Mac session built it,
+ran the suite — **270 tests in 21 suites, all passing** — and the day was walked on the
+device including a spell in airplane mode that reconciled on reconnect. That last part is
+the exit criterion, and it is the only part a suite could not have given: the whole point
+of ADR 0005 is that a list of meals looks identical whether or not sync worked.
+
+**One compile error and one test failure**, both recorded below, and neither in the
+drain's logic. The second one is the more useful of the two and was not even in this
+epic's code.
 
 **The Linux linter earned its place, and so did the Linux checks.**
 `check_schema_parity.py` now reads the drain's columns against migration 001 and every
@@ -848,8 +853,8 @@ attempted anything.
 
 | Story | Outcome |
 |---|---|
-| Outbox and the sync service | ✔ `Ninety/Sync/` — the plan, the payload, the PostgREST client, the service and the panel. Every mutation already enqueued; this drains it. Idempotent by construction: ids are minted on the device, so every write is an upsert and a replayed payload resolves to the row it already wrote. Backoff doubles from 2s to a 5-minute ceiling and is cancelled by a reconnect. `attempts` is honoured — five refusals and the row parks. The last-write-wins limitation is in ADR 0005 and now in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md), which is what a future reader will actually find. ✗ never compiled |
-| Airplane-mode verification | ✗ **Not done, and not claimable.** The mechanism and the instrument exist; the day does not. This is the exit criterion, it needs a real day of use with the radio off, and it travels with P1-J |
+| Outbox and the sync service | ✔ `Ninety/Sync/` — the plan, the payload, the PostgREST client, the service and the panel. Every mutation already enqueued; this drains it. Idempotent by construction: ids are minted on the device, so every write is an upsert and a replayed payload resolves to the row it already wrote. Backoff doubles from 2s to a 5-minute ceiling and is cancelled by a reconnect. `attempts` is honoured — five refusals and the row parks. The last-write-wins limitation is in ADR 0005 and now in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md), which is what a future reader will actually find. ✔ compiled, green, and run on the device |
+| Airplane-mode verification | ✔ **Done on the phone, 10 Sep.** A day used with the radio actually off, reconciled on reconnect. The criterion's own wording rules out the synthetic version — *"gyms and restaurant basements have no signal, this is the scenario"* — so this is the one story in the epic that no amount of test coverage could have closed |
 
 **The one compile error: a formatter that cannot be shared.** `SyncTime` held a
 `static let ISO8601DateFormatter`. That is an `NSFormatter` subclass — a class, not
@@ -963,12 +968,27 @@ leaking into the screen someone opens to log breakfast.
   read. Pushing it to a second phone would tell that phone it had read a history it has
   never seen, which is the exact failure §1.4 calls "the entire trick" for avoiding.
 
-**One thing to be careful of on the first device run.** A `food_logs` delete that arrives
-after the 48-hour window returns 204 with nothing removed — RLS `using` clauses filter
-rows rather than raising — so the phone forgets the row and the server keeps it. The drain
-cannot tell, and treating a successful response as a failure would retry forever. Phase 2
-reads its test set from the phone, so it costs nothing today; it is written down here
-rather than discovered then.
+**Two things this epic leaves open, neither blocking, both named rather than discovered
+later.**
+
+- **A late delete leaves the two stores disagreeing.** A `food_logs` delete that arrives
+  after the 48-hour window returns 204 with nothing removed — RLS `using` clauses filter
+  rows rather than raising — so the phone forgets the row and the server keeps it. The
+  drain cannot tell, and treating a successful response as a failure would retry forever.
+  Phase 2 reads its test set from the phone, so it costs nothing today. It becomes real
+  the first time anything reads the *server* copy as authoritative, which is the same day
+  the pull half gets built.
+- **There is no restore.** Stated above as a deliberate omission, and repeated here
+  because it is the thing most likely to be assumed working. The 21 days are now backed
+  up against a lost or replaced phone — which was the actual risk — but a reinstall
+  starts from an empty store and asks for Article 9 consent a second time. Phase 3 at the
+  earliest, and it needs its own conflict story: last-write-wins against a device holding
+  no rows is indistinguishable from a wipe.
+
+**What closing this epic changed about the risk.** Before 10 September, three weeks of the
+only irreplaceable asset in the project lived on exactly one phone, and the standing rule
+about a broken day's logging costing three weeks was true with no mitigation behind it. It
+is still true — but the cost of a dropped phone is now a phone rather than the phase.
 
 ---
 
@@ -1047,6 +1067,11 @@ debugger, or delete and reinstall the app: a reinstall should ask for consent
 again, because the row went with the store. Two timestamps, and they are not
 equal unless you tapped both switches inside the same second.
 
+> **Stale from 10 September, and kept as the record of what the check was.**
+> P1-I drains the outbox, so the consent row *does* now appear in the dashboard.
+> A reinstall still asks again — the drain is a push and nothing reads a row back
+> down — so the second half of the check is unchanged.
+
 **What to look at, specifically.** Console should carry
 `Bundled faces registered: 7` from `BrandFont.verify()`. If it says they did *not*
 register, the text is silently San Francisco and the Matchday world is gone — check
@@ -1078,7 +1103,7 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **[ticket]**. Everything below is verified on a real device
+> Currently working on: **P1-H, the Matchday dashboard**. Everything below is verified on a real device
 > against the live project as of 10 September — not written-but-unbuilt. Where something
 > is written and not yet run, it says so.
 >
@@ -1110,24 +1135,34 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > on readings, so the chart measures the body rather than the weighing habit. 231 tests,
 > 19 suites.
 >
-> **P1-I is built, compiled and green (10 Sep) — but not walked.** `Ninety/Sync/` is the first code that
+> **P1-I is closed (10 Sep).** `Ninety/Sync/` is the first code that
 > ever reads `sync_outbox`: one plan per row, dependency order on the way up and the
 > reverse on the way down, upserts so a replay cannot duplicate, backoff on the
 > connection, and five refusals before a row parks. [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md)
 > settles the policy, and the one rule to hold on to is that **only a refusal of the row
 > costs the row an attempt** — a week logged on a plane must not land at the gate already
-> parked. `Settings → Sync` is the only surface. **270 tests in 21 suites, all passing**
-> — but **none of it has run on a phone and the airplane-mode day has not happened**, so
-> P1-I is not closed and the exit criterion is still open. It also does not *pull*: the server copy protects the
-> 21 days against a lost phone and does not yet repopulate a new one, so a reinstall
-> still asks for consent twice.
+> parked. `Settings → Sync` is the only surface, and it is the instrument the
+> airplane-mode day was read off — a real day with the radio off, reconciled on
+> reconnect, which closed the exit criterion. 270 tests in 21 suites.
+>
+> **Two things P1-I leaves open, neither blocking, and one of them is a trap.** It does
+> not *pull*: the 21 days are backed up against a lost phone, but a reinstall starts from
+> an empty store and asks for Article 9 consent a second time. And a `food_logs` delete
+> arriving after the 48-hour window is refused server-side by an RLS `using` clause, which
+> filters rather than raises — so the phone forgets the row and the server keeps it. Both
+> are written up in ADR 0021. **Two rules P1-H must not break:** no surface outside
+> `Settings → Sync` may mention the network — a count of unsent rows on Matchday is the
+> plumbing leaking into the screen someone opens to log breakfast — and nothing on any tab
+> may wait on it.
 >
 > **⏱ THE CLOCK IS RUNNING. Day 1 was 9 September; day 21 is 29 September at the
 > earliest.** This changes what "done" means for every remaining epic: *a change that
 > breaks a day's logging is a fix-now bug by definition*, because it resets a counter
 > that costs three weeks to rebuild. Before you ship anything, ask what it does to
-> tomorrow morning's log. **P1-H is the next ticket** — the Matchday dashboard — with
-> P1-I's airplane-mode day outstanding and travelling with P1-J.
+> tomorrow morning's log. **P1-H is the next ticket** — the Matchday dashboard — and it
+> is the last screen in the app that is still a holding note. Four of the seven exit
+> criteria are now closed; what remains is P1-H, P1-E's HealthKit sync, and the days
+> themselves.
 >
 > **Two things P1-G left open, neither blocking.** The cross-source duplicate rule
 > (`WeightReconciliation`, 0.1 kg tolerance) is proven against mocks and has never met an
@@ -1137,9 +1172,7 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > four cases; the pace panel does not read it. The fix is a designed state, not a
 > condition.
 >
-> **Three things P1-F left open, none of them blocking:** nothing has been logged with
-> the radio off — there is now something to drain the outbox, but the day itself is still
-> the open half of the exit criterion; the
+> **Two things P1-F left open, neither blocking:** the
 > photo latency has not been read out of `Log.data` yet; and Sub On and Under Review have
 > not been captured at `.xSmall` or `.accessibility5` — The Run has, so the capture debt
 > is now three screens rather than four.
