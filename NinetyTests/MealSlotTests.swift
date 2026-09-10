@@ -18,7 +18,6 @@ struct MealSlotTests {
         SubOnTests.at(hour, minute, day: day, in: calendar)
     }
 
-
     /// Null means derived, and the repository is what keeps it meaning that.
     ///
     /// The rule is easy to state and easy to lose: store the slot **only** where
@@ -43,18 +42,33 @@ struct MealSlotTests {
         let foods = MockFoodRepository(logs: [log], userID: user, now: morning)
 
         // Re-picking what was already showing writes nothing.
-        try foods.update(log, grams: 220, kcal: 286, mealSlot: .breakfast, at: morning, calendar: calendar)
+        try foods.update(
+            log,
+            to: FoodLogCorrection(grams: 220, kcal: 286, mealSlot: .breakfast),
+            at: morning,
+            calendar: calendar
+        )
         #expect(log.storedMealSlot == nil)
         #expect(log.mealSlot(calendar: calendar) == .breakfast)
 
         // Moving it does, and the move is what a later read sees.
-        try foods.update(log, grams: 220, kcal: 286, mealSlot: .dinner, at: morning, calendar: calendar)
+        try foods.update(
+            log,
+            to: FoodLogCorrection(grams: 220, kcal: 286, mealSlot: .dinner),
+            at: morning,
+            calendar: calendar
+        )
         #expect(log.storedMealSlot == .dinner)
         #expect(log.mealSlot(calendar: calendar) == .dinner)
 
         // And it can be handed back to the derivation, which is the only way a
         // user undoes a correction they did not mean.
-        try foods.update(log, grams: 220, kcal: 286, mealSlot: .breakfast, at: morning, calendar: calendar)
+        try foods.update(
+            log,
+            to: FoodLogCorrection(grams: 220, kcal: 286, mealSlot: .breakfast),
+            at: morning,
+            calendar: calendar
+        )
         #expect(log.storedMealSlot == nil)
     }
 
@@ -78,7 +92,12 @@ struct MealSlotTests {
         let foods = MockFoodRepository(logs: [log], userID: user, now: now)
 
         #expect(throws: RepositoryError.self) {
-            try foods.update(log, grams: 200, kcal: 260, mealSlot: .dinner, at: now, calendar: calendar)
+            try foods.update(
+            log,
+            to: FoodLogCorrection(grams: 200, kcal: 260, mealSlot: .dinner),
+            at: now,
+            calendar: calendar
+        )
         }
         #expect(log.storedMealSlot == nil)
     }

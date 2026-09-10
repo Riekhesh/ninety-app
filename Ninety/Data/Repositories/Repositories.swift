@@ -71,6 +71,25 @@ struct FoodLogDraft {
     }
 }
 
+/// A correction on its way to a log that already exists.
+///
+/// A value rather than three more parameters, and the reasoning is
+/// `FoodLogDraft`'s rather than the argument count: the correction sheet holds
+/// one of these while the user edits it, and hands it over when they save. It
+/// also keeps `update` under the parameter limit, which is the lint rule doing
+/// its actual job — six positional arguments on a write path is where a `grams`
+/// and a `kcal` eventually get swapped.
+struct FoodLogCorrection: Equatable, Sendable {
+    var grams: Double
+    var kcal: Double
+
+    /// **The slot the user is looking at, not an override.** The repository
+    /// stores it only where it disagrees with what `logged_at` would derive
+    /// (ADR 0022), so a sheet can hand back whatever its picker holds without
+    /// working out whether the user actually moved it.
+    var mealSlot: MealSlot
+}
+
 /// A food about to be created or cached locally.
 ///
 /// Two jobs, deliberately one type. A custom food the user typed on the manual
@@ -232,20 +251,10 @@ protocol FoodRepositoryProtocol {
     /// Refuses after the 48-hour window. The moment is a parameter so the rule
     /// can be tested without waiting two days or moving the device clock.
     ///
-    /// **`mealSlot` is the slot the user is looking at, not an override**, and
-    /// the difference is the whole of ADR 0022's storage rule: passing the slot
-    /// the derivation would have produced anyway clears the column rather than
-    /// writing it, so null keeps meaning "the app worked this out". A correction
-    /// screen can therefore hand back whatever its picker holds without having
-    /// to work out whether the user actually moved it.
-    func update(
-        _ log: FoodLog,
-        grams: Double,
-        kcal: Double,
-        mealSlot: MealSlot,
-        at moment: Date,
-        calendar: Calendar
-    ) throws
+    /// The calendar is needed because the correction carries a meal slot, and
+    /// whether that slot is an override depends on what `logged_at` derives to
+    /// in the user's own calendar (ADR 0022).
+    func update(_ log: FoodLog, to correction: FoodLogCorrection, at moment: Date, calendar: Calendar) throws
 
     func delete(_ log: FoodLog, at moment: Date) throws
 }

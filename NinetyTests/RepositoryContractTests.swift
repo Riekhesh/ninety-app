@@ -52,9 +52,7 @@ struct RepositoryContractTests {
         #expect(throws: RepositoryError.self) {
             try food.update(
                 entry,
-                grams: 200,
-                kcal: 200,
-                mealSlot: entry.mealSlot(calendar: .current),
+                to: FoodLogCorrection(grams: 200, kcal: 200, mealSlot: entry.mealSlot(calendar: .current)),
                 at: loggedAt.addingTimeInterval(72 * 3_600),
                 calendar: .current
             )

@@ -275,9 +275,7 @@ final class SubOnModel {
         do {
             try foods.update(
                 log,
-                grams: max(grams, 1),
-                kcal: kcal,
-                mealSlot: mealSlot,
+                to: FoodLogCorrection(grams: max(grams, 1), kcal: kcal, mealSlot: mealSlot),
                 at: now(),
                 calendar: calendar
             )

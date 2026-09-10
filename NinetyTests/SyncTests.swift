@@ -131,9 +131,7 @@ struct SyncTests {
         let log = try world.food.log(meal("Porridge with milk", grams: 200, kcal: 260))
         try world.food.update(
             log,
-            grams: 300,
-            kcal: 390,
-            mealSlot: log.mealSlot(calendar: .current),
+            to: FoodLogCorrection(grams: 300, kcal: 390, mealSlot: log.mealSlot(calendar: .current)),
             at: Self.noon.addingTimeInterval(600),
             calendar: .current
         )
@@ -292,9 +290,7 @@ struct SyncTests {
         // Inside the window, so the app allows it and queues it.
         try world.food.update(
             log,
-            grams: 300,
-            kcal: 500,
-            mealSlot: log.mealSlot(calendar: .current),
+            to: FoodLogCorrection(grams: 300, kcal: 500, mealSlot: log.mealSlot(calendar: .current)),
             at: Self.noon.addingTimeInterval(3_600),
             calendar: .current
         )
@@ -335,17 +331,13 @@ struct SyncTests {
         let log = try world.food.log(meal("Corrected twice"))
         try world.food.update(
             log,
-            grams: 260,
-            kcal: 470,
-            mealSlot: log.mealSlot(calendar: .current),
+            to: FoodLogCorrection(grams: 260, kcal: 470, mealSlot: log.mealSlot(calendar: .current)),
             at: Self.noon.addingTimeInterval(60),
             calendar: .current
         )
         try world.food.update(
             log,
-            grams: 270,
-            kcal: 480,
-            mealSlot: log.mealSlot(calendar: .current),
+            to: FoodLogCorrection(grams: 270, kcal: 480, mealSlot: log.mealSlot(calendar: .current)),
             at: Self.noon.addingTimeInterval(120),
             calendar: .current
         )

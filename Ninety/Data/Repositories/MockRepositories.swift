@@ -172,19 +172,18 @@ final class MockFoodRepository: FoodRepositoryProtocol {
 
     func update(
         _ log: FoodLog,
-        grams: Double,
-        kcal: Double,
-        mealSlot: MealSlot,
+        to correction: FoodLogCorrection,
         at moment: Date,
         calendar: Calendar
     ) throws {
         guard log.isEditable(at: moment) else { throw RepositoryError.logIsLocked(since: log.locksAt) }
-        log.grams = grams
-        log.kcal = kcal
+        log.grams = correction.grams
+        log.kcal = correction.kcal
         // The same rule as the real one, written out rather than shared: a mock
         // that delegates its interesting behaviour somewhere else stops being a
         // thing a test can read top to bottom.
-        log.storedMealSlot = mealSlot == MealSlot.of(log.loggedAt, calendar: calendar) ? nil : mealSlot
+        let derived = MealSlot.of(log.loggedAt, calendar: calendar)
+        log.storedMealSlot = correction.mealSlot == derived ? nil : correction.mealSlot
     }
 
     func delete(_ log: FoodLog, at moment: Date) throws {
