@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SCHEMA = ROOT / "supabase" / "migrations" / "20260902000001_initial_schema.sql"
+MIGRATIONS = ROOT / "supabase" / "migrations"
 DOMAIN = ROOT / "Ninety" / "Data" / "Domain.swift"
 MODELS = ROOT / "Ninety" / "Data" / "Models"
 PAYLOAD = ROOT / "Ninety" / "Sync" / "SyncPayload.swift"
@@ -41,6 +41,7 @@ ENUMS = {
     "weight_source": "WeightSource",
     "outbox_operation": "OutboxOperation",
     "goal_type": "GoalType",
+    "meal_slot": "MealSlot",
     "sex": "Sex",
     "activity_level": "ActivityLevel",
 }
@@ -120,8 +121,22 @@ DELIBERATELY_NOT_SENT = {
 }
 
 
+def schema() -> str:
+    """Every migration, concatenated in the order `supabase db push` applies them.
+
+    **Not migration 001 alone, and that changed with 007.** Until meal slots the
+    whole live schema was one file, so reading one file was the same thing as
+    reading the schema. It is not any more: a `create type` or an `alter table
+    ... add column` in a later migration is as real as anything in 001, and a
+    checker that cannot see it reports a column the drain sends as one that does
+    not exist. Filename order is the applied order — that is what `supabase db
+    push` guarantees — so sorting the paths is enough.
+    """
+    return "\n".join(path.read_text() for path in sorted(MIGRATIONS.glob("*.sql")))
+
+
 def postgres_columns(sql: str, table: str) -> dict[str, str]:
-    """Column name -> the rest of its declaration, for one create table."""
+    """Column name -> the rest of its declaration, across every migration."""
     match = re.search(rf"create table {table} \((.*?)\n\);", sql, re.S)
     if not match:
         return {}
@@ -137,6 +152,16 @@ def postgres_columns(sql: str, table: str) -> dict[str, str]:
         if name in {"constraint", "unique", "check", "primary", "foreign"}:
             continue
         columns[name] = rest
+
+    # Anything a later migration bolted on. `add column` only: a `drop column`
+    # would need the same treatment, and there has never been one — when there
+    # is, this is the function that has to learn about it rather than the caller.
+    for name, rest in re.findall(
+        rf"alter table {table}\s+add column\s+(?:if not exists\s+)?([a-z][a-z0-9_]*)\s+([^;]+);",
+        sql,
+        re.S,
+    ):
+        columns[name] = " ".join(rest.split())
     return columns
 
 
@@ -215,12 +240,12 @@ def check_sync_payload(sql: str) -> bool:
     for table, columns in sorted(written.items()):
         declared = postgres_columns(sql, table)
         if not declared:
-            print(f"BAD SyncPayload writes to `{table}`, which migration 001 does not create")
+            print(f"BAD SyncPayload writes to `{table}`, which no migration creates")
             clean = False
             continue
 
         for column in sorted(columns - set(declared)):
-            print(f"BAD SyncPayload sends `{table}.{column}`, which does not exist in migration 001")
+            print(f"BAD SyncPayload sends `{table}.{column}`, which no migration creates")
             clean = False
 
         for column, declaration in sorted(declared.items()):
@@ -265,7 +290,7 @@ def swift_enum_values(swift: str, name: str) -> list[str] | None:
 
 
 def main() -> int:
-    sql = SCHEMA.read_text()
+    sql = schema()
     swift = DOMAIN.read_text()
     failures = 0
 
@@ -290,7 +315,7 @@ def main() -> int:
 
     for table, model in TABLES.items():
         if not re.search(rf"create table {table} \(", sql):
-            print(f"BAD migration 001 has no table `{table}`")
+            print(f"BAD no migration creates the table `{table}`")
             failures += 1
         elif not (MODELS / f"{model}.swift").exists():
             print(f"BAD `{table}` has no local model — expected Ninety/Data/Models/{model}.swift")

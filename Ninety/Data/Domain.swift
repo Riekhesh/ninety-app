@@ -21,6 +21,18 @@ enum EntryMethod: String, Codable, CaseIterable, Sendable {
     case manual, search, barcode, photo
 }
 
+/// Which meal a log belongs to (ADR 0022).
+///
+/// **Three values and no `snack`.** Adding a fourth is `alter type meal_slot add
+/// value 'snack'` and a case here; *removing* one is a data migration over
+/// everybody's history, so the enum starts at the three the decision asked for
+/// rather than at the four somebody might want. `MealSlot.swift` carries the
+/// derivation and the titles; this is the half Postgres has to agree with, and
+/// `check_schema_parity.py` is what keeps the two honest.
+enum MealSlot: String, Codable, CaseIterable, Sendable {
+    case breakfast, lunch, dinner
+}
+
 enum WeightSource: String, Codable, CaseIterable, Sendable {
     case manual, healthkit
 }

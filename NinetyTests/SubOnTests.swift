@@ -26,7 +26,7 @@ struct SubOnTests {
     /// in London in September, not 11:59. Two assertions were checking a time
     /// they did not mean, and two more passed by luck.
     ///
-    /// The failure was in the fixture rather than in `MealPeriod`, which is the
+    /// The failure was in the fixture rather than in the slot rule, which is the
     /// good version of this bug — but it is exactly the confusion the type
     /// exists to prevent, so the helper is now one that cannot be misread.
     static func at(_ hour: Int, _ minute: Int = 0, day: Int, in calendar: Calendar) -> Date {
@@ -39,25 +39,34 @@ struct SubOnTests {
         return calendar.date(from: components) ?? Date()
     }
 
-    // MARK: - First Half / Second Half
+    // MARK: - Breakfast / lunch / dinner
 
-    @Test("the halves change over at midday")
-    func halvesChangeAtMidday() {
+    /// The two changeovers, and both edges of each.
+    ///
+    /// **Was First Half / Second Half at midday** until ADR 0022. The rule these
+    /// assertions are actually protecting did not change — the hour is read in
+    /// the user's own calendar, and the boundaries are named constants rather
+    /// than literals in two places — so the test moved with the type rather than
+    /// being rewritten from scratch.
+    @Test("the slots change over at eleven and at four")
+    func slotsChangeAtTheirBoundaries() {
         let calendar = Self.london
-        #expect(MealPeriod.of(Self.at(8, 30, day: 8, in: calendar), calendar: calendar) == .firstHalf)
-        #expect(MealPeriod.of(Self.at(11, 59, day: 8, in: calendar), calendar: calendar) == .firstHalf)
-        #expect(MealPeriod.of(Self.at(12, day: 8, in: calendar), calendar: calendar) == .secondHalf)
-        #expect(MealPeriod.of(Self.at(19, 45, day: 8, in: calendar), calendar: calendar) == .secondHalf)
+        #expect(MealSlot.of(Self.at(6, 45, day: 8, in: calendar), calendar: calendar) == .breakfast)
+        #expect(MealSlot.of(Self.at(10, 59, day: 8, in: calendar), calendar: calendar) == .breakfast)
+        #expect(MealSlot.of(Self.at(11, day: 8, in: calendar), calendar: calendar) == .lunch)
+        #expect(MealSlot.of(Self.at(15, 59, day: 8, in: calendar), calendar: calendar) == .lunch)
+        #expect(MealSlot.of(Self.at(16, day: 8, in: calendar), calendar: calendar) == .dinner)
+        #expect(MealSlot.of(Self.at(19, 45, day: 8, in: calendar), calendar: calendar) == .dinner)
     }
 
-    /// The acceptance criterion: *"First Half / Second Half meal periods assign
-    /// correctly across a date boundary."*
+    /// The acceptance criterion, carried over from the halves: *"meal periods
+    /// assign correctly across a date boundary."*
     ///
-    /// A late dinner is the Second Half of the day it was eaten, and a 00:10
-    /// snack is the First Half of the next one — never the Second Half of the
-    /// day before, which is what an hour read off a fixed UTC offset would say
-    /// in British Summer Time.
-    @Test("a log either side of midnight lands in the right half of the right day")
+    /// A late dinner is dinner on the day it was eaten, and a 00:10 raid on the
+    /// fridge is breakfast of the next one — never dinner of the day before,
+    /// which is what an hour read off a fixed UTC offset would say in British
+    /// Summer Time.
+    @Test("a log either side of midnight lands in the right meal of the right day")
     func acrossTheDateBoundary() {
         let calendar = Self.london
 
@@ -69,15 +78,15 @@ struct SubOnTests {
         let lateDinner = Self.at(23, 30, day: 8, in: calendar)
         let midnightSnack = Self.at(0, 10, day: 9, in: calendar)
 
-        #expect(MealPeriod.of(lateDinner, calendar: calendar) == .secondHalf)
-        #expect(MealPeriod.of(midnightSnack, calendar: calendar) == .firstHalf)
+        #expect(MealSlot.of(lateDinner, calendar: calendar) == .dinner)
+        #expect(MealSlot.of(midnightSnack, calendar: calendar) == .breakfast)
 
-        // And the halves agree with the days the repository counts them against.
+        // And the slots agree with the days the repository counts them against.
         #expect(!calendar.isDate(lateDinner, inSameDayAs: midnightSnack))
     }
 
-    @Test("the changeover hour is read from the calendar, not from UTC")
-    func periodUsesTheGivenCalendar() {
+    @Test("the changeover hours are read from the calendar, not from UTC")
+    func slotUsesTheGivenCalendar() {
         var tokyo = Calendar(identifier: .gregorian)
         tokyo.timeZone = TimeZone(identifier: "Asia/Tokyo") ?? .gmt
         var utc = Calendar(identifier: .gregorian)
@@ -86,12 +95,12 @@ struct SubOnTests {
         // **One instant, two answers.** 05:00 UTC is a six-in-the-morning coffee
         // in London and a two-in-the-afternoon lunch in Tokyo, on a day when
         // London is an hour ahead of UTC and Tokyo is nine. Nothing about the
-        // moment decides which half it is; the calendar does, which is the whole
+        // moment decides which meal it is; the calendar does, which is the whole
         // reason it is a parameter rather than read from ambient state.
         let instant = Self.at(5, day: 8, in: utc)
 
-        #expect(MealPeriod.of(instant, calendar: Self.london) == .firstHalf)
-        #expect(MealPeriod.of(instant, calendar: tokyo) == .secondHalf)
+        #expect(MealSlot.of(instant, calendar: Self.london) == .breakfast)
+        #expect(MealSlot.of(instant, calendar: tokyo) == .lunch)
     }
 
     // MARK: - The Squad and the Bench

@@ -8,11 +8,12 @@ import SwiftUI
 /// §2.3's forty-eight-hour edit window had been in the repository, tested, since
 /// P1-B with no surface at all.
 ///
-/// **Grouped by half rather than by meal.** First Half and Second Half are pure
-/// functions of `logged_at` in the user's own calendar, so this costs no column
-/// and no migration. It is most of what a lunch-and-dinner breakdown would give
-/// you; whether Ninety ever grows real meal slots is a product decision with a
-/// migration behind it, and this is deliberately not a down-payment on one.
+/// **Grouped by meal** (ADR 0022). Breakfast, lunch and dinner replaced First
+/// Half and Second Half when Matchday's team sheet made two buckets stop being
+/// enough. The slot is still derived from `logged_at` for almost every row, so
+/// logging costs the same number of taps it did; what the column bought is the
+/// row the derivation gets wrong — a night shift, a very late dinner — which is
+/// corrected in the sheet below and stays corrected.
 struct TodaySection: View {
     let model: SubOnModel
 
@@ -44,8 +45,8 @@ struct TodaySection: View {
                     detail: SubOnCopy.nothingLoggedDetail
                 )
             } else {
-                ForEach(MealPeriod.allCases) { period in
-                    half(period)
+                ForEach(MealSlot.allCases) { slot in
+                    meal(slot)
                 }
             }
         }
@@ -55,11 +56,11 @@ struct TodaySection: View {
     }
 
     @ViewBuilder
-    private func half(_ period: MealPeriod) -> some View {
-        let logs = model.today(in: period)
+    private func meal(_ slot: MealSlot) -> some View {
+        let logs = model.today(in: slot)
         if !logs.isEmpty {
             VStack(alignment: .leading, spacing: Ninety.Space.sm) {
-                Text(period.title)
+                Text(slot.title)
                     .ninetyType(.label)
                     .foregroundStyle(Ninety.Colour.textTertiary)
                     .accessibilityAddTraits(.isHeader)
@@ -135,6 +136,13 @@ private struct CorrectLogSheet: View {
     @State private var gramsText = ""
     @State private var kcalText = ""
 
+    /// Seeded from the log on appear, which for almost every row is the derived
+    /// answer rather than a stored one. The picker does not distinguish them and
+    /// does not need to: the repository stores a slot only where it disagrees
+    /// with the derivation, so re-picking what was already showing is a no-op
+    /// rather than a write (ADR 0022).
+    @State private var slot: MealSlot = .breakfast
+
     private var isEditable: Bool { model.isEditable(log) }
 
     var body: some View {
@@ -144,6 +152,7 @@ private struct CorrectLogSheet: View {
                     if isEditable {
                         NinetyField(label: SubOnCopy.gramsField, unit: "g", value: $gramsText)
                         NinetyField(label: SubOnCopy.kcalField, unit: "kcal", value: $kcalText)
+                        mealPicker
 
                         Button(SubOnCopy.saveEdit, action: save)
                             .buttonStyle(.primary)
@@ -190,14 +199,45 @@ private struct CorrectLogSheet: View {
         .onAppear {
             gramsText = "\(Int(log.grams.rounded()))"
             kcalText = "\(Int(log.kcal.rounded()))"
+            slot = model.slot(of: log)
+        }
+    }
+
+    /// Which meal it was, when the clock got it wrong.
+    ///
+    /// A segmented picker rather than a menu: three options that always fit, and
+    /// the current one is readable without opening anything — which is the point,
+    /// because for almost every row the right answer is already selected and the
+    /// user is here about the portion.
+    private var mealPicker: some View {
+        VStack(alignment: .leading, spacing: Ninety.Space.sm) {
+            Text(SubOnCopy.mealField)
+                .ninetyType(.label)
+                .foregroundStyle(Ninety.Colour.textTertiary)
+
+            Picker(SubOnCopy.mealField, selection: $slot) {
+                ForEach(MealSlot.allCases) { option in
+                    Text(option.title).tag(option)
+                }
+            }
+            .pickerStyle(.segmented)
+            .accessibilityLabel(SubOnCopy.mealField)
+
+            Text(SubOnCopy.mealFieldNote)
+                .ninetyType(.footnote)
+                .foregroundStyle(Ninety.Colour.textTertiary)
         }
     }
 
     private func save() {
         guard let kcal = ManualEntryView.number(kcalText) else { return }
-        if model.update(log, grams: ManualEntryView.number(gramsText) ?? log.grams, kcal: kcal) {
-            dismiss()
-        }
+        let landed = model.update(
+            log,
+            grams: ManualEntryView.number(gramsText) ?? log.grams,
+            kcal: kcal,
+            mealSlot: slot
+        )
+        if landed { dismiss() }
     }
 
     private func remove() {

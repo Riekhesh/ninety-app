@@ -34,6 +34,28 @@ enum NinetySchemaV1: VersionedSchema {
     }
 }
 
+/// V2 · `FoodLog.mealSlotRaw` (ADR 0022).
+///
+/// **The first schema change to land on a phone that already holds logged
+/// days**, which is the case the whole of `NinetySchemaV1`'s note was written
+/// for. It is the cheapest shape that change can have: one new property, on one
+/// model, optional, with no default and nothing to backfill.
+///
+/// That last part is not an accident of the design, it *is* the design. Nil
+/// means "derive the slot from `logged_at`", so every row already in the store
+/// is already correct under V2 without being touched — which is what makes this
+/// a lightweight stage rather than a custom one that has to walk somebody's
+/// fortnight of history on launch, on a phone, with the clock running.
+enum NinetySchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+    /// The same eight types. SwiftData reads the *current* declarations, so this
+    /// list and V1's are the same array — the version identifier is what
+    /// distinguishes them, and V1 stays declared as the record of what the store
+    /// on an existing device was opened as.
+    static var models: [any PersistentModel.Type] { NinetySchemaV1.models }
+}
+
 /// How the store gets from one version to the next.
 ///
 /// One stage per release that changes the schema. A lightweight stage covers
@@ -42,14 +64,16 @@ enum NinetySchemaV1: VersionedSchema {
 /// happens to the rows already there.
 enum NinetyMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [NinetySchemaV1.self]
+        [NinetySchemaV1.self, NinetySchemaV2.self]
     }
 
     static var stages: [MigrationStage] {
-        // Empty until V2. The list is what a future stage is appended to, and
-        // having it here means the next schema change is an append rather than
-        // a decision about whether versioning was worth it.
-        []
+        // Lightweight, and it is worth being explicit about why rather than
+        // reaching for the cheap one by default: the only difference between V1
+        // and V2 is an optional property whose absent value is meaningful, so
+        // there is no row in an existing store that needs a decision made about
+        // it. A custom stage here would have nothing to do.
+        [.lightweight(fromVersion: NinetySchemaV1.self, toVersion: NinetySchemaV2.self)]
     }
 }
 
@@ -63,7 +87,7 @@ extension ModelContainer {
     static func ninety(inMemory: Bool = false) throws -> ModelContainer {
         if !inMemory { try makeApplicationSupportDirectory() }
         return try ModelContainer(
-            for: Schema(versionedSchema: NinetySchemaV1.self),
+            for: Schema(versionedSchema: NinetySchemaV2.self),
             migrationPlan: NinetyMigrationPlan.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: inMemory)
         )

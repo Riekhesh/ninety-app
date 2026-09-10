@@ -38,7 +38,7 @@ struct SubOnSheet: View {
 
     var body: some View {
         NavigationStack {
-            Screen(title: SubOnCopy.masthead, meta: model.period.title) {
+            Screen(title: SubOnCopy.masthead, meta: model.slot.title) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Ninety.Space.xl) {
                         RouteChips(route: $model.route)

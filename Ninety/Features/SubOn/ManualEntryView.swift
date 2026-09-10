@@ -61,7 +61,7 @@ struct ManualEntryView: View {
     @State private var isDerived = false
 
     var body: some View {
-        Screen(title: SubOnCopy.manualTitle, meta: model.period.title) {
+        Screen(title: SubOnCopy.manualTitle, meta: model.slot.title) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Ninety.Space.xl) {
                     Text(SubOnCopy.manualDetail)

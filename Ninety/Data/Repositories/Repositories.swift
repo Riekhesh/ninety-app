@@ -46,13 +46,20 @@ struct FoodLogDraft {
     var entryMethod: EntryMethod
     var loggedAt: Date
 
+    /// Almost always nil, and that is the design rather than an omission (ADR
+    /// 0022). Nil means the slot is derived from `loggedAt`, so no route has to
+    /// ask which meal this was — the field is here for a future route that
+    /// genuinely knows, and for a test that wants to state one.
+    var mealSlot: MealSlot?
+
     init(
         food: Food? = nil,
         grams: Double,
         kcal: Double,
         name: String,
         entryMethod: EntryMethod,
-        loggedAt: Date
+        loggedAt: Date,
+        mealSlot: MealSlot? = nil
     ) {
         self.food = food
         self.grams = grams
@@ -60,6 +67,7 @@ struct FoodLogDraft {
         self.name = name
         self.entryMethod = entryMethod
         self.loggedAt = loggedAt
+        self.mealSlot = mealSlot
     }
 }
 
@@ -223,7 +231,21 @@ protocol FoodRepositoryProtocol {
 
     /// Refuses after the 48-hour window. The moment is a parameter so the rule
     /// can be tested without waiting two days or moving the device clock.
-    func update(_ log: FoodLog, grams: Double, kcal: Double, at moment: Date) throws
+    ///
+    /// **`mealSlot` is the slot the user is looking at, not an override**, and
+    /// the difference is the whole of ADR 0022's storage rule: passing the slot
+    /// the derivation would have produced anyway clears the column rather than
+    /// writing it, so null keeps meaning "the app worked this out". A correction
+    /// screen can therefore hand back whatever its picker holds without having
+    /// to work out whether the user actually moved it.
+    func update(
+        _ log: FoodLog,
+        grams: Double,
+        kcal: Double,
+        mealSlot: MealSlot,
+        at moment: Date,
+        calendar: Calendar
+    ) throws
 
     func delete(_ log: FoodLog, at moment: Date) throws
 }

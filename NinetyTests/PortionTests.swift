@@ -138,7 +138,7 @@ struct PortionTests {
         Self.log(model, "Greek yogurt", kcal: 133, at: now)
         let log = try #require(model.today.first)
 
-        #expect(model.update(log, grams: 200, kcal: 266))
+        #expect(model.update(log, grams: 200, kcal: 266, mealSlot: model.slot(of: log)))
         #expect(model.today.first?.kcal == 266)
         #expect(model.loggedTodayKcal == 266)
     }
@@ -161,16 +161,20 @@ struct PortionTests {
         foods.storedLogs.append(old)
 
         #expect(!model.isEditable(old))
-        #expect(!model.update(old, grams: 200, kcal: 600))
+        #expect(!model.update(old, grams: 200, kcal: 600, mealSlot: model.slot(of: old)))
         #expect(!model.delete(old))
         #expect(model.writeFailed)
         #expect(foods.storedLogs.contains { $0.id == old.id })
     }
 
-    /// Most of what a lunch-and-dinner breakdown would give you, at the cost of
-    /// no column: the half is a pure function of `logged_at`.
-    @Test("the day's log splits into the two halves")
-    func theDaySplitsIntoHalves() {
+    /// The day, grouped as breakfast / lunch / dinner (ADR 0022).
+    ///
+    /// Still derived from `logged_at` for every row here, because none of the
+    /// three routes that wrote them asked which meal it was — which is the half
+    /// of the decision that keeps logging at the same number of taps it was
+    /// before the column existed.
+    @Test("the day's log splits into the three meals")
+    func theDaySplitsIntoMeals() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(identifier: "Europe/London") ?? .gmt
 
@@ -192,11 +196,14 @@ struct PortionTests {
 
         components.hour = 8
         Self.log(model, "Porridge", kcal: 320, at: calendar.date(from: components) ?? evening)
-        components.hour = 19
+        components.hour = 13
         Self.log(model, "Chicken salad", kcal: 545, at: calendar.date(from: components) ?? evening)
+        components.hour = 19
+        Self.log(model, "Salmon and rice", kcal: 640, at: calendar.date(from: components) ?? evening)
 
-        #expect(model.today(in: .firstHalf).map(\.nameSnapshot) == ["Porridge"])
-        #expect(model.today(in: .secondHalf).map(\.nameSnapshot) == ["Chicken salad"])
+        #expect(model.today(in: .breakfast).map(\.nameSnapshot) == ["Porridge"])
+        #expect(model.today(in: .lunch).map(\.nameSnapshot) == ["Chicken salad"])
+        #expect(model.today(in: .dinner).map(\.nameSnapshot) == ["Salmon and rice"])
     }
 
     @Test("undoing the last log clears the strip rather than leaving it pointing at nothing")

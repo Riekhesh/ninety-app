@@ -196,6 +196,16 @@ struct SyncPlanTests {
         // §2.3's window is derived by trigger from `logged_at`, so the client
         // cannot move it.
         #expect(row.columns["locked_at"] == nil)
+
+        // ADR 0022: the slot is sent, and sent as null when the user has not
+        // corrected one. Null rather than absent, because the two mean
+        // different things to an upsert — absent leaves whatever the server
+        // holds, and a correction that hands a row back to the derivation has
+        // to be able to clear the column.
+        #expect(row.columns["meal_slot"] == SyncValue.null)
+
+        log.storedMealSlot = .dinner
+        #expect(SyncPayload.row(for: log).columns["meal_slot"] == .text("dinner"))
     }
 
     @Test("a health sample never carries the HealthKit anchor")

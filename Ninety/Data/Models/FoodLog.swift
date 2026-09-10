@@ -18,6 +18,17 @@ final class FoodLog {
     var grams: Double
     var entryMethodRaw: String
 
+    /// Which meal this was, **only when the user said so** (ADR 0022).
+    ///
+    /// Nil is not a missing value and must not be filled in by a backfill: it
+    /// means the slot is derived from `loggedAt`, which is what every row
+    /// written by every route means, because no route asks the question. A
+    /// stored value is the user having corrected the derivation — a night shift,
+    /// a very late dinner — and the two are different statements. Read it
+    /// through `mealSlot(calendar:)` rather than directly, which is where the
+    /// two are resolved into the one answer a screen wants.
+    var mealSlotRaw: String?
+
     /// §2.3. Set from `loggedAt` on creation and never moved. Postgres derives
     /// the same value by trigger and enforces it in the update policy, so the
     /// two agree without the client being trusted about it.
@@ -46,6 +57,7 @@ final class FoodLog {
         entryMethod: EntryMethod,
         kcal: Double,
         nameSnapshot: String,
+        mealSlot: MealSlot? = nil,
         food: Food? = nil,
         estimates: [PhotoEstimate] = []
     ) {
@@ -56,6 +68,7 @@ final class FoodLog {
         self.loggedAt = loggedAt
         self.grams = grams
         self.entryMethodRaw = entryMethod.rawValue
+        self.mealSlotRaw = mealSlot?.rawValue
         self.locksAt = loggedAt.addingTimeInterval(FoodLog.editWindow)
         self.kcal = kcal
         self.nameSnapshot = nameSnapshot
@@ -74,6 +87,27 @@ extension FoodLog {
     var entryMethod: EntryMethod {
         get { EntryMethod(rawValue: entryMethodRaw) ?? .manual }
         set { entryMethodRaw = newValue.rawValue }
+    }
+
+    /// The correction the user made, or nil if they have not made one.
+    ///
+    /// Separate from `mealSlot(calendar:)` because a picker has to be able to
+    /// tell "the user chose dinner" from "the app worked out dinner" — the first
+    /// survives a change to the boundaries and the second does not.
+    var storedMealSlot: MealSlot? {
+        get { mealSlotRaw.flatMap(MealSlot.init(rawValue:)) }
+        set { mealSlotRaw = newValue?.rawValue }
+    }
+
+    /// Which meal this log belongs to: the user's answer if there is one, the
+    /// derivation off `loggedAt` otherwise.
+    ///
+    /// The calendar is a parameter for the same reason it is on
+    /// `MealSlot.of(_:calendar:)` and on `isEditable(at:)` — a rule that reads
+    /// ambient state cannot be tested in a timezone other than the machine's,
+    /// and logging across a date boundary is an explicit Phase 2 exploit.
+    func mealSlot(calendar: Calendar) -> MealSlot {
+        storedMealSlot ?? MealSlot.of(loggedAt, calendar: calendar)
     }
 
     /// The date is injected rather than read from the clock, for the same

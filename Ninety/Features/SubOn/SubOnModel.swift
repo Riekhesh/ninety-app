@@ -134,8 +134,8 @@ final class SubOnModel {
 
     // MARK: - Derived
 
-    /// The masthead's meta line. First or Second Half, in the user's calendar.
-    var period: MealPeriod { MealPeriod.of(now(), calendar: calendar) }
+    /// The masthead's meta line. Which meal it is now, in the user's calendar.
+    var slot: MealSlot { MealSlot.of(now(), calendar: calendar) }
 
     /// What is left in the band, and it is allowed to be negative.
     ///
@@ -243,16 +243,20 @@ final class SubOnModel {
         try? foods.saveFood(food.draft)
     }
 
-    /// Today's logs, split into the two halves.
+    /// Today's logs, by meal (ADR 0022).
     ///
-    /// This is most of what a meal breakdown would give you, and it costs no
-    /// column: the half is a pure function of `logged_at` in the user's own
-    /// calendar. Whether Ninety ever grows real meal slots is a product
-    /// decision with a migration behind it, and this is deliberately not a
-    /// down-payment on one.
-    func today(in period: MealPeriod) -> [FoodLog] {
-        today.filter { MealPeriod.of($0.loggedAt, calendar: calendar) == period }
+    /// Was First Half / Second Half, which was derived and stored nowhere. It is
+    /// still derived for almost every row — `FoodLog.mealSlot(calendar:)` falls
+    /// back to `logged_at` — so this costs no keystroke at logging time; what
+    /// changed is that a row the derivation got wrong can now be moved, and the
+    /// move sticks.
+    func today(in slot: MealSlot) -> [FoodLog] {
+        today.filter { $0.mealSlot(calendar: calendar) == slot }
     }
+
+    /// Which slot a log currently sits in, asked at the model's own calendar so
+    /// a view never has to reach for one.
+    func slot(of log: FoodLog) -> MealSlot { log.mealSlot(calendar: calendar) }
 
     /// Whether a log is still inside §2.3's window, asked at the model's own
     /// clock so a view never has to reach for one.
@@ -267,9 +271,16 @@ final class SubOnModel {
     /// mysterious disabled control: *"Logs older than 48 hours can't be edited.
     /// It keeps scores honest."*
     @discardableResult
-    func update(_ log: FoodLog, grams: Double, kcal: Double) -> Bool {
+    func update(_ log: FoodLog, grams: Double, kcal: Double, mealSlot: MealSlot) -> Bool {
         do {
-            try foods.update(log, grams: max(grams, 1), kcal: kcal, at: now())
+            try foods.update(
+                log,
+                grams: max(grams, 1),
+                kcal: kcal,
+                mealSlot: mealSlot,
+                at: now(),
+                calendar: calendar
+            )
             writeFailed = false
             refresh()
             return true

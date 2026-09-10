@@ -43,6 +43,13 @@ enum SubOnCopy {
     static let editTitle = "Correct it"
     static let saveEdit = "Save"
 
+    /// The slot picker on the correction sheet (ADR 0022). The note says what
+    /// the app did rather than asking the user to do anything: for almost every
+    /// row the right answer is already selected, and the control is there for
+    /// the night shift and the very late dinner.
+    static let mealField = "Which meal?"
+    static let mealFieldNote = "Ninety reads this off the time you logged it. Move it if that is wrong."
+
     /// The band remaining, on the artboard as ROOM LEFT TODAY.
     static let roomLeft = "Room left today"
     static let roomLeftUnknown = "Finish Pre-Season to see your band."
@@ -208,7 +215,7 @@ enum SubOnCopy {
         nothingLeftToLog, modelNotesHeading,
         confirmLabel(items: 1), confirmLabel(items: 3),
         todayHeading, todayDetail, nothingLoggedYet, nothingLoggedDetail,
-        editTitle, saveEdit, derivedFrom(kcalPer100g: 133),
+        editTitle, saveEdit, mealField, mealFieldNote, derivedFrom(kcalPer100g: 133),
         found(1), found(3), estimated("340 ±50"), appearances(1), appearances(9),
         nudgeLabel(up: true, item: "Greek yogurt", grams: 10),
         nudgeLabel(up: false, item: "Greek yogurt", grams: 10),

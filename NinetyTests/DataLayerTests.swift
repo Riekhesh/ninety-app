@@ -80,11 +80,28 @@ struct DataLayerTests {
         #expect(entry.isEditable(at: loggedAt.addingTimeInterval(47 * 3_600)))
         #expect(!entry.isEditable(at: loggedAt.addingTimeInterval(49 * 3_600)))
 
-        try food.update(entry, grams: 150, kcal: 300, at: loggedAt.addingTimeInterval(3_600))
+        try food.update(
+            entry,
+            grams: 150,
+            kcal: 300,
+            // The slot the derivation already gives it, so this stays a portion
+            // correction and nothing else — ADR 0022 stores a slot only where
+            // it disagrees, and the assertion below is about `grams`.
+            mealSlot: entry.mealSlot(calendar: .current),
+            at: loggedAt.addingTimeInterval(3_600),
+            calendar: .current
+        )
         #expect(entry.grams == 150)
 
         #expect(throws: RepositoryError.self) {
-            try food.update(entry, grams: 999, kcal: 999, at: loggedAt.addingTimeInterval(49 * 3_600))
+            try food.update(
+                entry,
+                grams: 999,
+                kcal: 999,
+                mealSlot: entry.mealSlot(calendar: .current),
+                at: loggedAt.addingTimeInterval(49 * 3_600),
+                calendar: .current
+            )
         }
     }
 

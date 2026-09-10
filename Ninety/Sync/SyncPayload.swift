@@ -88,6 +88,15 @@ enum SyncPayload {
     /// has gone, and `on delete set null` in migration 001 says the same thing.
     /// The name and the calories are on the log itself, which is what makes
     /// either survivable rather than data loss.
+    ///
+    /// **`meal_slot` is sent as null when the user has not corrected one**, and
+    /// the null is the message rather than the absence of one (ADR 0022, and
+    /// migration 007 says the same thing on the column). The server derives
+    /// nothing: both sides read `logged_at` in the user's calendar and get the
+    /// same answer, so a null row means "whatever the derivation says" on the
+    /// phone and in Postgres alike. Sending the derived value instead would
+    /// freeze today's boundaries into three weeks of history the first time
+    /// anything drained.
     static func row(for log: FoodLog) -> SyncRow {
         SyncRow(
             table: .foodLogs,
@@ -102,6 +111,7 @@ enum SyncPayload {
                 "entry_method": .text(log.entryMethod.rawValue),
                 "kcal": .number(log.kcal),
                 "name_snapshot": .text(log.nameSnapshot),
+                "meal_slot": log.storedMealSlot.map { .text($0.rawValue) } ?? .null,
             ]
         )
     }

@@ -30,7 +30,7 @@ struct UnderReviewView: View {
     }
 
     var body: some View {
-        Screen(title: SubOnCopy.underReviewMasthead, meta: model.period.title) {
+        Screen(title: SubOnCopy.underReviewMasthead, meta: model.slot.title) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Ninety.Space.xl) {
                     warning

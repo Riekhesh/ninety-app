@@ -27,7 +27,7 @@ struct BarcodeRouteView: View {
     }
 
     var body: some View {
-        Screen(title: SubOnCopy.barcodeRoute, meta: model.period.title) {
+        Screen(title: SubOnCopy.barcodeRoute, meta: model.slot.title) {
             VStack(alignment: .leading, spacing: Ninety.Space.lg) {
                 if BarcodeScanner.isUsable {
                     scanner

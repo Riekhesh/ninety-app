@@ -194,6 +194,7 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
             entryMethod: draft.entryMethod,
             kcal: draft.kcal,
             nameSnapshot: draft.name,
+            mealSlot: draft.mealSlot,
             food: draft.food
         )
         context.insert(entry)
@@ -226,10 +227,22 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
         return (try? context.fetch(descriptor))?.first
     }
 
-    func update(_ log: FoodLog, grams: Double, kcal: Double, at moment: Date) throws {
+    func update(
+        _ log: FoodLog,
+        grams: Double,
+        kcal: Double,
+        mealSlot: MealSlot,
+        at moment: Date,
+        calendar: Calendar
+    ) throws {
         guard log.isEditable(at: moment) else { throw RepositoryError.logIsLocked(since: log.locksAt) }
         log.grams = grams
         log.kcal = kcal
+        // ADR 0022's storage rule, in one line: store the slot only where it
+        // disagrees with what the app would have derived. The alternative —
+        // writing whatever the picker holds — fills the column on every
+        // correction and loses the distinction the column exists to carry.
+        log.storedMealSlot = mealSlot == MealSlot.of(log.loggedAt, calendar: calendar) ? nil : mealSlot
         log.updatedAt = moment
         Outbox(context: context, userID: userID)
             .enqueue(.update, tableName: "food_logs", id: log.id, at: moment)

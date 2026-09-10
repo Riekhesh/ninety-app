@@ -31,7 +31,7 @@ struct PhotoRouteView: View {
     }
 
     var body: some View {
-        Screen(title: SubOnCopy.photoRoute, meta: model.period.title) {
+        Screen(title: SubOnCopy.photoRoute, meta: model.slot.title) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Ninety.Space.xl) {
                     switch phase {

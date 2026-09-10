@@ -129,7 +129,14 @@ struct SyncTests {
     func correctionsBeforeSyncCollapse() async throws {
         let world = try fixture()
         let log = try world.food.log(meal("Porridge with milk", grams: 200, kcal: 260))
-        try world.food.update(log, grams: 300, kcal: 390, at: Self.noon.addingTimeInterval(600))
+        try world.food.update(
+            log,
+            grams: 300,
+            kcal: 390,
+            mealSlot: log.mealSlot(calendar: .current),
+            at: Self.noon.addingTimeInterval(600),
+            calendar: .current
+        )
 
         await world.service.drain()
 
@@ -283,7 +290,14 @@ struct SyncTests {
         #expect(world.client.upserts.count == 1)
 
         // Inside the window, so the app allows it and queues it.
-        try world.food.update(log, grams: 300, kcal: 500, at: Self.noon.addingTimeInterval(3_600))
+        try world.food.update(
+            log,
+            grams: 300,
+            kcal: 500,
+            mealSlot: log.mealSlot(calendar: .current),
+            at: Self.noon.addingTimeInterval(3_600),
+            calendar: .current
+        )
         #expect(world.queued.count == 1)
 
         // Out the other side of it by the time there is a signal.
@@ -319,8 +333,22 @@ struct SyncTests {
     func statusCountsRows() async throws {
         let world = try fixture()
         let log = try world.food.log(meal("Corrected twice"))
-        try world.food.update(log, grams: 260, kcal: 470, at: Self.noon.addingTimeInterval(60))
-        try world.food.update(log, grams: 270, kcal: 480, at: Self.noon.addingTimeInterval(120))
+        try world.food.update(
+            log,
+            grams: 260,
+            kcal: 470,
+            mealSlot: log.mealSlot(calendar: .current),
+            at: Self.noon.addingTimeInterval(60),
+            calendar: .current
+        )
+        try world.food.update(
+            log,
+            grams: 270,
+            kcal: 480,
+            mealSlot: log.mealSlot(calendar: .current),
+            at: Self.noon.addingTimeInterval(120),
+            calendar: .current
+        )
         try world.food.log(meal("Left alone", at: Self.noon.addingTimeInterval(3_600)))
 
         world.service.refreshStatus()

@@ -23,7 +23,7 @@ struct FoodSearchView: View {
     }
 
     var body: some View {
-        Screen(title: SubOnCopy.searchRoute, meta: model.period.title) {
+        Screen(title: SubOnCopy.searchRoute, meta: model.slot.title) {
             VStack(alignment: .leading, spacing: Ninety.Space.lg) {
                 NinetyField(
                     label: SubOnCopy.searchPlaceholder,
