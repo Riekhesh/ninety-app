@@ -27,6 +27,13 @@ struct NinetyApp: App {
     /// is what keeps a fresh checkout runnable.
     private let stack: SupabaseStack?
 
+    /// One path monitor for the process, for the same reason there is one
+    /// Supabase client: it is a system resource with a callback queue behind it,
+    /// and a second one would be a second set of notifications about the same
+    /// radio. Handed down rather than reached for, so the sync service can be
+    /// built with a stub in a test.
+    private let connectivity = PathConnectivity()
+
     init() {
         TabBarStyle.apply()
         BrandFont.verify()
@@ -53,7 +60,7 @@ struct NinetyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(session: session, stack: stack)
+            RootView(session: session, stack: stack, connectivity: connectivity)
         }
         .modelContainer(container)
     }

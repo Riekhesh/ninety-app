@@ -206,9 +206,9 @@ each of them was unreachable before P1-D. Presented as a sheet from Matchday's m
 §1.6 caps the app at three tabs, and §10 S6 wants the opt-out within two taps.
 
 - Masthead: `Settings`
-- Order, and it is load-bearing: **Competitive features** · **Support** · **Your consent** ·
-  **Account**. The opt-out is first because two taps is only true while it is the panel you
-  land on.
+- Order, and it is load-bearing: **Competitive features** · **Support** · **Sync** ·
+  **Your consent** · **Account**. The opt-out is first because two taps is only true while
+  it is the panel you land on.
 
 **Competitive features** — the S6 copy above, plus:
 - When off: `Competitive features are off. You can turn them back on any time — your history is kept.`
@@ -216,6 +216,22 @@ each of them was unreachable before P1-D. Presented as a sheet from Matchday's m
 **Support** — heading `Support`, then the §2 signposting block verbatim. Permanently
 present, never behind a disclosure, never conditional on anything the app thinks it has
 noticed.
+
+**Sync** (added in P1-I)
+- Heading: `Sync`
+- Up to date: `Everything's on the server.` + `Ninety keeps a copy of what you log, so a lost or replaced phone doesn't take your days with it.` + `Last sent 12:04`
+- Waiting: `12 changes waiting` + `Saved on your phone and readable right now. They'll go up on their own when there's a signal.` + `Send them now`
+- Sending: `Sending…` — a sentence, never a spinner. §04's rule is that the UI never waits on the network, and a progress indicator is a small way of breaking it
+- Stopped asking: `2 changes still here` + `The server didn't take these, so Ninety has stopped asking for now. Everything is still on this phone and nothing has been lost.` + `Try these again`
+- No project in the build: `This build has no project in it.` + `Everything you log is saved on this phone and stays there. Nothing is being sent anywhere.`
+
+Every line says the same two things — where the data is, and that it is safe. A queue that
+has not drained is not a problem the user caused or can solve, so none of the copy asks them
+to do anything about it and none of it is a warning. The register is the offline line in §4
+below: *reassuring, not a warning.*
+
+This is the only place in the app that mentions sync at all. A count of unsent rows on
+Matchday would be the network leaking into the screen someone opens to log breakfast.
 
 **Your consent**
 - Heading: `Your consent`

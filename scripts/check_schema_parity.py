@@ -28,6 +28,9 @@ ROOT = Path(__file__).resolve().parent.parent
 SCHEMA = ROOT / "supabase" / "migrations" / "20260902000001_initial_schema.sql"
 DOMAIN = ROOT / "Ninety" / "Data" / "Domain.swift"
 MODELS = ROOT / "Ninety" / "Data" / "Models"
+PAYLOAD = ROOT / "Ninety" / "Sync" / "SyncPayload.swift"
+REPOSITORIES = ROOT / "Ninety" / "Data" / "Repositories"
+SYNC_TABLE = ROOT / "Ninety" / "Sync" / "SyncTable.swift"
 
 # Postgres type -> Swift type. `tier` is absent on purpose: it is generated from
 # the design tokens, because a tier is a division and a division is a visual
@@ -102,6 +105,141 @@ def check_reserved_property_names() -> bool:
     return clean
 
 
+# Columns the outbox drain deliberately does not send, and why. Everything else
+# that is `not null` with no default has to appear in SyncPayload, or the first
+# write of that table after a day offline comes back 400.
+#
+# Added with P1-I. The drain builds its JSON by hand — Postgres column names are
+# not Swift property names and neither can be inferred from the other — so the
+# mapping is exactly the kind of thing that is right on the day it is written
+# and wrong two epics later.
+DELIBERATELY_NOT_SENT = {
+    # Derived by trigger from logged_at so the client cannot move §2.3's
+    # 48-hour window. Sending one would be rejected on principle.
+    ("food_logs", "locked_at"),
+}
+
+
+def postgres_columns(sql: str, table: str) -> dict[str, str]:
+    """Column name -> the rest of its declaration, for one create table."""
+    match = re.search(rf"create table {table} \((.*?)\n\);", sql, re.S)
+    if not match:
+        return {}
+
+    columns: dict[str, str] = {}
+    for line in match.group(1).splitlines():
+        line = line.strip()
+        if not line or line.startswith("--"):
+            continue
+        name, _, rest = line.partition(" ")
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", name):
+            continue
+        if name in {"constraint", "unique", "check", "primary", "foreign"}:
+            continue
+        columns[name] = rest
+    return columns
+
+
+def sync_table_names() -> dict[str, str]:
+    """Swift case name -> Postgres table, read off SyncTable."""
+    source = SYNC_TABLE.read_text()
+    body = re.search(r"enum SyncTable: String.*?\n}", source, re.S)
+    if not body:
+        return {}
+    names: dict[str, str] = {}
+    for case_name, explicit in re.findall(r"case (\w+)(?: = \"(\w+)\")?$", body.group(0), re.M):
+        names[case_name] = explicit or case_name
+    return names
+
+
+def payload_columns() -> dict[str, set[str]]:
+    """Postgres table -> the columns SyncPayload writes into it."""
+    source = PAYLOAD.read_text()
+    tables = sync_table_names()
+    written: dict[str, set[str]] = {}
+    for block in source.split("table: .")[1:]:
+        case_name = re.match(r"(\w+)", block)
+        if not case_name or case_name.group(1) not in tables:
+            continue
+        columns = re.search(r"columns: \[(.*?)\n {12}\]", block, re.S)
+        if not columns:
+            continue
+        written[tables[case_name.group(1)]] = set(re.findall(r'"([a-z][a-z0-9_]*)":', columns.group(1)))
+    return written
+
+
+def check_enqueued_tables() -> bool:
+    """Every table name a repository enqueues is one the drain can map.
+
+    `OutboxEntry.tableName` is a String, deliberately — a stored enum turns an
+    unrecognised value into a decode failure at fetch time, which takes the whole
+    queue down instead of one row of it. The cost of that choice is that a typo in
+    an `enqueue` call compiles, writes, and then sits in the outbox forever being
+    counted as stuck. This is the check that would have been the compiler's job.
+    """
+    known = set(sync_table_names().values())
+    if not known:
+        print("BAD could not read the tables out of SyncTable.swift")
+        return False
+
+    clean = True
+    seen: set[str] = set()
+    for path in sorted(REPOSITORIES.glob("*.swift")):
+        for match in re.finditer(r'enqueue\([^)]*?tableName: "([^"]+)"', path.read_text(), re.S):
+            table = match.group(1)
+            seen.add(table)
+            if table not in known:
+                print(
+                    f"BAD {path.name} enqueues `{table}`, which SyncTable cannot map — "
+                    f"the row will queue forever and be counted as stuck"
+                )
+                clean = False
+
+    if clean:
+        print(f"OK  all {len(seen)} enqueued table names are ones the drain can map")
+    return clean
+
+
+def check_sync_payload(sql: str) -> bool:
+    """Every column the drain sends exists, and every required one is sent."""
+    if not PAYLOAD.exists():
+        print("BAD Ninety/Sync/SyncPayload.swift is missing — the drain has no row builder")
+        return False
+
+    clean = True
+    written = payload_columns()
+    if not written:
+        print("BAD could not read any columns out of SyncPayload.swift")
+        return False
+
+    for table, columns in sorted(written.items()):
+        declared = postgres_columns(sql, table)
+        if not declared:
+            print(f"BAD SyncPayload writes to `{table}`, which migration 001 does not create")
+            clean = False
+            continue
+
+        for column in sorted(columns - set(declared)):
+            print(f"BAD SyncPayload sends `{table}.{column}`, which does not exist in migration 001")
+            clean = False
+
+        for column, declaration in sorted(declared.items()):
+            required = "not null" in declaration and "default" not in declaration
+            if not required or column in columns:
+                continue
+            if (table, column) in DELIBERATELY_NOT_SENT:
+                continue
+            print(
+                f"BAD `{table}.{column}` is not null with no default and SyncPayload never sends it — "
+                f"the first write after a day offline will come back 400"
+            )
+            clean = False
+
+    if clean:
+        print(f"OK  every column the outbox sends exists, across {len(written)} tables")
+    return clean
+
+
 def postgres_enum_values(sql: str, name: str) -> list[str] | None:
     match = re.search(rf"create type {name} as enum \(([^)]*)\)", sql, re.S)
     if not match:
@@ -161,6 +299,12 @@ def main() -> int:
         print(f"OK  all {len(TABLES)} live tables have a local model")
 
     if not check_reserved_property_names():
+        failures += 1
+
+    if not check_sync_payload(sql):
+        failures += 1
+
+    if not check_enqueued_tables():
         failures += 1
 
     return 1 if failures else 0

@@ -23,6 +23,11 @@ struct SettingsView: View {
     let recorder: ConsentRecorder
     let profiles: any ProfileRepositoryProtocol
 
+    /// P1-I. Nil on a clone with no Supabase project *and* in the previews —
+    /// the panel then reports that there is nothing to send anywhere, which is
+    /// the truth about that build rather than an error state.
+    var sync: SyncService?
+
     /// Called after either consent switch moves. The shell re-reads the profile
     /// and, if health consent is gone, puts the consent gate back up — the app
     /// has no lawful basis to keep showing a tracker after that.
@@ -63,7 +68,10 @@ struct SettingsView: View {
             }
             .scrollBounceBehavior(.basedOnSize)
         }
-        .onAppear(perform: read)
+        .onAppear {
+            read()
+            sync?.refreshStatus()
+        }
     }
 
     @ViewBuilder
@@ -71,6 +79,7 @@ struct SettingsView: View {
         switch section {
         case .competitive: competitive
         case .support: support
+        case .sync: syncPanel
         case .consent: consent
         case .account: account
         }
@@ -144,6 +153,29 @@ struct SettingsView: View {
                 .foregroundStyle(Ninety.Colour.textTertiary)
         }
         .chalkPanel(padding: Ninety.Space.lg)
+    }
+
+    // MARK: - P1-I
+
+    /// Read on appearance rather than watched.
+    ///
+    /// `SyncService` is `@Observable`, so the panel tracks it while the sheet is
+    /// open without anything here — but the sheet can be opened after a drain
+    /// finished in the background, and the status is recomputed from the store
+    /// rather than kept in sync with it. One read on the way in is what makes
+    /// the number true when the screen appears.
+    @ViewBuilder
+    private var syncPanel: some View {
+        if let sync {
+            SyncPanel(
+                status: sync.status,
+                stuck: sync.stuckCount,
+                sendNow: sync.requestDrain,
+                retryStuck: sync.retryStuck
+            )
+        } else {
+            SyncPanel(status: .noProject, stuck: 0, sendNow: {}, retryStuck: {})
+        }
     }
 
     // MARK: - Consent

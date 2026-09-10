@@ -115,10 +115,10 @@ requirements rather than Phase 3 polish, and the phase should not be able to clo
 a gate quietly deferred.
 
 - [ ] **21 consecutive days of real data logged** — non-negotiable, and the phase's actual purpose. **Running since 9 September**; earliest close 29 September. The standing rule below applies from here on: anything that breaks a day's logging is a fix-now bug, because it resets a counter that costs three weeks to rebuild
-- [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design, but neither has been exercised with the radio actually off, and nothing drains the outbox yet. That half belongs with P1-I's airplane-mode day and is deliberately not ticked here — the criterion says *offline included* and half a criterion is not a closed one
+- [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design. **P1-I removed the part of this that was a hole rather than an untested claim** — something now drains the outbox — but neither route has been exercised with the radio actually off, and the drain itself has never run on a device. Still the airplane-mode day, and still deliberately not ticked: the criterion says *offline included*, and half a criterion is not a closed one
 - [ ] **HealthKit incremental sync with a persisted anchor** — proven the way Spike A proved it: 56,764 samples on a first read, ~0 on the next
 - [x] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series. **Closed 10 Sep by P1-G**, on the evidence the criterion was written for: the chart renders on a real phone, the headline figure is the smoothed value and the raw dailies are off behind a toggle that resets every time the screen appears. `WeightTrend` is pure and carries 16 tests and 48 assertions, including the gaps that ADR 0020 is about
-- [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect
+- [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect. **P1-I built the mechanism (10 Sep) and did not verify it.** The drain, the ordering, last-write-wins, the backoff and the parked-row state all exist and carry 37 tests; **none of it has been compiled and none of those tests has been run**, and the criterion asks for a *day*, not a suite. What is left is exactly what the criterion says: log a real day with the radio off — food, weight, a correction — turn it back on, and check the server holds it once, in order, with nothing lost. `Settings → Sync` is the instrument that reads out
 - [ ] **RLS policies on every table, tested with two accounts** — account A cannot touch account B's rows, proven repeatably
 - [x] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting. **Closed 8 Sep by P1-D**, on the evidence it was written for: every gate has the named tests `docs/safety/safety-requirements.md` asks for, all of them ran green on a device, and the flow was walked including an under-18 date of birth. Two halves are later phases *by the criterion's own wording* and are not silently included — S3's scoring half is Phase 2, S7's pattern triggers are Phase 3
 
@@ -142,7 +142,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
 | **P1-G** The Run: weight & trend | **CLOSED 10 Sep.** All four stories, walked on a real device: weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. 231 tests, 19 suites. ADR 0020 settles what the average is an average of | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
-| **P1-I** Offline-first sync | Outbox, last-write-wins, airplane-mode verification | High |
+| **P1-I** Offline-first sync | **Built 10 Sep, not yet compiled or walked.** `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and a panel in Settings. ADR 0021 settles the drain policy. The airplane-mode day is the half that is left | High |
 | **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
 | **P1-X** Phase 1 exit criteria | The seven conditions above, mirrored as tickets | Highest |
 
@@ -180,10 +180,12 @@ order laid out visually, is published at
    9 September** — the day food could first be logged in Ninety, on the weight
    Pre-Season had already recorded. See [the clock](#the-one-thing-that-shapes-the-plan)
    for what day 1 actually consisted of.
-6. **Everything else, underneath a running clock**, in this order: ~~P1-G ·~~ **P1-I ·
-   P1-H · P1-E**, then P1-J and P1-X. **The clock is running as of 9 September, so this
+6. **Everything else, underneath a running clock**, in this order: ~~P1-G ·~~ ~~P1-I ·~~
+   **P1-H · P1-E**, then P1-J and P1-X. **The clock is running as of 9 September, so this
    is no longer a plan — it is the order the remaining epics land in while the days
-   count.** Sync is second rather than
+   count.** P1-I is struck through for its *build* only: the code landed on 10 September
+   and the airplane-mode day it exists for has not been run, so the exit criterion stays
+   open and travels with P1-J. Sync is second rather than
    last for two reasons: three weeks of the only irreplaceable asset in the project
    currently live on one phone with nothing draining the outbox, and the airplane-mode
    criterion needs real logging days to reconcile, so it has to happen *during* the clock.
@@ -822,6 +824,89 @@ does not, which is why it is in the runbook rather than only in a commit.
 
 ---
 
+## P1-I — what landed
+
+Both stories' *build*, 8 points, on branch `p1-i`. **Written, not yet built:** every line
+of this was produced in a Linux container with no Xcode, Swift toolchain or simulator, so
+the epic is not closed until a Mac has compiled it and a phone has spent a day with the
+radio off. Everything that *could* be checked without a toolchain has been —
+`check_schema_parity.py` now reads the drain's columns against migration 001, and it
+passes.
+
+**The gap this closed is not "sync was slow", it is "sync did not exist".** Every write
+in the app has left a note in `sync_outbox` since P1-B, and nothing had ever read one.
+Three weeks of the only irreplaceable asset in the project were on one phone, and the
+`OutboxEntry.attempts` column had never been incremented because nothing had ever
+attempted anything.
+
+| Story | Outcome |
+|---|---|
+| Outbox and the sync service | ✔ `Ninety/Sync/` — the plan, the payload, the PostgREST client, the service and the panel. Every mutation already enqueued; this drains it. Idempotent by construction: ids are minted on the device, so every write is an upsert and a replayed payload resolves to the row it already wrote. Backoff doubles from 2s to a 5-minute ceiling and is cancelled by a reconnect. `attempts` is honoured — five refusals and the row parks. The last-write-wins limitation is in ADR 0005 and now in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md), which is what a future reader will actually find. ✗ never compiled |
+| Airplane-mode verification | ✗ **Not done, and not claimable.** The mechanism and the instrument exist; the day does not. This is the exit criterion, it needs a real day of use with the radio off, and it travels with P1-J |
+
+**Four decisions, all in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md),
+and the third is the one the clock forced.**
+
+- **One plan per row, not one request per entry.** A meal logged on the Underground,
+  corrected at the barrier and corrected again on the bus is three outbox entries and one
+  write, read from the current local row at drain time. `Outbox.enqueue` promised exactly
+  this in P1-B and wrote `{}` as its payload on the strength of it.
+- **Upserts in dependency order, deletes in the reverse.** `food_logs.food_id` references
+  `foods` and `photo_estimates.log_id` references `food_logs`, so a batch sent in the
+  order the user made it violates a foreign key roughly whenever somebody adds a custom
+  food and logs it.
+- **Only a refusal of the row costs the row an attempt.** No network, no session, a 5xx
+  or a 429 stops the drain where it is and charges nothing to anything. This is not
+  tidiness: a week logged on a plane would otherwise spend five attempts per row on an
+  aeroplane and land at the gate already parked, which is the clock's failure mode
+  written as a retry loop.
+- **Five refusals and it stops asking, visibly.** Parked, kept, counted, and shown in
+  `Settings → Sync` with a control that resets the count. `OutboxEntry`'s own doc comment
+  asked for this in P1-B — *"so a row that fails forever can be found rather than retried
+  silently until the end of time"* — and this is the first code that could honour it.
+
+**Two writes are dropped on purpose rather than sent**, both logged by name so a queue
+that empties without sending anything can be explained afterwards. A queued insert whose
+local row has gone describes something that does not exist — created and deleted offline,
+or cascaded away with its parent. And a correction to a `food_logs` row that reaches the
+front of the queue after §2.3's 48-hour window has closed is dropped rather than sent to
+be refused five times: the rule is what bounds the conflict window in the first place, and
+ADR 0005 already counted that as a happy side effect.
+
+**One surface, and it is an instrument rather than a feature.** `Settings → Sync` says
+where the day's logging currently is: up to date, *n* changes waiting, sending, or *n*
+still here with a way to ask again. It exists because "reconciled cleanly on reconnect"
+is not visible in a list of meals — the whole point of ADR 0005 is that the list looks
+identical either way — so the airplane-mode day needs somewhere to read the answer off.
+Deliberately the only place: a count of unsent rows on Matchday would be the network
+leaking into the screen someone opens to log breakfast.
+
+**Three things this epic deliberately did not do.**
+
+- **It does not pull.** The outbox is a push, so the server copy protects the 21 days
+  against a lost phone and does not yet repopulate a new one. `RootView` has said since
+  P1-C that a reinstall would stop asking for consent twice once P1-I landed; half of that
+  is now true — the timestamp reaches Postgres — and the comment has been corrected rather
+  than left reading as a claim about what the code does. Last-write-wins against a device
+  holding no rows is indistinguishable from a wipe, which is why a restore is a separate
+  decision and not a follow-on commit.
+- **It does not send `updated_at`.** ADR 0005 resolves conflicts by *server* timestamp
+  and migration 001 is emphatic about the word: a client-supplied one lets a device with a
+  wrong clock win every conflict. The `set_updated_at` trigger owns the column and the
+  payload does not mention it.
+- **It does not send `hk_anchor`.** An anchor describes what *one device* has already
+  read. Pushing it to a second phone would tell that phone it had read a history it has
+  never seen, which is the exact failure §1.4 calls "the entire trick" for avoiding.
+
+**One thing to be careful of on the first device run.** A `food_logs` delete that arrives
+after the 48-hour window returns 204 with nothing removed — RLS `using` clauses filter
+rows rather than raising — so the phone forgets the row and the server keeps it. The drain
+cannot tell, and treating a successful response as a failure would retry forever. Phase 2
+reads its test set from the phone, so it costs nothing today; it is written down here
+rather than discovered then.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
@@ -960,14 +1045,24 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > on readings, so the chart measures the body rather than the weighing habit. 231 tests,
 > 19 suites.
 >
+> **P1-I is built and not yet compiled (10 Sep).** `Ninety/Sync/` is the first code that
+> ever reads `sync_outbox`: one plan per row, dependency order on the way up and the
+> reverse on the way down, upserts so a replay cannot duplicate, backoff on the
+> connection, and five refusals before a row parks. [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md)
+> settles the policy, and the one rule to hold on to is that **only a refusal of the row
+> costs the row an attempt** — a week logged on a plane must not land at the gate already
+> parked. `Settings → Sync` is the only surface. 37 tests written; **none of it has been
+> built or run, and the airplane-mode day has not happened**, so P1-I is not closed and
+> the exit criterion is still open. It also does not *pull*: the server copy protects the
+> 21 days against a lost phone and does not yet repopulate a new one, so a reinstall
+> still asks for consent twice.
+>
 > **⏱ THE CLOCK IS RUNNING. Day 1 was 9 September; day 21 is 29 September at the
 > earliest.** This changes what "done" means for every remaining epic: *a change that
 > breaks a day's logging is a fix-now bug by definition*, because it resets a counter
 > that costs three weeks to rebuild. Before you ship anything, ask what it does to
-> tomorrow morning's log. **P1-I is the next ticket** — the outbox, last-write-wins, and
-> the airplane-mode day — and it is next precisely because three weeks of the only
-> irreplaceable asset in the project currently live on one phone with nothing draining
-> the outbox.
+> tomorrow morning's log. **P1-H is the next ticket** — the Matchday dashboard — with
+> P1-I's airplane-mode day outstanding and travelling with P1-J.
 >
 > **Two things P1-G left open, neither blocking.** The cross-source duplicate rule
 > (`WeightReconciliation`, 0.1 kg tolerance) is proven against mocks and has never met an
@@ -978,7 +1073,8 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > condition.
 >
 > **Three things P1-F left open, none of them blocking:** nothing has been logged with
-> the radio off (P1-I's airplane-mode day, and the exit criterion stays open for it); the
+> the radio off — there is now something to drain the outbox, but the day itself is still
+> the open half of the exit criterion; the
 > photo latency has not been read out of `Log.data` yet; and Sub On and Under Review have
 > not been captured at `.xSmall` or `.accessibility5` — The Run has, so the capture debt
 > is now three screens rather than four.
