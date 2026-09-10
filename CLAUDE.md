@@ -11,8 +11,16 @@ the type decision that blocked every view ticket. P1-D added `Ninety/Safety/`, w
 where §10's S1–S7 live as types rather than as review notes — if you are touching a
 calorie target, a goal weight, a rate of loss or an age check, that is the directory.
 P1-F closed on 9 September with all four logging routes on a real device; `supabase/
-functions/` and `Ninety/Features/SubOn/` are its two halves. **The next ticket is P1-G's
-weight-entry surface, which is the only thing left before the 21-day clock can start.**
+functions/` and `Ninety/Features/SubOn/` are its two halves. P1-G closed on 10 September
+and added `Ninety/Features/TheRun/` and `Ninety/Health/` — weight entry, the 7-day EWMA,
+and the one `import HealthKit` in the app.
+
+**⏱ The 21-day clock has been running since 9 September** (`docs/phase-1/README.md` is
+where it is counted). That is the single most important fact about this repo right now:
+**a change that breaks a day's logging is a fix-now bug by definition**, because it
+resets a counter that costs three weeks to rebuild. Ask what a change does to tomorrow
+morning's log before you ship it. **The next ticket is P1-I** — the outbox, and the
+airplane-mode day.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -29,6 +37,7 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | What Phase 1 has to do, and what closes it | `docs/phase-1/README.md` — the live tracker |
 | What Phase 0 closed on, and the product state | `docs/phase-0/README.md` (closed) + `PRODUCT.md` |
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
+| What the weight trend actually averages | ADR 0020 — calendar days, not readings. Read it before touching `WeightTrend` |
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |
 | What a screen should look like | `design/redesign/README.md` → the six PNGs in `screens/` |
@@ -80,8 +89,13 @@ scripts/       verify-toolchain.sh (the Mac) · verify-accounts.sh (the .env)
 ```
 
 ```
-Ninety/          the app. App/ · DesignSystem/ · Features/ · Resources/Fonts/
+Ninety/          the app. App/ · Auth/ · Data/ · DesignSystem/ · Features/ · Health/ ·
+                 Safety/ · Support/ · Resources/Fonts/
                  A synchronized folder in Xcode — new files need no .pbxproj edit
+  Health/        the ONLY place `import HealthKit` appears. Everything above it works
+                 against `BodyMassSourcing`, which is what makes it testable at all
+  Features/TheRun/  weight entry, the EWMA, the chart, the pace. `WeightTrend` is pure
+                 and calendar-injected, because Phase 2's progress score reads it
 NinetyTests/     unit tests (Swift Testing)
 Packages/        RankingEngine. Pure, no dependencies, three lint rules guard it
 Config/          xcconfig + Info.plist. Local.xcconfig (gitignored) holds your team id
@@ -117,6 +131,17 @@ docs and design commits never spend the 200-minute budget.
   that did not do this logged 200 g of food at 100 g of energy for a day.
 - **A range is a figure and a tolerance, never a dash** — `1,850 ±100`, not
   `1,750–1,950`. `DESIGN.md` § Numbers, and `SafetyCopyTests` checks it.
+- **The clock is running, so "I'll fix it tomorrow" has a price now.** Day 1 was
+  9 September. Anything that stops a day being logged costs three weeks, not a day,
+  because the count restarts rather than pausing. This outranks tidiness, refactors and
+  every remaining epic.
+- **The weight trend smooths calendar days, not readings** (ADR 0020). Smoothing the
+  array of weigh-ins makes α a function of how often the user remembers, so the chart
+  measures the habit rather than the body. The two agree exactly when somebody weighs in
+  daily, which is why the bug is invisible until it is somebody else's data.
+- **Never show raw daily weight as the headline.** §1.5 calls it actively harmful, and it
+  is the one display rule the brief argues for at length. The toggle exists and resets to
+  off every time the screen appears.
 
 ---
 

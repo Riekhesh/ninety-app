@@ -246,51 +246,6 @@ struct SwiftDataFoodRepository: FoodRepositoryProtocol {
     }
 }
 
-// MARK: - Weight
-
-@MainActor
-struct SwiftDataWeightRepository: WeightRepositoryProtocol {
-    let context: ModelContext
-    let userID: UUID
-
-    func recent(limit: Int) -> [WeightLog] {
-        let id = userID
-        var descriptor = FetchDescriptor<WeightLog>(
-            predicate: #Predicate { $0.userID == id },
-            sortBy: [SortDescriptor(\.measuredAt, order: .reverse)]
-        )
-        descriptor.fetchLimit = limit
-        return (try? context.fetch(descriptor)) ?? []
-    }
-
-    @discardableResult
-    func record(kg: Double, at measuredAt: Date, source: WeightSource) throws -> WeightLog {
-        let now = Date()
-        let entry = WeightLog(
-            userID: userID,
-            createdAt: now,
-            updatedAt: now,
-            measuredAt: measuredAt,
-            kg: kg,
-            source: source
-        )
-        context.insert(entry)
-        Outbox(context: context, userID: userID)
-            .enqueue(.insert, tableName: "weight_logs", id: entry.id, at: now)
-        try context.save()
-        return entry
-    }
-
-    func delete(_ log: WeightLog) throws {
-        let now = Date()
-        let id = log.id
-        context.delete(log)
-        Outbox(context: context, userID: userID)
-            .enqueue(.delete, tableName: "weight_logs", id: id, at: now)
-        try context.save()
-    }
-}
-
 // MARK: - Health
 
 @MainActor

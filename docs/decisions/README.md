@@ -52,5 +52,6 @@ Re-litigating settled decisions is the most expensive habit in solo projects.
 | [0017](0017-health-consent-separate-from-terms.md) | Health consent is a separate record, and gates the app | Locked | 1 |
 | [0018](0018-seven-day-calibration-window.md) | Calibration window is seven days, not fourteen | Locked | 1 |
 | [0019](0019-photo-logs-are-a-correction-dataset.md) | The 21 days produce a correction dataset, not an accuracy baseline | Locked | 1 |
+| [0020](0020-trend-smoothed-over-calendar-days.md) | The weight trend is smoothed over calendar days, not over readings | Locked | 1 |
 
 New decisions get the next number. Do not renumber; a stale link is worse than a gap.

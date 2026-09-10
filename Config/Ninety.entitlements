@@ -19,5 +19,18 @@
 	<array>
 		<string>Default</string>
 	</array>
+
+	<!-- HealthKit read access (P1-G's second weight route, and P1-E's whole
+	     epic). Smart scales write body mass to Apple Health on their own, which
+	     is the cheapest daily weight there is — the alternative is asking
+	     somebody who already owns a scale to type the number twice.
+
+	     `health-records` is deliberately absent. That is clinical records —
+	     lab results, medications, allergies — a strictly larger category than
+	     anything Ninety reads, and requesting it would put data on the Article 9
+	     record that the app has no use for. The base entitlement covers body
+	     mass, steps, active energy and workouts. -->
+	<key>com.apple.developer.healthkit</key>
+	<true/>
 </dict>
 </plist>

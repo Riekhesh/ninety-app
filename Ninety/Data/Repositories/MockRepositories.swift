@@ -184,23 +184,52 @@ final class MockFoodRepository: FoodRepositoryProtocol {
 @MainActor
 final class MockWeightRepository: WeightRepositoryProtocol {
     var storedLogs: [WeightLog]
+    let userID: UUID
 
-    init(logs: [WeightLog] = []) {
+    /// Set to make every write fail. The screens have a state for a write that
+    /// did not land — a tracker that says it saved and did not is how a day of
+    /// the twenty-one disappears silently — and it needs a way to be reached.
+    var failure: (any Error)?
+
+    init(logs: [WeightLog] = [], userID: UUID = UUID(), failure: (any Error)? = nil) {
         self.storedLogs = logs
+        self.userID = userID
+        self.failure = failure
     }
 
     func recent(limit: Int) -> [WeightLog] {
         Array(storedLogs.sorted { $0.measuredAt > $1.measuredAt }.prefix(limit))
     }
 
+    func readings(since moment: Date) -> [WeightLog] {
+        storedLogs.filter { $0.measuredAt >= moment }.sorted { $0.measuredAt < $1.measuredAt }
+    }
+
     @discardableResult
     func record(kg: Double, at measuredAt: Date, source: WeightSource) throws -> WeightLog {
-        let entry = WeightLog(userID: UUID(), measuredAt: measuredAt, kg: kg, source: source)
+        if let failure { throw failure }
+        let entry = WeightLog(userID: userID, measuredAt: measuredAt, kg: kg, source: source)
         storedLogs.append(entry)
         return entry
     }
 
+    @discardableResult
+    func importReadings(_ readings: [BodyMassReading], calendar: Calendar) throws -> [WeightLog] {
+        if let failure { throw failure }
+        let unseen = WeightReconciliation.unseen(
+            readings,
+            against: storedLogs.map(\.weighIn),
+            calendar: calendar
+        )
+        let written = unseen.map {
+            WeightLog(userID: userID, measuredAt: $0.measuredAt, kg: $0.kg, source: .healthkit)
+        }
+        storedLogs.append(contentsOf: written)
+        return written
+    }
+
     func delete(_ log: WeightLog) throws {
+        if let failure { throw failure }
         storedLogs.removeAll { $0.id == log.id }
     }
 }

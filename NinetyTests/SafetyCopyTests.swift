@@ -40,6 +40,7 @@ struct SafetyCopyTests {
             + OnboardingCopy.all
             + SettingsCopy.all
             + SubOnCopy.all
+            + TheRunCopy.all
             + Signposting.all
             + AuthFailure.allCases.compactMap(\.errorDescription)
             + AuthFailure.allCases.compactMap(\.recoveryDescription)
@@ -58,9 +59,8 @@ struct SafetyCopyTests {
             + [
                 "Sub on", "Sub on. Log food.",
                 "No day started", "No readings", "Today", "Nothing logged yet.",
-                "Weight", "No weight yet.", "Division",
-                "Ranking arrives in the next update.", "How it will be scored",
-                "Consistency", "Adherence", "Progress",
+                "Division", "Ranking arrives in the next update.",
+                "How it will be scored", "Consistency", "Adherence", "Progress",
                 "Settings, support and your consent",
             ]
     }
@@ -155,6 +155,45 @@ struct SafetyCopyTests {
             }
             #expect(copy.contains("±"))
         }
+    }
+
+    /// P1-G's own copy rule, and it comes from a Phase 0 measurement rather
+    /// than from taste: *"a denied read returns an empty result identical to 'no
+    /// data', and iOS will never distinguish them."*
+    ///
+    /// So no empty state on The Run may speculate about why there is nothing
+    /// there. "Grant access" would be wrong half the time with no way to know
+    /// which half, and "you haven't weighed yourself" would be wrong the other
+    /// half — both accuse the user of something on a coin flip.
+    @Test("no empty state on The Run guesses why the data is missing")
+    func emptyStatesDoNotSpeculate() {
+        let states = [
+            TheRunCopy.noWeightHeadline, TheRunCopy.noWeightDetail,
+            TheRunCopy.oneReadingHeadline, TheRunCopy.oneReadingDetail,
+            TheRunCopy.trendNeedsAWeek, TheRunCopy.buildingDetail,
+            TheRunCopy.importedNothing, TheRunCopy.healthUnavailable,
+        ]
+        let speculation = [
+            "permission", "grant", "allow access", "denied", "not allowed",
+            "you haven't", "you have not", "forgot", "enable",
+        ]
+        for copy in states {
+            let lowered = copy.lowercased()
+            for guess in speculation {
+                #expect(!lowered.contains(guess), "\"\(copy)\" guesses at why there is no data")
+            }
+        }
+    }
+
+    /// §1.5's rule as a property of the copy: the seven-day average is the
+    /// headline everywhere it is named, and the raw series is never offered as
+    /// the number.
+    @Test("the weight copy names the average as the figure, and the raw line as an extra")
+    func weightCopyKeepsTheAverageAsTheHeadline() {
+        #expect(TheRunCopy.averageLabel.contains("\(WeightTrend.windowDays)-day"))
+        #expect(TheRunCopy.explainer.contains("7-day average"))
+        #expect(TheRunCopy.showRawReadings.lowercased().contains("show"), "the raw line is opt-in, by its own label")
+        #expect(TheRunCopy.versusFourWeeks(-1.2).contains("4 weeks"))
     }
 
     /// ADR 0018 halved the calibration window, and the number appears in copy as

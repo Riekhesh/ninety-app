@@ -44,4 +44,14 @@ extension WeightLog {
         get { WeightSource(rawValue: sourceRaw) ?? .manual }
         set { sourceRaw = newValue.rawValue }
     }
+
+    /// The row as the pure code sees it.
+    ///
+    /// `WeightTrend` and `WeightReconciliation` are both pure and neither may
+    /// touch SwiftData — the trend because Phase 2's progress score will read
+    /// the same series out of `Packages/RankingEngine`, which the purity lint
+    /// forbids from importing persistence at all, and the reconciliation because
+    /// a duplicate rule that needs a store to test is a rule nobody tests. This
+    /// is the one line that crosses between them.
+    var weighIn: WeighIn { WeighIn(measuredAt: measuredAt, kg: kg) }
 }
