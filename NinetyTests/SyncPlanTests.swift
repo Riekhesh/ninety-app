@@ -257,8 +257,8 @@ struct SyncPlanTests {
         try context.save()
 
         let row = try #require(SyncPayload.row(for: estimate))
-        let body = String(decoding: row.body, as: UTF8.self)
-        #expect(body.contains(String(decoding: verbatim, as: UTF8.self)))
+        let body = try #require(String(bytes: row.body, encoding: .utf8))
+        #expect(body.contains(try #require(String(bytes: verbatim, encoding: .utf8))))
         #expect(row.columns["log_id"] == .text(log.id.uuidString.lowercased()))
     }
 
@@ -295,7 +295,7 @@ struct SyncPlanTests {
             id: UUID(),
             columns: ["kg": .number(78.4), "source": .text("manual"), "id": .null]
         )
-        #expect(String(decoding: row.body, as: UTF8.self) == #"{"id":null,"kg":78.4,"source":"manual"}"#)
+        #expect(String(bytes: row.body, encoding: .utf8) == #"{"id":null,"kg":78.4,"source":"manual"}"#)
     }
 
     @Test("a day is the day in the user's own calendar, not the day in UTC")

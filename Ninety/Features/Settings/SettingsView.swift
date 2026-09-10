@@ -164,8 +164,7 @@ struct SettingsView: View {
     /// finished in the background, and the status is recomputed from the store
     /// rather than kept in sync with it. One read on the way in is what makes
     /// the number true when the screen appears.
-    @ViewBuilder
-    private var syncPanel: some View {
+    @ViewBuilder private var syncPanel: some View {
         if let sync {
             SyncPanel(
                 status: sync.status,

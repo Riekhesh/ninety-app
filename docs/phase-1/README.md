@@ -844,6 +844,29 @@ attempted anything.
 | Outbox and the sync service | ✔ `Ninety/Sync/` — the plan, the payload, the PostgREST client, the service and the panel. Every mutation already enqueued; this drains it. Idempotent by construction: ids are minted on the device, so every write is an upsert and a replayed payload resolves to the row it already wrote. Backoff doubles from 2s to a 5-minute ceiling and is cancelled by a reconnect. `attempts` is honoured — five refusals and the row parks. The last-write-wins limitation is in ADR 0005 and now in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md), which is what a future reader will actually find. ✗ never compiled |
 | Airplane-mode verification | ✗ **Not done, and not claimable.** The mechanism and the instrument exist; the day does not. This is the exit criterion, it needs a real day of use with the radio off, and it travels with P1-J |
 
+**Seven SwiftLint violations under `--strict`, all this epic's, all fixed before the
+commit — found on Linux.** `CONTRIBUTING.md` documents `swiftlint-static`, which runs on
+Linux with no Swift toolchain and skips only the `custom_rules` block (those need
+SourceKit). It had never been used in this repo, and it earned its keep immediately: on a
+machine that cannot compile a line of Swift it caught every structural violation that
+would have failed the macOS job. **Run it before every push from a container.** What it
+found:
+
+- **`RootView.swift` hit 420 lines against a 400-line limit** once the sync service was
+  threaded through it. `MainTabView` and its previews moved to `Ninety/App/MainTabView.swift`
+  — the same split P1-G made for `SwiftDataWeightRepository`, and the same wrong fix
+  avoided: trimming comments until the number comes down.
+- **`optional_data_string_conversion`, four times.** `String(decoding:as:)` is
+  non-failable and substitutes replacement characters. In `SyncRow` that would have put
+  them inside a `jsonb` column, so the rule was right about more than style — the
+  failable initialiser is there now, falling back to `{}` rather than a JSON `null` that
+  `model_output`'s `not null` would refuse forever.
+- **Two closures, one of them trailing**, on the Sub On sheet once `onDismiss` arrived.
+  `MatchdayView` already carries the note: with more than one closure, a reader has to go
+  and look up which parameter the braces landed on.
+- **`@ViewBuilder` on its own line above a *variable*.** The rule wants attributes on
+  their own line in functions and types, and on the same line as variables.
+
 **Four decisions, all in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md),
 and the third is the one the clock forced.**
 

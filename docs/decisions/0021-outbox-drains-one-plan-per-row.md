@@ -166,6 +166,6 @@ restore path is a data-destroying code path nobody has exercised.
 | `Ninety/Sync/` | The whole layer: the plan, the payload, the client, the service |
 | `Ninety/Sync/SyncTable.swift` | Where `OutboxEntry.tableName` finally becomes `sync_outbox.entity` |
 | `Ninety/Features/Settings/SyncPanel.swift` | The only surface, and the airplane-mode instrument |
-| `Ninety/App/RootView.swift` | The service is built per signed-in user; the stale P1-I note is corrected |
+| `Ninety/App/RootView.swift` · `MainTabView.swift` | The service is built per signed-in user; the stale P1-I note is corrected. The shell split off a 400-line limit |
 | `scripts/check_schema_parity.py` | Every column the drain sends is checked against migration 001 |
 | `NinetyTests/SyncPlanTests.swift` · `SyncTests.swift` | This ADR as assertions |

@@ -76,7 +76,16 @@ extension SyncRow {
             bool ? "true" : "false"
         case .json(let data):
             // Verbatim. See the note above.
-            String(decoding: data, as: UTF8.self)
+            //
+            // Failable rather than `String(decoding:as:)`, and not only because
+            // the linter says so: bytes that are not UTF-8 were never JSON, and
+            // decoding them lossily would put replacement characters inside a
+            // `jsonb` column. `{}` keeps the row — `model_output` is `not null`,
+            // so a JSON `null` would have it refused five times and parked —
+            // and what the benchmark actually scores is the correction delta
+            // next to it, which is unaffected. The verbatim copy is on the
+            // phone regardless; this column is the backup.
+            String(bytes: data, encoding: .utf8) ?? "{}"
         case .null:
             "null"
         }
