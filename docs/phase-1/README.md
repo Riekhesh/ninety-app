@@ -89,7 +89,7 @@ a gate quietly deferred.
 - [ ] **21 consecutive days of real data logged** — non-negotiable, and the phase's actual purpose
 - [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design, but neither has been exercised with the radio actually off, and nothing drains the outbox yet. That half belongs with P1-I's airplane-mode day and is deliberately not ticked here — the criterion says *offline included* and half a criterion is not a closed one
 - [ ] **HealthKit incremental sync with a persisted anchor** — proven the way Spike A proved it: 56,764 samples on a first read, ~0 on the next
-- [ ] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series. **Written 9 Sep (P1-G) and deliberately not ticked**: `WeightTrend` is the EWMA, the raw series is off by default behind a toggle, and 51 tests across three new suites cover the maths — but nothing has rendered a `Chart` yet, and this criterion is about what the app *shows*. It closes on a device, on a screenshot
+- [ ] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series. **Built and green 10 Sep (P1-G) and deliberately not ticked**: `WeightTrend` is the EWMA, the raw series is off by default behind a toggle, and 51 tests across three new suites cover the maths — but no `Chart` has rendered anywhere but a preview, and this criterion is about what the app *shows*. It closes on a device, on a screenshot
 - [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect
 - [ ] **RLS policies on every table, tested with two accounts** — account A cannot touch account B's rows, proven repeatably
 - [x] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting. **Closed 8 Sep by P1-D**, on the evidence it was written for: every gate has the named tests `docs/safety/safety-requirements.md` asks for, all of them ran green on a device, and the flow was walked including an under-18 date of birth. Two halves are later phases *by the criterion's own wording* and are not silently included — S3's scoring half is Phase 2, S7's pattern triggers are Phase 3
@@ -112,7 +112,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-D** Pre-Season: onboarding & the §10 gates | **CLOSED 8 Sep.** All ten stories, compiled, 104 tests green, walked on a real device. Onboarding, the band, S1–S7, the Settings screen, and the calibration window — now seven days (ADR 0018) | Highest |
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
 | **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
-| **P1-G** The Run: weight & trend | **All four stories written, 9 Sep — not yet compiled.** Weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. ADR 0020 settles what the average is an average of | Medium |
+| **P1-G** The Run: weight & trend | **All four stories built and green, 10 Sep — not yet walked on a device.** Weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. 231 tests, 19 suites. ADR 0020 settles what the average is an average of | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
 | **P1-I** Offline-first sync | Outbox, last-write-wins, airplane-mode verification | High |
 | **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
@@ -700,20 +700,37 @@ result, the second needed a real barcode on a real tin.
 
 ## P1-G — what landed
 
-All four stories, 13 points, on branch `claude/weight-entry-impl-gfed70`. **Written, not
-yet built:** every line was produced in a Linux container with no Xcode, Swift toolchain
-or simulator. That caveat has now been carried by four epics in a row and has been worth
-carrying every time — the first ⌘U on P1-B found `OutboxEntry.entity`, which broke every
-write in the app and which nothing but running it could have found.
+All four stories, 13 points, on branch `claude/weight-entry-impl-gfed70`.
+
+**Compiled and green, 10 September.** Written the day before in a Linux container with no
+Xcode, Swift toolchain or simulator; the first Mac session built it, ran the full suite
+— **231 tests in 19 suites, all passing** — and launched the app. `Charts` and
+`HealthKit` both compiled first time, which is not what the previous three epics'
+caveats would have predicted.
+
+**Two SwiftLint violations under `--strict`, and both were this epic's.** Neither was a
+bug and both are recorded because the fix for each had a wrong version:
+
+- **`SwiftDataRepositories.swift` hit 401 lines against a 400-line limit.** Extracting
+  the shared `insert` helper for the batch import is what pushed it over. Split into
+  `SwiftDataWeightRepository.swift` — the one repository of the four that actually grew.
+  The wrong fix was trimming a comment until the number came down.
+- **`WeighIn` and `Pace` wrote out their own memberwise initialisers.** Deleted;
+  `unneeded_synthesized_initializer` is right. `BodyMassReading` keeps its init because
+  that one carries a default value and is therefore not synthesised.
+
+**Still not walked on a device.** The simulator has no Health app, so no HealthKit call
+has executed against real data, nothing has rendered at `.xSmall` or `.accessibility5`,
+and no real weigh-in has survived a rebuild. **Day 1 of the clock is still ahead.**
 
 **This epic is not one thing, and the running order says so.** The weight-entry surface
 is day 0; the rest lands underneath a clock that is already counting.
 
 | Story | Outcome |
 |---|---|
-| Weight entry: manual plus HealthKit | ✔ Both routes land in `weight_logs` with `source` set. Manual is offline by construction — nothing on the path is `async`. `HealthKitBodyMass` is the only file in `Ninety/` that imports HealthKit; everything else works against `BodyMassSourcing`. ✗ never rendered, and no HealthKit call has ever executed |
+| Weight entry: manual plus HealthKit | ✔ Both routes land in `weight_logs` with `source` set. Manual is offline by construction — nothing on the path is `async`. `HealthKitBodyMass` is the only file in `Ninety/` that imports HealthKit; everything else works against `BodyMassSourcing`. ✗ no HealthKit call has executed against real data — the simulator has no Health app |
 | No duplicate when the same reading arrives both ways | ✔ `WeightReconciliation` — three filters, tested. Ninety's own samples by `HKSource`, the same instant, and the same day within 0.1 kg. ✗ never exercised against a real scale |
-| 7-day EWMA in Swift Charts | ✔ `WeightTrend`, pure, with 16 tests and 48 assertions covering gaps, day collapse, entry order and a timezone change. ADR 0020 records what the average is an average of. ✗ no `Chart` has ever rendered |
+| 7-day EWMA in Swift Charts | ✔ `WeightTrend`, pure, with 16 tests and 48 assertions covering gaps, day collapse, entry order and a timezone change. ADR 0020 records what the average is an average of. ✗ no `Chart` has rendered outside a preview |
 | One-point and no-point trend states | ✔ Four states, not three: zero, one, a handful, and a full week. `TrendReadiness` counts *reading days* rather than points, which is the distinction Spike A's one-point trend was about |
 | Pace against the rate chosen at onboarding | ✔ Line derived from the S3-filtered rate on the profile, clamped at the S2-validated goal weight. Ahead is stated and never celebrated, with a test that says so by name |
 | The Run, as a screen | ✔ Headline, chart, range selector, legend, pace panel, reading list with removal, Apple Health section. ✗ never rendered, at any type size |
@@ -758,13 +775,13 @@ is day 0; the rest lands underneath a clock that is already counting.
   acceptance criterion asks for it. The duplicate filter for Ninety's own samples is in
   place anyway, inert rather than wrong, so the day that changes is a change to one array.
 
-**What the first Mac session has to check, in order:** that it compiles at all (`Charts`
-and `HealthKit` are both new imports); that the HealthKit entitlement and the two usage
-strings are picked up, because an app that asks for authorization without them crashes
-rather than fails; that The Run renders at `.xSmall` and `.accessibility5`, which is the
-capture debt P1-A opened and P1-H still carries; and that a real weigh-in lands, survives
-a rebuild, and appears on the chart. **Day 1 of the clock is that last one, not this
-commit.**
+**What is left, and all of it needs the phone rather than the simulator.** That the
+HealthKit entitlement and the two usage strings are picked up — an app that asks for
+authorization without them crashes rather than fails, and the App ID needs the HealthKit
+capability enabled at developer.apple.com the same way P1-C needed Sign in with Apple.
+That The Run renders at `.xSmall` and `.accessibility5`, which is the capture debt P1-A
+opened and P1-H still carries. And that a real weigh-in lands, survives a rebuild, and
+appears on the chart. **Day 1 of the clock is that last one.**
 
 ---
 
@@ -898,16 +915,18 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > the Bench, a Today list with correction and removal inside §2.3's 48-hour window, and
 > the per-user daily photo cap enforced server-side. 175 tests, 19 suites.
 >
-> **P1-G is written and not yet compiled (9 Sep).** All four stories: weight entry from
+> **P1-G is built and green (10 Sep), and not yet walked on a device.** All four stories: weight entry from
 > the keyboard and from Apple Health, the 7-day EWMA in Swift Charts, the zero / one /
 > handful / full-week states, and the pace against the S3-filtered rate on the profile.
 > The Run is a real screen rather than a holding note, `Ninety/Health/` is where the one
 > `import HealthKit` lives, and ADR 0020 settles what the average is an average of — the
 > series runs on calendar days, not on readings, so the chart measures the body rather
-> than the weighing habit. **The next session is a Mac**: `Charts` and `HealthKit` are
-> both new imports, the HealthKit entitlement and its two usage strings have never been
-> exercised, and nothing here has rendered at any type size. **Day 1 of the clock is a
-> real weigh-in on a real phone, not this commit.**
+> than the weighing habit. 231 tests in 19 suites pass and both new frameworks compiled
+> first time. **What is left needs the phone, not the simulator**: the HealthKit
+> entitlement and its two usage strings have never been exercised, the App ID needs the
+> HealthKit capability turned on at developer.apple.com, and nothing has rendered at
+> `.xSmall` or `.accessibility5`. **Day 1 of the clock is a real weigh-in on a real
+> phone.**
 >
 > **One gap named rather than buried, from P1-G.** The pace verdict does not say how thin
 > its evidence is. Two readings a fortnight apart put the trend almost exactly on the pace

@@ -49,14 +49,6 @@ struct Pace: Equatable, Sendable {
     /// downstream reads it. `docs/safety/` does not carry it for that reason.
     var corridorKg: Double { max(abs(ratePerWeekKg), 0.3) }
 
-    init(ratePerWeekKg: Double, anchorDay: Date, anchorKg: Double, goalKg: Double?, goalType: GoalType) {
-        self.ratePerWeekKg = ratePerWeekKg
-        self.anchorDay = anchorDay
-        self.anchorKg = anchorKg
-        self.goalKg = goalKg
-        self.goalType = goalType
-    }
-
     /// The pace for a profile, against a trend that has somewhere to start.
     ///
     /// Nil when there is no trend to anchor on. A pace line with no series under

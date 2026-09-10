@@ -11,11 +11,6 @@ import Foundation
 struct WeighIn: Equatable, Sendable {
     let measuredAt: Date
     let kg: Double
-
-    init(measuredAt: Date, kg: Double) {
-        self.measuredAt = measuredAt
-        self.kg = kg
-    }
 }
 
 /// One day on the trend line.
