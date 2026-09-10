@@ -40,7 +40,7 @@ struct SyncPanel: View {
                 .ninetyType(.subhead)
                 .foregroundStyle(Ninety.Colour.textSecondary)
 
-            if case .upToDate(let sent) = status, let sent {
+            if case .upToDate(let lastSent) = status, let sent = lastSent {
                 Text(SyncCopy.lastSent(at: sent))
                     .ninetyType(.footnote)
                     .foregroundStyle(Ninety.Colour.textTertiary)

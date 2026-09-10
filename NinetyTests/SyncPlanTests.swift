@@ -258,7 +258,8 @@ struct SyncPlanTests {
 
         let row = try #require(SyncPayload.row(for: estimate))
         let body = try #require(String(bytes: row.body, encoding: .utf8))
-        #expect(body.contains(try #require(String(bytes: verbatim, encoding: .utf8))))
+        let sent = try #require(String(bytes: verbatim, encoding: .utf8))
+        #expect(body.contains(sent))
         #expect(row.columns["log_id"] == .text(log.id.uuidString.lowercased()))
     }
 
