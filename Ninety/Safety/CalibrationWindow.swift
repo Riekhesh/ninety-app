@@ -13,7 +13,13 @@ import Foundation
 /// rules out exactly that pressure. Calendar days are not gameable because they
 /// cannot be earned.
 ///
-/// This is the only place the number seven appears in Swift.
+/// **This is the only place the *calibration* seven appears in Swift**, and the
+/// qualifier matters more each epic. `WeightTrend.windowDays` is also seven and
+/// so is `Form.windowDays`, and none of the three is the same decision: this one
+/// is ADR 0018's window before a first tier, the second is §1.5's smoothing
+/// span, the third is §2.2's consistency window. They move independently, which
+/// is why each names its own rather than sharing a constant that would look like
+/// agreement.
 struct CalibrationWindow: Equatable, Sendable {
     static let days = 7
 

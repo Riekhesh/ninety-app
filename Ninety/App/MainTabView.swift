@@ -54,10 +54,29 @@ struct MainTabView: View {
     @State private var features = CompetitiveFeatures(isOptedOut: false)
     @State private var calibration: CalibrationState?
 
+    /// Bumped when Sub On closes, to tell Matchday to re-read the day.
+    ///
+    /// **A counter rather than a call, because there is nothing here to call.**
+    /// `MatchdayView` owns its model in `@State`, so the instance this closure
+    /// constructs on every render is discarded after the first one — which is
+    /// the behaviour `TheRunModel` relies on and the reason neither model
+    /// fetches in `init`. The dashboard is *behind* the sheet rather than
+    /// replaced by it, so dismissing Sub On fires no `onAppear`, and a meal
+    /// logged into a sheet over a stale band would show the old figure until the
+    /// tab was left and come back to. One `Int` and one `onChange` is the whole
+    /// of the fix.
+    @State private var matchdayRefresh = 0
+
     var body: some View {
         TabView(selection: $destination) {
             Tab(Destination.matchday.title, systemImage: Destination.matchday.symbol, value: .matchday) {
                 MatchdayView(
+                    model: MatchdayModel(
+                        foods: repositories.food,
+                        profiles: repositories.profile,
+                        weights: repositories.weight
+                    ),
+                    refreshToken: matchdayRefresh,
                     subOn: { isSubbingOn = true },
                     openSettings: { isShowingSettings = true }
                 )
@@ -81,9 +100,17 @@ struct MainTabView: View {
         // Closing Sub On is the moment a meal has just been logged, and the one
         // point in the app where a drain has something new to carry. Everything
         // else is a timer or an event; this is the write itself.
+        //
+        // It is also the moment Matchday has something new to show, and the two
+        // are deliberately adjacent rather than entangled: the drain is asked to
+        // run and the dashboard is asked to re-read, neither waits on the other,
+        // and the screen would show the same figures with the radio off.
         .sheet(
             isPresented: $isSubbingOn,
-            onDismiss: { sync?.requestDrain() },
+            onDismiss: {
+                sync?.requestDrain()
+                matchdayRefresh += 1
+            },
             content: {
                 SubOnSheet(
                     repositories: repositories,

@@ -17,9 +17,15 @@ struct TheTableView: View {
     var body: some View {
         Screen(title: Destination.theTable.title, meta: calibration?.chip) {
             VStack(alignment: .leading, spacing: Ninety.Space.lg) {
+                // The division slot's copy lives in `MatchdayCopy`, because
+                // Matchday is where the badge actually lands in Phase 2 and this
+                // screen is the other place the same hole is drawn. Two screens
+                // with a division-shaped gap in them have to give the same
+                // answer for it, or one of them implies the other knows more —
+                // and two literals is how that drift starts.
                 HoldingNote(
-                    eyebrow: "Division",
-                    headline: "Ranking arrives in the next update.",
+                    eyebrow: MatchdayCopy.divisionHeading,
+                    headline: MatchdayCopy.divisionPlaceholder,
                     detail: detail
                 )
                 weights

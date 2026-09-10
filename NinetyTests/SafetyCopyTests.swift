@@ -41,6 +41,7 @@ struct SafetyCopyTests {
             + SettingsCopy.all
             + SubOnCopy.all
             + TheRunCopy.all
+            + MatchdayCopy.all
             + SyncCopy.all
             + Signposting.all
             + AuthFailure.allCases.compactMap(\.errorDescription)
@@ -58,9 +59,7 @@ struct SafetyCopyTests {
             + MealEstimateError.allCases.map(\.recoveryDescription)
             + CatalogueError.allCases.compactMap(\.errorDescription)
             + [
-                "Sub on", "Sub on. Log food.",
-                "No day started", "No readings", "Today", "Nothing logged yet.",
-                "Division", "Ranking arrives in the next update.",
+                "No readings", "Today", "Nothing logged yet.",
                 "How it will be scored", "Consistency", "Adherence", "Progress",
                 "Settings, support and your consent",
             ]
@@ -128,6 +127,33 @@ struct SafetyCopyTests {
         // colour of its own.
         #expect(DayMark.allCases.count == 2)
         #expect(!DayMark.missed.isFilled)
+
+        // P1-H's own version of the same rule, and the one most likely to
+        // acquire a judgement later: the string for a week with nothing in it.
+        // `0 of 7 days` is a count. "You missed 7 days" is on the banned list,
+        // and so is every phrasing near it.
+        #expect(MatchdayCopy.formDays(0) == "0 of 7 days")
+        #expect(!MatchdayCopy.formNote.lowercased().contains("should"))
+    }
+
+    /// P1-H's headline is the one figure on the dashboard that can go negative,
+    /// and §10 S5 decides what happens when it does: the eyebrow changes and the
+    /// colour does not.
+    ///
+    /// `BandState.above` is `.neutral`, so the figure is drawn in the same
+    /// `textPrimary` as any other day — a red 312 would be the app editorialising
+    /// about a meal, and there is no red in the token set to reach for.
+    @Test("a day above the band changes the words, not the colour")
+    func aDayAboveTheBandIsNotAnError() {
+        #expect(BandState.above.tone.colour == Tone.neutral.colour)
+        #expect(BandState.below.note != nil, "the one direction §10 cares about states what now")
+        #expect(BandState.above.note == nil, "and the other has nothing to add")
+
+        // The eyebrow is a fact rather than a verdict. `over budget` and
+        // `exceeded your` are both on the banned list, and the sweep above
+        // covers this string — this is the assertion that it says the right
+        // thing rather than merely not saying a wrong one.
+        #expect(MatchdayCopy.aboveYourBandBy == "Above your band by")
     }
 
     /// §1.2 and the Under Review ticket: a range is a figure and a tolerance,
