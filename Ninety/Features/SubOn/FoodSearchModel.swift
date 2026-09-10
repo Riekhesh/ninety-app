@@ -97,6 +97,24 @@ final class FoodSearchModel {
         }
     }
 
+    /// Waits for the scheduled catalogue search, if there is one.
+    ///
+    /// **Exists so that a test does not have to guess.** The debounce is real
+    /// time, so `FoodSearchTests` used to sleep for longer than it and assert
+    /// afterwards — a bet that the machine would get round to the work inside
+    /// the slack. P1-I collected on that bet: thirty-nine new `@MainActor`
+    /// tests, several building in-memory stores, ate the headroom, and "a query
+    /// with no match anywhere reaches the empty state" started failing while
+    /// being perfectly correct. It had 350 ms of margin and no guarantee.
+    ///
+    /// A longer sleep is not a fix, it is a longer bet. Awaiting the task is the
+    /// answer. It still costs the debounce, because the debounce is the thing
+    /// under test — correctness is worth 250 ms.
+    func settle() async {
+        guard let pending else { return }
+        await pending.value
+    }
+
     /// Everything the phone already holds, ranked the way the ticket asks.
     private func searchLocally() {
         let text = trimmed

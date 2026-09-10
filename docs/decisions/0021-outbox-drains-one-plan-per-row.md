@@ -169,3 +169,4 @@ restore path is a data-destroying code path nobody has exercised.
 | `Ninety/App/RootView.swift` · `MainTabView.swift` | The service is built per signed-in user; the stale P1-I note is corrected. The shell split off a 400-line limit |
 | `scripts/check_schema_parity.py` | Every column the drain sends is checked against migration 001 |
 | `NinetyTests/SyncPlanTests.swift` · `SyncTests.swift` | This ADR as assertions |
+| `Ninety/Features/SubOn/FoodSearchModel.swift` | `settle()`, because this epic's tests made a P1-F wall-clock wait start losing its bet |

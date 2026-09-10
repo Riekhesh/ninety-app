@@ -15,8 +15,8 @@ functions/` and `Ninety/Features/SubOn/` are its two halves. P1-G closed on 10 S
 and added `Ninety/Features/TheRun/` and `Ninety/Health/` — weight entry, the 7-day EWMA,
 and the one `import HealthKit` in the app. **P1-I's build landed on 10 September**:
 `Ninety/Sync/` is the first code that ever reads the outbox, and ADR 0021 settles how it
-drains. It has not been compiled and the airplane-mode day has not been run, so the
-epic is not closed.
+drains. It compiles and the suite is green (270 tests, 21 suites), but the airplane-mode
+day has not been run, so the epic is not closed.
 
 **⏱ The 21-day clock has been running since 9 September** (`docs/phase-1/README.md` is
 where it is counted). That is the single most important fact about this repo right now:
@@ -149,6 +149,12 @@ docs and design commits never spend the 200-minute budget.
   a count of times the *server refused this row*, and five of them park it. Charging one
   for a plane or a basement would take a week logged offline and land it already parked,
   which is the clock's failure mode written as a retry loop.
+- **No test may wait on a wall clock.** There is no `Task.sleep` in `NinetyTests/` and it
+  is worth keeping that way. `FoodSearchTests` used to sleep past a 250 ms debounce and
+  assert; P1-I's 39 new `@MainActor` tests ate the slack and it started failing while
+  being perfectly correct. A longer sleep is a longer bet — await the work instead
+  (`FoodSearchModel.settle()`). The cost of this kind of test always lands on somebody
+  else's ticket, looking like a bug they caused.
 - **Never show raw daily weight as the headline.** §1.5 calls it actively harmful, and it
   is the one display rule the brief argues for at length. The toggle exists and resets to
   off every time the screen appears.

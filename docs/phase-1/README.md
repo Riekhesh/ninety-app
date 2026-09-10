@@ -118,7 +118,7 @@ a gate quietly deferred.
 - [ ] **All four logging routes work, offline included** — **the four routes are done and walked on a device (P1-F, 9 Sep); the "offline included" half is not.** Manual is offline by construction and search degrades to the phone's own foods by design. **P1-I removed the part of this that was a hole rather than an untested claim** — something now drains the outbox — but neither route has been exercised with the radio actually off, and the drain itself has never run on a device. Still the airplane-mode day, and still deliberately not ticked: the criterion says *offline included*, and half a criterion is not a closed one
 - [ ] **HealthKit incremental sync with a persisted anchor** — proven the way Spike A proved it: 56,764 samples on a first read, ~0 on the next
 - [x] **Weight trend rendering as a moving average** — 7-day EWMA; raw daily weight is never the primary series. **Closed 10 Sep by P1-G**, on the evidence the criterion was written for: the chart renders on a real phone, the headline figure is the smoothed value and the raw dailies are off behind a toggle that resets every time the screen appears. `WeightTrend` is pure and carries 16 tests and 48 assertions, including the gaps that ADR 0020 is about
-- [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect. **P1-I built the mechanism (10 Sep) and did not verify it.** The drain, the ordering, last-write-wins, the backoff and the parked-row state all exist and carry 37 tests; **none of it has been compiled and none of those tests has been run**, and the criterion asks for a *day*, not a suite. What is left is exactly what the criterion says: log a real day with the radio off — food, weight, a correction — turn it back on, and check the server holds it once, in order, with nothing lost. `Settings → Sync` is the instrument that reads out
+- [ ] **Outbox sync verified in airplane mode** — a real day with the radio off, reconciled cleanly on reconnect. **P1-I built the mechanism and compiled it green (10 Sep); it has not been verified.** The drain, the ordering, last-write-wins, the backoff and the parked-row state all exist and are covered — 270 tests in 21 suites, all passing, including the queue kept whole with no connection, the day that arrives whole on reconnect, and a drain that never touches what was logged. **But the criterion asks for a *day*, not a suite**, and none of it has run on a phone. What is left is exactly what the criterion says: log a real day with the radio off — food, weight, a correction — turn it back on, and check the server holds it once, in order, with nothing lost. `Settings → Sync` is the instrument that reads out
 - [ ] **RLS policies on every table, tested with two accounts** — account A cannot touch account B's rows, proven repeatably
 - [x] **The seven §10 safety gates all built in** — S1 floor · S2 BMI rejection · S3 onboarding ceiling · S4 age gate · S5 lint rule active · S6 opt-out · S7 signposting. **Closed 8 Sep by P1-D**, on the evidence it was written for: every gate has the named tests `docs/safety/safety-requirements.md` asks for, all of them ran green on a device, and the flow was walked including an under-18 date of birth. Two halves are later phases *by the criterion's own wording* and are not silently included — S3's scoring half is Phase 2, S7's pattern triggers are Phase 3
 
@@ -142,7 +142,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
 | **P1-G** The Run: weight & trend | **CLOSED 10 Sep.** All four stories, walked on a real device: weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. 231 tests, 19 suites. ADR 0020 settles what the average is an average of | Medium |
 | **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
-| **P1-I** Offline-first sync | **Built 10 Sep, not yet compiled or walked.** `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and a panel in Settings. ADR 0021 settles the drain policy. The airplane-mode day is the half that is left | High |
+| **P1-I** Offline-first sync | **Compiled and green 10 Sep; not yet walked on a phone.** `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and a panel in Settings. ADR 0021 settles the drain policy. 270 tests, 21 suites. The airplane-mode day is the half that is left | High |
 | **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
 | **P1-X** Phase 1 exit criteria | The seven conditions above, mirrored as tickets | Highest |
 
@@ -826,12 +826,19 @@ does not, which is why it is in the runbook rather than only in a commit.
 
 ## P1-I — what landed
 
-Both stories' *build*, 8 points, on branch `p1-i`. **Written, not yet built:** every line
-of this was produced in a Linux container with no Xcode, Swift toolchain or simulator, so
-the epic is not closed until a Mac has compiled it and a phone has spent a day with the
-radio off. Everything that *could* be checked without a toolchain has been —
-`check_schema_parity.py` now reads the drain's columns against migration 001, and it
-passes.
+Both stories' *build*, 8 points, on branch `p1-i`.
+
+**Compiled and green, 10 September — 270 tests in 21 suites.** Written the same day in a
+Linux container with no Xcode, Swift toolchain or simulator; the Mac session built it and
+ran the suite. **One compile error and one test failure**, both recorded below, and
+neither in the drain's logic. The epic is still open: a phone has not spent a day with
+the radio off, which is the whole of the exit criterion.
+
+**The Linux linter earned its place, and so did the Linux checks.**
+`check_schema_parity.py` now reads the drain's columns against migration 001 and every
+enqueued table name against `SyncTable`; both pass without a Mac. `swiftlint-static`
+caught seven `--strict` violations before the first build. What none of them could catch
+was the one thing that did fail, which is the point of the section below.
 
 **The gap this closed is not "sync was slow", it is "sync did not exist".** Every write
 in the app has left a note in `sync_outbox` since P1-B, and nothing had ever read one.
@@ -844,8 +851,43 @@ attempted anything.
 | Outbox and the sync service | ✔ `Ninety/Sync/` — the plan, the payload, the PostgREST client, the service and the panel. Every mutation already enqueued; this drains it. Idempotent by construction: ids are minted on the device, so every write is an upsert and a replayed payload resolves to the row it already wrote. Backoff doubles from 2s to a 5-minute ceiling and is cancelled by a reconnect. `attempts` is honoured — five refusals and the row parks. The last-write-wins limitation is in ADR 0005 and now in [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md), which is what a future reader will actually find. ✗ never compiled |
 | Airplane-mode verification | ✗ **Not done, and not claimable.** The mechanism and the instrument exist; the day does not. This is the exit criterion, it needs a real day of use with the radio off, and it travels with P1-J |
 
+**The one compile error: a formatter that cannot be shared.** `SyncTime` held a
+`static let ISO8601DateFormatter`. That is an `NSFormatter` subclass — a class, not
+`Sendable` — so a shared one is exactly the mutable static `SWIFT_STRICT_CONCURRENCY =
+complete` refuses. Both obvious repairs are worse than dropping it: an instance per call
+allocates a formatter to print six columns, and a lock around a shared one is a mutex
+protecting a date. `SyncTime` had already hand-rolled `yyyy-MM-dd` to avoid
+`String(format:)` reading `%d` as a 32-bit width against a 64-bit `Int`, so the instant
+went the same way and the file now holds no shared state at all. It gained precision on
+the way: microseconds rather than milliseconds, which is what `timestamptz` stores and
+what `weight_logs` resolves its upsert against.
+
+**The one test failure was not in this epic's code, and it is the more interesting of
+the two.** `FoodSearchTests.noMatchAnywhere` — a P1-F test, untouched, passing since 9
+September — started failing. Nothing about search changed. What changed is the *timing
+environment*.
+
+`FoodSearchModel` debounces the catalogue call by 250 ms of real time. The tests slept
+600 ms and asserted afterwards, leaving 350 ms of slack for the debounce task to be
+scheduled and finish. Both the model and this epic's 39 new tests are `@MainActor`, and
+several of the new ones build in-memory `ModelContainer`s — they ran at 0.7–1.2 s each
+and held the MainActor exactly while the debounce was waiting for it. The headroom went.
+The test's own comment had called the interval *"long enough not to be flaky on a loaded
+machine"*, which was a guess, and adding tests falsified it.
+
+**The fix is not a longer sleep.** A sleep that is long enough is not a fix, it is a
+longer bet, and the next epic would collect on it again. `FoodSearchModel` gained
+`settle()` — it awaits the pending task — and all five sleeps in the suite became
+`await model.settle()`. It still costs the debounce, because the debounce is the thing
+under test; what it no longer costs is a guess about how busy the machine is. **There is
+now no `Task.sleep` anywhere in `NinetyTests/`**, which is worth keeping true.
+
+The general lesson is worth more than the fix: **a test suite that waits on a wall clock
+gets more fragile every time the suite grows.** It is a cost that arrives on somebody
+else's ticket, in somebody else's file, looking like a bug they caused.
+
 **Seven SwiftLint violations under `--strict`, all this epic's, all fixed before the
-commit — found on Linux.** `CONTRIBUTING.md` documents `swiftlint-static`, which runs on
+first build — found on Linux.** `CONTRIBUTING.md` documents `swiftlint-static`, which runs on
 Linux with no Swift toolchain and skips only the `custom_rules` block (those need
 SourceKit). It had never been used in this repo, and it earned its keep immediately: on a
 machine that cannot compile a line of Swift it caught every structural violation that
@@ -1068,15 +1110,15 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > on readings, so the chart measures the body rather than the weighing habit. 231 tests,
 > 19 suites.
 >
-> **P1-I is built and not yet compiled (10 Sep).** `Ninety/Sync/` is the first code that
+> **P1-I is built, compiled and green (10 Sep) — but not walked.** `Ninety/Sync/` is the first code that
 > ever reads `sync_outbox`: one plan per row, dependency order on the way up and the
 > reverse on the way down, upserts so a replay cannot duplicate, backoff on the
 > connection, and five refusals before a row parks. [ADR 0021](../decisions/0021-outbox-drains-one-plan-per-row.md)
 > settles the policy, and the one rule to hold on to is that **only a refusal of the row
 > costs the row an attempt** — a week logged on a plane must not land at the gate already
-> parked. `Settings → Sync` is the only surface. 37 tests written; **none of it has been
-> built or run, and the airplane-mode day has not happened**, so P1-I is not closed and
-> the exit criterion is still open. It also does not *pull*: the server copy protects the
+> parked. `Settings → Sync` is the only surface. **270 tests in 21 suites, all passing**
+> — but **none of it has run on a phone and the airplane-mode day has not happened**, so
+> P1-I is not closed and the exit criterion is still open. It also does not *pull*: the server copy protects the
 > 21 days against a lost phone and does not yet repopulate a new one, so a reinstall
 > still asks for consent twice.
 >
