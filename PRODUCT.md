@@ -110,8 +110,11 @@ photo-accuracy benchmark's data comes from.
   top-left, 2px chalk lines, one gold reserved for the division. Kit stripes are the
   club device. The product language is football throughout: Matchday (the day), Sub On
   (logging), The Table (rank), The Squad / On the Bench (frequent / recent foods),
-  First & Second Half (meal periods), Form (7-day consistency), Divisions (tiers,
-  chevrons carrying the count). Two directions were built and cut: Gauge (dark
+  the Team Sheet (the day's meals), Form (7-day consistency), Divisions (tiers,
+  chevrons carrying the count). **First & Second Half were cut in P1-H** (ADR 0022):
+  they were the world's name for a grouping derived from `logged_at`, and the
+  dashboard is where two buckets stopped saying more than the timestamps they came
+  from. Meals are breakfast, lunch and dinner. Two directions were built and cut: Gauge (dark
   instrument) and Split-Flap (departure board).
 - **Tier = division**, carried by chevron count and the word, never colour alone.
 - **The calorie range renders as a single figure plus tolerance** (`612 ±100`), never

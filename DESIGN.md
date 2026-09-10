@@ -27,7 +27,15 @@ reason.
 | Device | Kit stripes — gold, chalk, gold — beside every masthead and nowhere else |
 
 The language runs through the product rather than sitting on it: Matchday, Sub
-On, The Table, The Squad, On the Bench, First and Second Half, Form, Divisions.
+On, The Table, The Squad, On the Bench, the Team Sheet, Form, Divisions.
+
+> **First and Second Half are gone** (ADR 0022). They were the world's name for
+> a grouping derived from `logged_at`, and Matchday's team sheet is where two
+> buckets stopped being enough — `SECOND HALF · 778` answers no question anybody
+> has at breakfast, and it says less than the timestamps it came from. Meals are
+> breakfast, lunch and dinner now. The vocabulary is not weakened by it: the list
+> above is still every screen, every section and every state, and *the day is a
+> team sheet* was always the stronger half of that metaphor.
 
 ---
 
@@ -92,9 +100,15 @@ Three rules that are safety requirements rather than taste:
 `1,850 ±100`, not `1,750–1,950`; `340 ±50`, not `290–390`. The two forms read as
 different things: the dash form reads as a rule about where you are meant to
 stay, and the tolerance form reads as a target with slack in it — which is what
-a calorie band and a photo estimate both actually are. It holds in three places
-so far and will hold everywhere a range appears: `CalorieBand`, `EstimateRange`
-and the room left on Sub On. `SafetyCopyTests.rangesAreNeverDashed` is the check.
+a calorie band and a photo estimate both actually are. It holds in four places
+so far and will hold everywhere a range appears: `CalorieBand`, `EstimateRange`,
+the room left on Sub On, and the band under Matchday's headline.
+`SafetyCopyTests.rangesAreNeverDashed` is the check.
+
+> **The copy deck was wrong about this and has been corrected.** §3 wrote the
+> dashboard's band as `of 1,750–1,950 band` — the dash form, in the one document
+> that is meant to be the source for the strings this rule is about. It now reads
+> `of your 1,850 ±100 band`, which is what the build renders.
 
 **Never a decimal place on a calorie figure.** §1.2: hitting exactly 1,847 is not
 a real human goal. `no_false_precision_kcal` catches the formatted version, and
@@ -202,6 +216,53 @@ cannot tap is not.
 > the same series with no way to act on a row; the reading list is the only place
 > a mistyped weight can be removed, and a mistyped weight drags every trend value
 > after it for as long as it is stored.
+
+**Matchday is one reading and four instruments, in that order.** The figure and
+the pitch, then Form, the weight trend, the macro split, the division slot and
+the team sheet. The order is what the screen is for: the number somebody opened
+the app to see, then the thing the whole thesis leans on, then two panels that
+are context, then a slot that is honest about being empty, then the day itself
+with the way to add to it at the bottom.
+
+**Every panel on it can be empty, and none of them fills the gap with a number.**
+That is the § Numbers rule above, and Matchday is the screen most tempted to
+break it because it has the most holes to fill. No band is a sentence about
+Pre-Season, not a zero. No readings is the weight panel saying so, not a flat
+line. A day with nothing logged is a team sheet that says what will fill it. The
+macro panel is the sharpest case: macros live on the `foods` row a log points at,
+and three of the four routes can produce a log without one — so the panel states
+what fraction of the day it covers rather than presenting a partial total as a
+whole one.
+
+> **Deviation from the copy deck.** The deck labels the headline `CALORIES
+> REMAINING`; the build uses the artboard's `STILL TO PLAY WITH`. The Mode
+> section settles this the same way twice already — the world's vocabulary runs
+> through the product everywhere it costs nothing, and the deck wins where it
+> costs something. Under Review took HIGH / MEDIUM / LOW because that chip tells
+> somebody which number to go and check. This costs nothing: the figure has
+> `KCAL` beside it, and nobody needs to be told what "still to play with" means.
+
+> **Deviation from the artboards.** `Main.dc.html` draws Form as seven bars in a
+> row; the ticket calls it a ring. The build draws a ring **of seven discrete
+> segments**, which is both. A single sweeping arc was rejected for the same
+> reason a streak counter is: it reads as a quantity of progress that can be
+> lost, and this is a count of days that can only be added to. The segments keep
+> a missed day a gap in a sequence rather than a dent in a continuous arc —
+> §10 S5's *"empty, never crossed out"*, drawn rather than described.
+
+> **Deviation from the artboards.** `Main.dc.html` gives the division strip a
+> gold border, a chevron badge and `GOLD DIVISION · 0.71 this week`. The build
+> draws a `HoldingNote` with no tier in it at all. The artboard is a picture of
+> Phase 2, and the task's acceptance criterion is explicit that v1 carries no
+> invented tier, no sample rank and no other user's number. The strip also
+> disappears entirely under §10 S6's opt-out, which no artboard could have shown
+> because none of the six was drawn after the gates were written.
+
+**The dashboard says nothing about the network, and waits on nothing.**
+`MatchdayModel` has no reference to `SyncService` and neither do any of the views
+under it. A count of unsent rows here would be the plumbing leaking into the
+screen somebody opens to log breakfast; `Settings → Sync` is the only surface in
+the app that mentions it, and that is where the airplane-mode day was read off.
 
 **Pre-Season is four screens, and the last one carries two things.** About you ·
 starting weight · goal · your band. The band screen also holds the calibration

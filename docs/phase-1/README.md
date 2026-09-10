@@ -141,7 +141,7 @@ whatever day the minimum set lands, the phase cannot close fewer than 21 days la
 | **P1-E** HealthKit sync | Statistics-collection buckets, persisted anchor, background delivery, honest empty states | High |
 | **P1-F** Sub On: food logging, four routes | **CLOSED 9 Sep.** All four routes walked on a real device against the live project, 175 tests green. Manual, search, barcode, photo, the Squad and the Bench, the Under Review gate, the Edge Function and its per-user cap, the Today list, and the food mirror | High |
 | **P1-G** The Run: weight & trend | **CLOSED 10 Sep.** All four stories, walked on a real device: weight entry (manual + Apple Health), the 7-day EWMA in Swift Charts, the zero/one/handful/week states, and the pace against the S3-filtered rate. 231 tests, 19 suites. ADR 0020 settles what the average is an average of | Medium |
-| **P1-H** Matchday: the Today dashboard | Band, macros, sparkline, Form ring, division placeholder | High |
+| **P1-H** Matchday: the Today dashboard | **Written 10 Sep, NOT YET COMPILED.** All four stories and the task: the band and the pitch, the Form ring, the macro split with its coverage line, the weight sparkline off the same `WeightTrend`, the division placeholder, and the team sheet grouped by meal. [ADR 0022](../decisions/0022-meals-are-slots-derived-and-overridable.md) settles the parked slot question. Needs a Mac session — see below | High |
 | **P1-I** Offline-first sync | **CLOSED 10 Sep.** Both stories, walked on a real phone including a day with the radio off. `Ninety/Sync/` drains the outbox: one plan per row, dependency order, last-write-wins on server timestamps, backoff, parked rows, and the panel in Settings the day is read off. ADR 0021 settles the drain policy. 270 tests, 21 suites | High |
 | **P1-J** Dogfood: 21 consecutive days | The clock. **The photo-accuracy benchmark is deferred** — see below | Highest |
 | **P1-X** Phase 1 exit criteria | The seven conditions above, mirrored as tickets | Highest |
@@ -181,7 +181,9 @@ order laid out visually, is published at
    Pre-Season had already recorded. See [the clock](#the-one-thing-that-shapes-the-plan)
    for what day 1 actually consisted of.
 6. **Everything else, underneath a running clock**, in this order: ~~P1-G ·~~ ~~P1-I ·~~
-   **P1-H · P1-E**, then P1-J and P1-X. **The clock is running as of 9 September, so this
+   ~~P1-H~~ · **P1-E**, then P1-J and P1-X. P1-H is written and unbuilt as of
+   10 September, so it is struck through here on the same terms P1-A was: the commit is
+   not the close, the Mac session is. **The clock is running as of 9 September, so this
    is no longer a plan — it is the order the remaining epics land in while the days
    count.** P1-I closed on 10 September, airplane-mode day included, so the three weeks
    are no longer sitting on one phone with nothing draining the outbox. Sync was second
@@ -240,10 +242,13 @@ style the bundled families cannot render.
 **Consequence for the artboards:** their sizes are the Large baseline, not the layout.
 Every screen holding a metric owes a reflow at accessibility sizes.
 
-**Still outstanding:** Matchday captured at `.xSmall` and `.accessibility5`. Matchday is
-P1-H, so there is no dashboard to photograph yet — the mechanism and the harness exist
-(every view ships an `.accessibility5` preview; `DesignSystemTests.typeScales` asserts
-all sixteen styles respond to the content size category). Carried into P1-H.
+**Still outstanding:** Matchday captured at `.xSmall` and `.accessibility5`. **There is
+now a dashboard to photograph** — P1-H ships both previews by name, and every panel on it
+grows with the type through `@ScaledMetric` rather than sitting at a fixed size. What is
+still outstanding is the *capture*, which needs the device session that builds it. The
+mechanism and the harness have existed since P1-A (every view ships an `.accessibility5`
+preview; `DesignSystemTests.typeScales` asserts all sixteen styles respond to the content
+size category).
 
 ---
 
@@ -992,6 +997,105 @@ is still true — but the cost of a dropped phone is now a phone rather than the
 
 ---
 
+## P1-H — what landed
+
+Four stories and one task, 14 points, on branch `p1-h-matchday`.
+
+**Written 10 September. NOT YET COMPILED**, and that caveat is the most important line in
+this section. Every line of it was produced in a Linux container with no Xcode, no Swift
+toolchain and no simulator — the same position P1-A was in for six days, and the same
+rule applies: **the epic is not closed until a Mac has built it, run the suite and
+rendered it on a phone.** Everything that *could* be checked without a toolchain has
+been, and is marked as such below.
+
+| Story | Outcome |
+|---|---|
+| Band and remaining, on the pitch | ✔ `MatchdayView` + `PitchMeter`. One figure, its tolerance, and where the day sits. The figure goes negative rather than clamping, the eyebrow changes and the colour does not, and the band renders as `1,850 ±100`. The pitch runs a whole band's width past the box so a day over it has somewhere to be. ✗ never rendered |
+| Macro split | ✔ `MacroTotals` + `MacroPanel`. Scaled through `PortionBasis`, never through arithmetic in a view. Says what fraction of the day it covers. Tested at zero logs, one and twenty. ✗ never rendered |
+| Weight sparkline | ✔ `WeightPanel`. The same `WeightTrend` The Run builds, from the same repository — one calculation, two renderings, asserted by a test that compares the two models' `latestTrendKg`. Reads `TrendReadiness`, so the one-point state is designed rather than defaulted. ✗ never rendered |
+| Form: the 7-day consistency ring | ✔ `Form` + `FormGuide`. Seven segments always, calendar days in the user's own calendar, filled or hollow. No cross, no colour-only signal, no animation on the transition. ✗ never rendered |
+| Division badge placeholder | ✔ `DivisionSlot`. A `HoldingNote` with no tier in it, the same two strings The Table uses, and absent entirely under the §10 S6 opt-out. ✗ never rendered |
+
+**The parked product question is answered, and it turned into a schema change.**
+[ADR 0022](../decisions/0022-meals-are-slots-derived-and-overridable.md): meals are real
+slots — breakfast, lunch, dinner — **derived from `logged_at` by default and stored only
+where the user corrects the derivation.** Migration 007 adds a nullable `meal_slot` enum
+to `food_logs`; `MealPeriod` is deleted.
+
+The shape is the part worth remembering. **No logging route asks which meal it is**, so
+logging costs exactly the taps it did yesterday — which is the clock's constraint rather
+than a convenience, because a required field on the write path would spend the one thing
+this phase cannot compress on a label. The column exists so the derivation can be wrong:
+a night shift, a very late dinner. And a slot is written **only** where it disagrees with
+what the app would have derived, so `null` keeps meaning "the app worked this out" rather
+than decaying into "nobody has looked".
+
+### What the schema change cost, and what it caught
+
+- **The local store goes to V2.** `NinetySchemaV2` adds one optional property to one
+  model with a lightweight stage. This is the first schema change to land on a phone that
+  already holds logged days — precisely the case `NinetySchemaV1`'s own note was written
+  for — and it is the cheapest shape such a change can have: nil already means what every
+  existing row means, so there is nothing to backfill and no custom stage with anything to
+  do. **This is the highest-risk line in the epic for the clock** and the first thing the
+  Mac session should check: launch onto a store that already holds days, and confirm they
+  are all still there.
+- **`check_schema_parity.py` was reading one file and calling it the schema.** It had been
+  right until now: everything lived in migration 001. It would have reported `meal_slot` as
+  a column the drain sends that does not exist — a false failure, from a checker whose whole
+  job is to be trusted. It now concatenates every migration in filename order and folds in
+  `alter table … add column`. ✔ green on Linux, 12 checks.
+- **RLS needed no change, and the migration says so rather than leaving it to be assumed.**
+  The four `food_logs` policies are row-level, so a new column is covered the moment it
+  exists. §2.3's 48-hour lock covers it for the same reason — the lock is on the log, and
+  the slot is part of the log. There is a test for that.
+
+### Three things the build had to choose, and what it chose
+
+- **The Form ring against the artboard's bars.** `Main.dc.html` draws seven bars; the
+  ticket says ring. It is a ring **of seven discrete segments**, which is both. A single
+  sweeping arc was rejected for the reason a streak counter is: it reads as a quantity of
+  progress that can be lost, and this is a count of days that can only be added to.
+- **The macro panel's honesty against a tidier layout.** Macros live on the `foods` row a
+  log points at, and three of the four routes can produce a log without one — a quick add
+  by calories has none by construction. So the panel carries `From 3 of 5 items` rather
+  than presenting a partial total as a whole one. It is the least tidy thing on the screen
+  and the only version of it that is true.
+- **`STILL TO PLAY WITH` against the copy deck's `CALORIES REMAINING`.** The world's
+  vocabulary wins where it costs nothing, and this costs nothing. Recorded in `DESIGN.md`
+  alongside the two deviations that were settled the other way.
+
+**One thing the deck had wrong, now fixed.** §3 wrote the dashboard's band as
+`of 1,750–1,950 band` — the dash form — in the one document that is meant to be the source
+for the strings that rule is about. `DESIGN.md` § Numbers and
+`SafetyCopyTests.rangesAreNeverDashed` both say a range is a figure and a tolerance. The
+deck says so now too.
+
+### What a Mac session has to do before this closes
+
+1. **⌘U.** 25 new tests across `MatchdayTests`, `FormTests` and `MealSlotTests`, plus the
+   S5 sweep over `MatchdayCopy`. Nothing in this epic has ever been compiled.
+2. **Launch onto a store that already has days in it**, not a fresh install. The V2
+   migration is the one change here that can lose data, and a fresh simulator will not
+   exercise it.
+3. **Apply migration 007** to the live project, then log a meal and correct its slot with
+   the radio on — the column has to survive the round trip, and the drain has never sent
+   an enum that can be null.
+4. **Capture Matchday at `.xSmall` and `.accessibility5`.** Both previews exist by name.
+   This has been outstanding since P1-A and P1-H is the epic that can finally clear it.
+5. **Walk a day.** The screen is a dashboard, and a dashboard that has never been looked
+   at during an actual day is a layout.
+
+**What this epic does not touch, deliberately.** Nothing on Matchday mentions or waits on
+the network — `MatchdayModel` has no reference to `SyncService`, which is P1-I's
+constraint on this epic honoured as a dependency graph rather than as a comment. And the
+pace panel's thin-evidence gap that P1-G left open is **still open**: it is on The Run,
+not here, and widening this epic to fix it would have put an unbuilt change into a second
+screen. Matchday's own weight panel reads `TrendReadiness` from the first commit, so it
+does not repeat the mistake.
+
+---
+
 ## Out of scope, and where it went
 
 | | |
@@ -1103,9 +1207,11 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > ViewModels + protocol-based repositories, SwiftData local store with an outbox pattern
 > syncing to Supabase.
 >
-> Currently working on: **P1-H, the Matchday dashboard**. Everything below is verified on a real device
-> against the live project as of 10 September — not written-but-unbuilt. Where something
-> is written and not yet run, it says so.
+> Currently working on: **P1-H, the Matchday dashboard — written, and the next session is
+> the one that builds it.** Everything below is verified on a real device against the live
+> project as of 10 September *except P1-H itself*, which was written in a Linux container
+> with no Xcode and has never been compiled. Where something is written and not yet run, it
+> says so.
 >
 > P1-A is closed: the project builds, the type decision is ADR 0015 (Dynamic Type, two
 > bundled faces), the shell is three tabs with Sub On as a sheet, and `DESIGN.md` is the
@@ -1150,19 +1256,42 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > an empty store and asks for Article 9 consent a second time. And a `food_logs` delete
 > arriving after the 48-hour window is refused server-side by an RLS `using` clause, which
 > filters rather than raises — so the phone forgets the row and the server keeps it. Both
-> are written up in ADR 0021. **Two rules P1-H must not break:** no surface outside
-> `Settings → Sync` may mention the network — a count of unsent rows on Matchday is the
-> plumbing leaking into the screen someone opens to log breakfast — and nothing on any tab
-> may wait on it.
+> are written up in ADR 0021. **The two rules P1-H had to not break, and did not:** no
+> surface outside `Settings → Sync` mentions the network — `MatchdayModel` has no reference
+> to `SyncService` at all — and nothing on any tab waits on it.
+>
+> **P1-H is written and unbuilt (10 Sep).** All four stories and the task: the band and the
+> pitch, the Form ring, the macro split with its coverage line, the weight sparkline off the
+> same `WeightTrend` The Run draws, the division placeholder, and the team sheet grouped by
+> meal. It answers the parked product question as
+> [ADR 0022](../decisions/0022-meals-are-slots-derived-and-overridable.md) — real meal
+> slots, derived by default, stored only when corrected — which brings migration 007, a
+> nullable `meal_slot` enum, and the local store's first version bump to V2. **Nothing in
+> it has been compiled and migration 007 is not applied to the live project.** The Mac
+> session's checklist is in the P1-H section above; the first item is launching onto a
+> store that already holds days.
 >
 > **⏱ THE CLOCK IS RUNNING. Day 1 was 9 September; day 21 is 29 September at the
 > earliest.** This changes what "done" means for every remaining epic: *a change that
 > breaks a day's logging is a fix-now bug by definition*, because it resets a counter
 > that costs three weeks to rebuild. Before you ship anything, ask what it does to
-> tomorrow morning's log. **P1-H is the next ticket** — the Matchday dashboard — and it
-> is the last screen in the app that is still a holding note. Four of the seven exit
-> criteria are now closed; what remains is P1-H, P1-E's HealthKit sync, and the days
-> themselves.
+> tomorrow morning's log. **P1-H is written and not yet built** — the Matchday dashboard,
+> the last screen that was a holding note. It exists as code and has never been compiled,
+> so the next session is a Mac one and its checklist is in the P1-H section above. Four of
+> the seven exit criteria are closed; what remains is P1-H's device run, P1-E's HealthKit
+> sync, and the days themselves.
+>
+> **P1-H carries one change that can lose data, and it is the thing to check first.** The
+> local store goes to V2 for `food_logs.meal_slot` ([ADR 0022](../decisions/0022-meals-are-slots-derived-and-overridable.md)),
+> with a lightweight migration stage and nothing to backfill. Launch it onto a store that
+> already holds logged days rather than a fresh simulator, and confirm they are all still
+> there before anything else.
+>
+> **One thing P1-H leaves open, and it is inherited rather than new.** The pace panel on
+> The Run still does not say how thin its evidence is (below). Matchday's own weight panel
+> reads `TrendReadiness` from the first commit, so the dashboard does not repeat it — but
+> the fix on The Run was deliberately left out of this epic rather than widening an unbuilt
+> change into a second screen.
 >
 > **Two things P1-G left open, neither blocking.** The cross-source duplicate rule
 > (`WeightReconciliation`, 0.1 kg tolerance) is proven against mocks and has never met an
@@ -1177,11 +1306,13 @@ Neither blocks anything; both are the sort of thing that is annoying to discover
 > not been captured at `.xSmall` or `.accessibility5` — The Run has, so the capture debt
 > is now three screens rather than four.
 >
-> **One product question parked for P1-H:** whether Ninety grows real meal slots
-> (breakfast / lunch / dinner) or keeps First Half / Second Half. The Today list
-> currently groups by half, which costs no column — the half is a pure function of
-> `logged_at`. Real slots mean a migration and a Postgres enum, so it is a decision to
-> make with the dashboard in front of you rather than a patch.
+> **The product question parked for P1-H is answered.** Ninety has real meal slots —
+> breakfast, lunch, dinner — derived from `logged_at` by default and stored only where the
+> user corrects the derivation ([ADR 0022](../decisions/0022-meals-are-slots-derived-and-overridable.md)).
+> Migration 007 adds a nullable `meal_slot` enum to `food_logs` and `MealPeriod` is gone.
+> No logging route asks the question, so logging costs the same taps it did; the column
+> exists for the row the clock gets wrong. **Migration 007 has not been applied to the
+> live project yet** — that is on the Mac session's list along with everything else.
 >
 > Requirements: offline-first (the UI never waits on network), RLS on every table, photo
 > estimates always show ranges + confidence and require user confirmation. Ranges render

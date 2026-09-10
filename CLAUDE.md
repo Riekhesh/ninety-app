@@ -18,14 +18,26 @@ and the one `import HealthKit` in the app. **P1-I closed on 10 September** and a
 drains, and the airplane-mode day it exists for was walked on a real phone. 270 tests,
 21 suites.
 
+**P1-H is written and has never been compiled.** It landed on 10 September in a Linux
+container with no Xcode: `Ninety/Features/Matchday/` is a real dashboard — the band and
+the pitch, the Form ring, the macro split, the weight sparkline off the same
+`WeightTrend` The Run draws, the division placeholder, the team sheet — and ADR 0022
+answers the meal-slot question the tracker had parked. **Meals are breakfast, lunch and
+dinner now**, derived from `logged_at` and stored only where the user corrects the
+derivation; `MealPeriod` is gone, migration 007 adds the column, and the local store goes
+to schema V2. That last part is the thing to be careful with: it is the first schema
+change to reach a phone that already holds logged days. **17 test functions were added
+and none of them has been run** — the suite reads 287 `@Test`s across 24 suites as
+written, and the last number anybody actually watched go green is P1-I's 270 in 21.
+
 **⏱ The 21-day clock has been running since 9 September** (`docs/phase-1/README.md` is
 where it is counted). That is the single most important fact about this repo right now:
 **a change that breaks a day's logging is a fix-now bug by definition**, because it
 resets a counter that costs three weeks to rebuild. Ask what a change does to tomorrow
-morning's log before you ship it. **The next ticket is P1-H** — the Matchday dashboard,
-and the last screen in the app that is still a holding note. Four of the seven exit
-criteria are closed; what is left is P1-H, P1-E's HealthKit sync, and the days
-themselves.
+morning's log before you ship it. **The next session is a Mac one**: build P1-H, run the
+suite, apply migration 007, and launch onto a store that already has days in it. Four of
+the seven exit criteria are closed; what is left is P1-H's device run, P1-E's HealthKit
+sync, and the days themselves.
 
 **Read this file first and then only what you need.** Everything below is reference
 material — the whole repo is ~4,400 lines of prose and reading it end to end is a waste.
@@ -43,6 +55,7 @@ material — the whole repo is ~4,400 lines of prose and reading it end to end i
 | What Phase 0 closed on, and the product state | `docs/phase-0/README.md` (closed) + `PRODUCT.md` |
 | Why was X decided that way | `docs/decisions/README.md` index → the one ADR |
 | What the weight trend actually averages | ADR 0020 — calendar days, not readings. Read it before touching `WeightTrend` |
+| Why meals are breakfast/lunch/dinner, and what a null slot means | ADR 0022 — derived by default, stored only when corrected. Read it before touching `MealSlot` or migration 007 |
 | Is a number safe, what's banned in copy | `docs/safety/safety-requirements.md` |
 | Where does a key live, what if one leaks | `docs/security/secrets.md` |
 | What a screen should look like | `design/redesign/README.md` → the six PNGs in `screens/` |
@@ -67,7 +80,7 @@ docs/
   phase-1/     the LIVE tracker. Exit criteria, the running order, the 21-day clock.
                jira-import.csv seeded the board — 11 epics, 60 issues
   phase-0/     closed tracker. accounts.md is a runbook, not reading
-  decisions/   19 ADRs. Index first, then one file. Never renumber
+  decisions/   22 ADRs. Index first, then one file. Never renumber
   safety/      §10 as numbered rules S1-S7 with test names. Load-bearing for Phase 1
   security/    secrets policy. The anon key is public; RLS is the security boundary
 
@@ -104,6 +117,9 @@ Ninety/          the app. App/ · Auth/ · Data/ · DesignSystem/ · Features/ �
                  delete anything but a queue entry
   Features/TheRun/  weight entry, the EWMA, the chart, the pace. `WeightTrend` is pure
                  and calendar-injected, because Phase 2's progress score reads it
+  Features/Matchday/  the dashboard. `Form` and `MacroTotals` are pure and live here for
+                 the same reason `WeightTrend` does — consistency at 0.50 is the shape
+                 Phase 2 reads. Nothing under here may name the network
 NinetyTests/     unit tests (Swift Testing)
 Packages/        RankingEngine. Pure, no dependencies, three lint rules guard it
 Config/          xcconfig + Info.plist. Local.xcconfig (gitignored) holds your team id
@@ -160,6 +176,16 @@ docs and design commits never spend the 200-minute budget.
 - **Never show raw daily weight as the headline.** §1.5 calls it actively harmful, and it
   is the one display rule the brief argues for at length. The toggle exists and resets to
   off every time the screen appears.
+- **A null `meal_slot` is a statement, not a gap** (ADR 0022). It means "derive it from
+  `logged_at`", which is what almost every row means, because no logging route asks the
+  question. A value means the user corrected the derivation. Never backfill the column —
+  that would guess at three weeks of somebody's history and record the guess as their
+  word — and never store a slot that agrees with the derivation, which is what
+  `SwiftDataFoodRepository.update` is doing with that one comparison.
+- **The schema is no longer one file.** `check_schema_parity.py` reads every migration in
+  filename order and folds in `alter table … add column`; it used to read 001 alone and
+  was right to until 007. If you add a column in a later migration, the checker will find
+  it — but it only understands `add column`, so a `drop` needs teaching.
 
 ---
 

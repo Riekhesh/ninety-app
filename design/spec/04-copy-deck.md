@@ -255,20 +255,39 @@ that does not list it.
 
 ## 3. Today dashboard
 
-- Greeting: `Today` (no name, no time-of-day greeting — it ages badly and adds nothing)
-- Calories card label: `CALORIES REMAINING` · value · `of 1,750–1,950 band`
+- Masthead meta: the date — `Thu 10 Sep`. No name, no time-of-day greeting; it ages badly and adds nothing
+- Headline label, with room left: `STILL TO PLAY WITH` · value · `±100` · `KCAL`
+- Headline label, past the band: `ABOVE YOUR BAND BY` · value — the figure keeps counting rather than clamping at zero
+- Under it: `1,238 in · band 1,850 ±100`
 - In band: `In your band` (`positive`)
 - Above band: `Above your band` — **not** "over", **not** `critical`
 - Below band: `Below your band` + `Eating well under your band slows progress more often than it speeds it up.`
-- Consistency ring: `5 of 7 days`
-- Weight card: `78.4 kg` · `−1.2 kg vs 4 weeks ago` · `7-day average`
+- Pitch ends: `KICK OFF` · `THE BAND`
+- Form ring: `FORM · 7 DAYS` · `5 of 7 days` + `Consistency is weighted 0.50. It's the half of the score you control.`
+- Weight card: `WEIGHT · 7-DAY` · `78.4 kg` · `−1.2 kg`
+- Macro split: `MACROS` · `From 3 of 5 items` — the coverage is on the panel, not in a footnote
+- Team sheet: `TEAM SHEET` · `3 on · 1,238 kcal`, grouped `BREAKFAST` / `LUNCH` / `DINNER` (ADR 0022)
 - Tier slot pre-Phase 2: `Ranking arrives in the next update`
 - Tier slot during calibration: `CALIBRATING · 6 days to go` (of 7 — ADR 0018)
 
+> **Corrected in P1-H.** This section wrote the band as `of 1,750–1,950 band`, which is the
+> dash form the rest of the product rules out — in the one document that is meant to be the
+> source for the strings that rule is about. `DESIGN.md` § Numbers is explicit and
+> `SafetyCopyTests.rangesAreNeverDashed` is the check: a range is a figure and a tolerance.
+> It reads `1,850 ±100` now.
+>
+> The headline label is a **deviation the build makes deliberately** and it is recorded in
+> `DESIGN.md` rather than smoothed over here: the deck says `CALORIES REMAINING`, the build
+> uses the artboard's `STILL TO PLAY WITH`. The world's vocabulary wins where it costs
+> nothing, and this costs nothing.
+
 **Empty states** (principle 5 — permission-denied and no-data are worded identically, because
 the app genuinely cannot tell them apart):
-- Food: `Nothing logged yet today` + `Log a meal`
-- Weight: `No weight yet` + `Add today's weight`
+- Food: `Nothing logged yet today.` + `Sub on`
+- No band yet: `Finish Pre-Season to see your band.` — never a zero standing in for a number nobody computed
+- Weight: `No weight yet.` + the trend panel says the reading is on The Run
+- Macros: `No macros on today's logs.` + `Calories are what the band is made of, and every route records those. Macros come from the food's own figures, so a quick add by calories has none.`
+- Form, nothing in the window: `0 of 7 days` + `Nothing logged in the last seven days.` — a count, never `you missed`
 - Steps: `No step data` + `Connect Apple Health`
 - Steps after connecting, still empty: `No step data` + `Ninety reads steps from Apple Health when they're there.`
 
@@ -282,6 +301,11 @@ the app genuinely cannot tell them apart):
 - Empty search: `No match for "quinoa salad"` + `Add it manually` + `Foods come from Open Food Facts and USDA. Anything missing, you can add yourself.`
 - Offline: `Saved on your phone. It'll sync when you're back online.` — reassuring, not a warning.
 - Locked row: `Locked` + `Logs older than 48 hours can't be edited. It keeps scores honest.`
+- Correction sheet, meal picker: `Which meal?` · `Breakfast` / `Lunch` / `Dinner` + `Ninety reads this off the time you logged it. Move it if that is wrong.`
+
+That last note says what the app *did* rather than asking the user to do anything. The slot is
+derived from `logged_at` for almost every row (ADR 0022), so the right answer is already
+selected and the control is there for the night shift and the very late dinner.
 
 That last string states the anti-gaming rule plainly instead of leaving a mysterious disabled
 control. Users accept a rule they can see the point of.
